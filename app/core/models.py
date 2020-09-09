@@ -1,0 +1,325 @@
+from phonenumber_field.modelfields import PhoneNumberField
+
+from django.contrib.auth import get_user_model
+from django.contrib.auth.base_user import BaseUserManager
+from django.contrib.auth.models import AbstractUser, Group
+from django.core.validators import RegexValidator
+from django.db import models
+from django.utils.translation import gettext_lazy as _
+
+
+tax_id_validator = RegexValidator(
+    regex=r'^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$',
+    message='Invalid format. Must be: 00.000.000/0000-00'
+)
+
+branch_validator = RegexValidator(
+    regex=r'^\d{4}-\d{1}$',
+    message='Invalid format. Must be: 0000-0',
+)
+
+
+class CustomUserManager(BaseUserManager):
+    """
+    Define a model manager for User model with no username field.
+    """
+
+    def _create_user(self, email, password, **extra_fields):
+        """
+        Create and save a User with the given email and password.
+        """
+        if not email:
+            raise ValueError('The given email must be set')
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_user(self, email, password=None, **extra_fields):
+        """
+        Create and save a regular User with the given email and password.
+        """
+        extra_fields.setdefault('is_staff', False)
+        extra_fields.setdefault('is_superuser', False)
+        return self._create_user(email, password, **extra_fields)
+
+    def create_superuser(self, email, password, **extra_fields):
+        """
+        Create and save a SuperUser with the given email and password.
+        """
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError('Superuser must have is_staff=True.')
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError('Superuser must have is_superuser=True.')
+
+        return self._create_user(email, password, **extra_fields)
+
+
+class CustomUser(AbstractUser):
+    """
+    Base user model.
+    """
+
+    username_validator = None
+    username = None
+
+    email = models.EmailField(
+        _('email address'),
+        unique=True,
+    )
+    phone = PhoneNumberField(
+        _('Phone number'),
+        max_length=13,
+        null=True,
+    )
+    position = models.CharField(
+        _('Position In Company'),
+        max_length=100,
+    )
+    photo = models.ImageField(
+        _('Profile Photo'),
+        blank=True,
+        null=True,
+        upload_to='profile_pics',
+        help_text='User profile photo.'
+    )
+    companies = models.ManyToManyField(
+        'Company',
+        related_name='users',
+        through='Role',
+    )
+
+    objects = CustomUserManager()
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+
+    class Meta:
+        verbose_name = _('User')
+        verbose_name_plural = _('Users')
+
+
+class Company(models.Model):
+    """
+    Model for company registration.
+    """
+
+    FREIGHT_FORWARDER = 'agent'
+    CLIENT = 'client'
+
+    COMPANY_TYPE_CHOICES = (
+        (FREIGHT_FORWARDER, 'Freight forwarder'),
+        (CLIENT, 'Client'),
+    )
+
+    type = models.CharField(
+        _('Company Type'),
+        max_length=100,
+        choices=COMPANY_TYPE_CHOICES,
+    )
+    name = models.CharField(
+        _('Company Name'),
+        max_length=100,
+    )
+    address_line_first = models.CharField(
+        _('First address line'),
+        max_length=100,
+        null=True,
+    )
+    address_line_second = models.CharField(
+        _('Second address line'),
+        max_length=100,
+        blank=True,
+        null=True,
+    )
+    state = models.CharField(
+        _('State'),
+        max_length=100,
+    )
+    city = models.CharField(
+        _('City'),
+        max_length=100,
+    )
+    zip_code = models.CharField(
+        _('Zip Code'),
+        max_length=100,
+    )
+    phone = PhoneNumberField(
+        _('Phone number'),
+        max_length=13,
+        unique=True,
+    )
+    tax_id = models.CharField(
+        _('Tax id Number'),
+        max_length=18,
+        validators=[tax_id_validator],
+    )
+    employees_number = models.PositiveIntegerField(
+        _('Number of employees in company'),
+        default=1,
+    )
+    website = models.CharField(
+        _('Company website'),
+        max_length=100,
+        blank=True,
+        null=True,
+    )
+
+    def __str__(self):
+        return f'{self.name}'
+
+
+class SignUpRequest(models.Model):
+    """
+    Model for sing up request info.
+    """
+
+    type = models.CharField(
+        _('Company Type'),
+        max_length=100,
+        choices=Company.COMPANY_TYPE_CHOICES,
+    )
+    name = models.CharField(
+        _('Company Name'),
+        max_length=100,
+    )
+    address_line_first = models.CharField(
+        _('First address line'),
+        max_length=100,
+        null=True,
+    )
+    address_line_second = models.CharField(
+        _('Second address line'),
+        max_length=100,
+        blank=True,
+        null=True,
+    )
+    state = models.CharField(
+        _('State'),
+        max_length=100,
+    )
+    city = models.CharField(
+        _('City'),
+        max_length=100,
+    )
+    zip_code = models.CharField(
+        _('Zip Code'),
+        max_length=100,
+    )
+    phone = PhoneNumberField(
+        _('Phone number'),
+        max_length=13,
+        unique=True,
+    )
+    tax_id = models.CharField(
+        _('Tax id Number (00.000.000/0000-00)'),
+        max_length=18,
+        validators=[tax_id_validator],
+    )
+    employees_number = models.PositiveIntegerField(
+        _('Number of employees in company'),
+        default=1,
+    )
+    website = models.CharField(
+        _('Company website'),
+        max_length=100,
+        blank=True,
+        null=True,
+    )
+    master_email = models.EmailField(
+        _('Master email address'),
+        unique=True,
+    )
+
+    def __str__(self):
+        return f'Sign up request of company "{self.name}"'
+
+
+class SignUpToken(models.Model):
+    """
+    Model for sign up token info.
+    """
+
+    token = models.CharField(
+        _('Sign Up Token'),
+        max_length=30,
+    )
+    user = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+    )
+
+
+class Role(models.Model):
+    """
+    Model to connect company and users through django groups.
+    """
+
+    company = models.ForeignKey(
+        'Company',
+        on_delete=models.CASCADE,
+    )
+    user = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+    )
+    groups = models.ManyToManyField(
+        Group,
+        verbose_name=_('groups'),
+        help_text=_(
+            'The groups this user belongs to. A user will get all permissions '
+            'granted to each of their groups.'
+        ),
+        related_name="users",
+    )
+
+    def __str__(self):
+        return f'{self.user}, "{self.company}", {list(self.groups.all().values_list("name", flat=True))}'
+
+
+class BankAccount(models.Model):
+    """
+    Model for bank account info.
+    """
+
+    SAVINGS = 'savings'
+    CHECKING = 'checking'
+
+    ACCOUNT_TYPE_CHOICES = (
+        (SAVINGS, 'Savings'),
+        (CHECKING, 'Checking'),
+    )
+
+    bank_name = models.CharField(
+        _('Bank Name'),
+        max_length=100,
+    )
+    branch = models.CharField(
+        _('Branch Number (0000-0)'),
+        max_length=6,
+        validators=[branch_validator],
+    )
+    number = models.IntegerField(
+        _('Account Number'),
+    )
+    account_type = models.CharField(
+        _('Account Type'),
+        max_length=10,
+        choices=ACCOUNT_TYPE_CHOICES,
+    )
+    company = models.ForeignKey(
+        'Company',
+        on_delete=models.CASCADE,
+        related_name='bank_accounts',
+    )
+
+    class Meta:
+        verbose_name = _('Bank Account')
+        verbose_name_plural = _('Bank Accounts')
+
+    def __str__(self):
+        return f'{self.__class__.__name__} of company {self.company}'

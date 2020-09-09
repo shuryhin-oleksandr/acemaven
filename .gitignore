@@ -1,0 +1,7 @@
+__pycache__/
+.idea/
+.DS_Store
+config/settings/local.py
+config/static
+config/staticfiles
+config/media

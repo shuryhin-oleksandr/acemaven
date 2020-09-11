@@ -129,6 +129,18 @@ class UserSignUpView(CheckTokenMixin,
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
+class UserProfileView(mixins.RetrieveModelMixin,
+                      generics.GenericAPIView):
+    serializer_class = UserSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get_object(self):
+        return self.request.user
+
+    def get(self, request):
+        return self.retrieve(request)
+
+
 class CompanyActivateView(generics.GenericAPIView):
     permission_classes = (IsAuthenticated,)
 

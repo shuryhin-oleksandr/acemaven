@@ -8,7 +8,7 @@ from django.conf.urls import url
 from django.urls import path
 
 from app.core.views import CompanyEditViewSet, SignUpRequestViewSet, SignUpCheckView, UserSignUpView, \
-    UserViewSet, BankAccountViewSet, CompanyActivateView
+    UserViewSet, UserProfileView, BankAccountViewSet, CompanyActivateView
 
 
 app_name = 'projects'
@@ -41,6 +41,7 @@ urlpatterns += [
     path('signup-check/', SignUpCheckView.as_view()),
     path('signup/', UserSignUpView.as_view()),
     path('company-activate', CompanyActivateView.as_view()),
+    path('me/', UserProfileView.as_view()),
     url(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     url(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     url(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),

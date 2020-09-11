@@ -6,7 +6,7 @@ import logging
 logger = logging.getLogger("jettpro.task.logging")
 
 @celery_app.task
-def send_registration_email(message_body, recipient_email):
-    logger.info(f"[TASK] [EMAIL] going to send email []")
-
+def send_registration_email(token, recipient_email):
+    logger.info(f'New registration email going to be send to {recipient_email}')
+    message_body = f'{settings.DOMAIN_ADDRESS}signup?token={token}'
     send_mail('Acemaven. Registration process.', message_body, settings.DEFAULT_FROM_EMAIL, [recipient_email])

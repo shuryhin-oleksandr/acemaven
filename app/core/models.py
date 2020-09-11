@@ -1,3 +1,4 @@
+from django.db.models import Q
 from phonenumber_field.modelfields import PhoneNumberField
 
 from django.contrib.auth import get_user_model
@@ -102,6 +103,14 @@ class CustomUser(AbstractUser):
         verbose_name = _('User')
         verbose_name_plural = _('Users')
 
+    def get_roles(self):
+        return self.role_set.first().groups.all()
+
+    def set_roles(self, roles_list):
+        query_roles_list = [Q(name=role) for role in roles_list]
+        groups = Group.objects.filter(Q(*query_roles_list, _connector='OR'))
+        self.role_set.first().groups.set(groups)
+
 
 class Company(models.Model):
     """
@@ -167,6 +176,10 @@ class Company(models.Model):
         max_length=100,
         blank=True,
         null=True,
+    )
+    is_active = models.BooleanField(
+        _('Company is active'),
+        default=False,
     )
 
     def __str__(self):

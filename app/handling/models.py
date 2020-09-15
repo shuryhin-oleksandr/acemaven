@@ -13,6 +13,9 @@ class ShippingType(models.Model):
         max_length=20,
     )
 
+    def __str__(self):
+        return f'{self.title}'
+
 
 class ShippingMode(models.Model):
     """
@@ -28,6 +31,9 @@ class ShippingMode(models.Model):
         on_delete=models.CASCADE,
         related_name='shipping_modes',
     )
+
+    def __str__(self):
+        return f'{self.title} [{self.shipping_type}]'
 
 
 class PackagingType(models.Model):
@@ -200,6 +206,9 @@ class ReleaseType(models.Model):
         max_length=3,
     )
 
+    def __str__(self):
+        return f'{self.title} [{self.code}]'
+
 
 class Carrier(models.Model):
     """
@@ -286,9 +295,14 @@ class CommonFee(models.Model):
     """
 
     BOOKING = 'booking'
+    CANCELLATION_PENALTY = 'penalty'
+    AGENT_BOOKING = 'agent_booking'
     SERVICE = 'service'
+
     FEE_TYPE_CHOICES = (
         (BOOKING, 'Booking Fee'),
+        (CANCELLATION_PENALTY, 'Cancellation Penalty Fee'),
+        (AGENT_BOOKING, 'Agent Booking Fee'),
         (SERVICE, 'Service Fee'),
     )
 
@@ -296,7 +310,7 @@ class CommonFee(models.Model):
     PERCENT = 'percent'
     VALUE_TYPE_CHOICES = (
         (FIXED, 'Fixed value'),
-        (PERCENT, 'Percentage')
+        (PERCENT, 'Percentage'),
     )
 
     title = models.CharField(
@@ -305,7 +319,7 @@ class CommonFee(models.Model):
     )
     fee_type = models.CharField(
         _('Fee type'),
-        max_length=10,
+        max_length=20,
         choices=FEE_TYPE_CHOICES,
     )
     is_active = models.BooleanField(
@@ -337,6 +351,9 @@ class GlobalFee(CommonFee):
         on_delete=models.CASCADE,
         related_name='global_fees',
     )
+
+    def __str__(self):
+        return f'{self.title}, {self.fee_type}'
 
 
 class LocalFee(CommonFee):

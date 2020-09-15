@@ -247,6 +247,10 @@ class SignUpRequest(models.Model):
         _('Master email address'),
         unique=True,
     )
+    approved = models.BooleanField(
+        _('Approved'),
+        default=False,
+    )
 
     def __str__(self):
         return f'Sign up request of company "{self.name}"'

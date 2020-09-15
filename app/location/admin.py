@@ -1,3 +1,23 @@
 from django.contrib import admin
 
-# Register your models here.
+from app.location.models import Country, Region, State, InternationalZone
+
+
+@admin.register(Country)
+class CountryAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Region)
+class RegionAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(State)
+class StateAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(InternationalZone)
+class InternationalZoneAdmin(admin.ModelAdmin):
+    pass

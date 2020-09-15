@@ -18,6 +18,11 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 
+
+admin.site.site_header = 'Acemaven admin'
+admin.site.site_title = 'System Management'
+admin.site.index_title = 'Acemaven system management'
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/', include('app.core.urls', namespace='core')),

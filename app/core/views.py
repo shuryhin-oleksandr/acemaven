@@ -7,7 +7,7 @@ from rest_framework_jwt.settings import api_settings
 from django.contrib.auth import get_user_model, authenticate
 
 from app.core.models import BankAccount, Company, SignUpRequest, SignUpToken
-from app.core.permissions import IsMaster
+from app.core.permissions import IsMaster, IsMasterOrBilling
 from app.core.serializers import CompanySerializer, SignUpRequestSerializer, UserBaseSerializer, UserCreateSerializer, \
     UserSignUpSerializer, BankAccountSerializer, UserMasterSerializer, UserSerializer
 
@@ -40,7 +40,7 @@ class CreateMixin:
 class BankAccountViewSet(CreateMixin, viewsets.ModelViewSet):
     queryset = BankAccount.objects.all()
     serializer_class = BankAccountSerializer
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, IsMasterOrBilling, )
 
 
 class CompanyEditViewSet(mixins.RetrieveModelMixin,
@@ -49,21 +49,21 @@ class CompanyEditViewSet(mixins.RetrieveModelMixin,
                          viewsets.GenericViewSet):
     queryset = Company.objects.all()
     serializer_class = CompanySerializer
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, )
 
 
 class SignUpRequestViewSet(mixins.CreateModelMixin,
                            viewsets.GenericViewSet):
     queryset = SignUpRequest.objects.all()
     serializer_class = SignUpRequestSerializer
-    permission_classes = (AllowAny,)
+    permission_classes = (AllowAny, )
 
 
 class SignUpCheckView(mixins.RetrieveModelMixin,
                       CheckTokenMixin,
                       generics.GenericAPIView):
     serializer_class = UserBaseSerializer
-    permission_classes = (AllowAny,)
+    permission_classes = (AllowAny, )
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object().user
@@ -78,17 +78,16 @@ class UserViewSet(CreateMixin,
                   viewsets.ModelViewSet):
     queryset = get_user_model().objects.all()
     serializer_class = UserCreateSerializer
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, )
     permission_classes_by_action = {
-        'create': [IsMaster, ],
-        'destroy': [IsMaster, ],
-        'list': [IsMaster, ],
+        'create': [IsAuthenticated, IsMaster, ],
+        'destroy': [IsAuthenticated, IsMaster, ],
+        'list': [IsAuthenticated, IsMaster, ],
     }
 
     def get_serializer_class(self):
         if self.request.user.get_roles().filter(name='master').exists():
             if self.request.method == 'POST':
-                self.get_object()
                 return UserCreateSerializer
             elif self.request.method == 'GET':
                 return UserSerializer
@@ -107,7 +106,7 @@ class UserSignUpView(CheckTokenMixin,
                      generics.GenericAPIView):
     queryset = get_user_model().objects.all()
     serializer_class = UserSignUpSerializer
-    permission_classes = (AllowAny,)
+    permission_classes = (AllowAny, )
 
     def post(self, request, *args, **kwargs):
         token = self.get_object()
@@ -132,20 +131,10 @@ class UserSignUpView(CheckTokenMixin,
 class UserProfileView(mixins.RetrieveModelMixin,
                       generics.GenericAPIView):
     serializer_class = UserSerializer
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, )
 
     def get_object(self):
         return self.request.user
 
     def get(self, request):
         return self.retrieve(request)
-
-
-class CompanyActivateView(generics.GenericAPIView):
-    permission_classes = (IsAuthenticated,)
-
-    def post(self, request):
-        company = request.user.companies.first()
-        company.is_active = True
-        company.save()
-        return Response(status.HTTP_201_CREATED)

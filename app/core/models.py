@@ -111,6 +111,10 @@ class CustomUser(AbstractUser):
         groups = Group.objects.filter(Q(*query_roles_list, _connector='OR'))
         self.role_set.first().groups.set(groups)
 
+    @property
+    def roles(self):
+        return self.get_roles().values_list('name', flat=True)
+
 
 class Company(models.Model):
     """
@@ -166,6 +170,7 @@ class Company(models.Model):
         _('Tax id Number'),
         max_length=18,
         validators=[tax_id_validator],
+        unique=True,
     )
     employees_number = models.PositiveIntegerField(
         _('Number of employees in company'),
@@ -176,10 +181,6 @@ class Company(models.Model):
         max_length=100,
         blank=True,
         null=True,
-    )
-    is_active = models.BooleanField(
-        _('Company is active'),
-        default=False,
     )
 
     def __str__(self):
@@ -333,6 +334,10 @@ class BankAccount(models.Model):
         on_delete=models.CASCADE,
         related_name='bank_accounts',
     )
+    is_default = models.BooleanField(
+        _('Is default bank account or not'),
+        default=False,
+    )
 
     class Meta:
         verbose_name = _('Bank Account')
@@ -340,3 +345,8 @@ class BankAccount(models.Model):
 
     def __str__(self):
         return f'{self.__class__.__name__} of company {self.company}'
+
+    def save(self, *args, **kwargs):
+        if self.is_default:
+            BankAccount.objects.filter(company=self.company).update(is_default=False)
+        super(BankAccount, self).save(*args, **kwargs)

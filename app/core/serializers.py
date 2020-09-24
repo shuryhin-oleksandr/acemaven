@@ -2,18 +2,24 @@ from phonenumber_field.serializerfields import PhoneNumberField
 from rest_framework import serializers
 
 from django.db import transaction
-from django.contrib.auth import get_user_model, password_validation
-from django.core import exceptions
+from django.contrib.auth import get_user_model
 
 from app.core.models import BankAccount, Company, SignUpRequest, Role
 from app.core.utils import process_sign_up_token
+from app.core.validators import PasswordValidator
 
 
-class CompanySerializer(serializers.ModelSerializer):
+class CompanyBaseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Company
         fields = (
             'id',
+        )
+
+
+class CompanySerializer(CompanyBaseSerializer):
+    class Meta(CompanyBaseSerializer.Meta):
+        fields = CompanyBaseSerializer.Meta.fields + (
             'type',
             'name',
             'address_line_first',
@@ -46,13 +52,41 @@ class SignUpRequestSerializer(serializers.ModelSerializer):
             'master_email',
         )
 
+    def validate(self, attrs):
+        errors = {}
+        phone = attrs.get('phone')
+        email = attrs.get('master_email')
+        tax_id = attrs.get('tax_id')
+        users = get_user_model().objects.filter(email=email).exists()
+        companies = Company.objects.filter(phone=phone).exists()
+        tax_ids = Company.objects.filter(tax_id=tax_id).exists()
+        if users:
+            errors['master_email'] = 'User with provided email already exists.'
+        if companies:
+            errors['phone'] = 'Company with provided phone number already exists.'
+        if tax_ids:
+            errors['tax_id'] = 'Company with provided tax id already exists.'
+        if errors:
+            raise serializers.ValidationError(errors)
+        return attrs
 
-class UserCreateSerializer(serializers.Serializer):
-    first_name = serializers.CharField(max_length=150)
-    last_name = serializers.CharField(max_length=150)
-    email = serializers.EmailField()
-    position = serializers.CharField(max_length=100)
-    roles = serializers.ListField(write_only=True)
+
+class UserCreateSerializer(serializers.ModelSerializer):
+    first_name = serializers.CharField(required=False)
+    last_name = serializers.CharField(required=False)
+    position = serializers.CharField(required=False)
+    roles = serializers.ListField()
+
+    class Meta:
+        model = get_user_model()
+        fields = (
+            'id',
+            'first_name',
+            'last_name',
+            'email',
+            'position',
+            'roles',
+        )
 
     def validate(self, attrs):
         users = get_user_model().objects.filter(email=attrs.get('email'))
@@ -72,9 +106,13 @@ class UserCreateSerializer(serializers.Serializer):
         process_sign_up_token(user)
         return user
 
+    def get_get_role(self, obj):
+        return obj.get_roles().values_list('name', flat=True)
+
 
 class UserBaseSerializer(serializers.ModelSerializer):
-    roles = serializers.SerializerMethodField()
+    roles = serializers.ListField(read_only=True)
+    companies = CompanyBaseSerializer(many=True, read_only=True)
 
     class Meta:
         model = get_user_model()
@@ -88,23 +126,31 @@ class UserBaseSerializer(serializers.ModelSerializer):
             'roles',
         )
 
-    def get_roles(self, obj):
-        return obj.get_roles().values_list('name', flat=True)
-
 
 class UserSerializer(UserBaseSerializer):
+    password = serializers.CharField(min_length=8, max_length=25, write_only=True, validators=(PasswordValidator(), ))
+
     class Meta(UserBaseSerializer.Meta):
         fields = UserBaseSerializer.Meta.fields + (
             'phone',
             'photo',
+            'password',
         )
+
+    def update(self, instance, validated_data):
+        password = validated_data.pop('password', None)
+        if password:
+            instance.set_password(password)
+            instance.save()
+        super().update(instance, validated_data)
+        return instance
 
 
 class UserMasterSerializer(UserSerializer):
-    roles = serializers.ListField(write_only=True)
+    roles = serializers.ListField()
 
     def update(self, instance, validated_data):
-        roles = validated_data.pop('roles')
+        roles = validated_data.pop('roles', None)
         if roles:
             instance.set_roles(roles)
         super().update(instance, validated_data)
@@ -117,20 +163,14 @@ class UserSignUpSerializer(serializers.Serializer):
     email = serializers.EmailField()
     phone = PhoneNumberField()
     position = serializers.CharField(max_length=100)
-    password = serializers.CharField(min_length=8, max_length=25)
+    password = serializers.CharField(min_length=8, max_length=25, validators=(PasswordValidator(), ))
     confirm_password = serializers.CharField(min_length=8, max_length=25)
     photo = serializers.ImageField(required=False, allow_null=True)
 
     def validate(self, attrs):
         errors = {}
-        try:
-            password_validation.validate_password(attrs.get('password'))
-            if attrs.get('password') != attrs.get('confirm_password'):
-                errors['password'] = "Password fields didn't match."
-                raise serializers.ValidationError(errors)
-        except exceptions.ValidationError as e:
-            errors['password'] = list(e.messages)
-        if errors:
+        if attrs.get('password') != attrs.get('confirm_password'):
+            errors['password'] = "Password fields didn't match."
             raise serializers.ValidationError(errors)
         return attrs
 
@@ -147,10 +187,12 @@ class BankAccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = BankAccount
         fields = (
+            'id',
             'bank_name',
             'branch',
             'number',
             'account_type',
+            'is_default',
         )
 
     def create(self, validated_data):

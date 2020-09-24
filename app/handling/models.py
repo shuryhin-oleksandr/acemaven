@@ -104,10 +104,11 @@ class ContainerType(models.Model):
         _('Description'),
         max_length=100,
     )
-    mode = models.CharField(
-        _('Mode'),
-        max_length=20,
+    shipping_mode = models.ForeignKey(
+        'ShippingMode',
+        on_delete=models.SET_NULL,
         null=True,
+        related_name='container_types',
     )
     fcl_type = models.CharField(
         _('FCL type'),
@@ -175,6 +176,9 @@ class ContainerType(models.Model):
         max_length=150,
         null=True,
     )
+
+    def __str__(self):
+        return f'{self.code}'
 
 
 class IMOClass(models.Model):
@@ -371,6 +375,9 @@ class LocalFee(CommonFee):
         on_delete=models.CASCADE,
         related_name='fees',
     )
+
+    def __str__(self):
+        return f'{self.title}, {self.fee_type}, {self.company}'
 
 
 class Currency(models.Model):

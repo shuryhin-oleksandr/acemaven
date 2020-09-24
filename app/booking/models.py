@@ -171,3 +171,84 @@ class AdditionalSurcharge(models.Model):
 
     def __str__(self):
         return f'{self.title}'
+
+
+class FreightRate(models.Model):
+    """
+    Freight rate model.
+    """
+
+    carrier = models.ForeignKey(
+        'handling.Carrier',
+        on_delete=models.CASCADE,
+        related_name='freight_rates',
+    )
+    origin = models.ForeignKey(
+        'handling.Port',
+        on_delete=models.CASCADE,
+        related_name='origin_freight_rates',
+    )
+    destination = models.ForeignKey(
+        'handling.Port',
+        on_delete=models.CASCADE,
+        related_name='destination_freight_rates',
+    )
+    transit_time = models.PositiveIntegerField(
+        _('Transit time in days'),
+    )
+    shipping_mode = models.ForeignKey(
+        'handling.ShippingMode',
+        on_delete=models.CASCADE,
+        related_name='freight_rates',
+    )
+    company = models.ForeignKey(
+        'core.Company',
+        on_delete=models.CASCADE,
+        related_name='freight_rates',
+    )
+
+
+class Rate(models.Model):
+    """
+    Model for concrete amount of freight rate.
+    """
+
+    currency = models.ForeignKey(
+        'handling.Currency',
+        on_delete=models.CASCADE,
+    )
+    rate = models.DecimalField(
+        _('Rate amount'),
+        max_digits=15,
+        decimal_places=2,
+    )
+    start_date = models.DateField(
+        _('Rate start date'),
+    )
+    expiration_date = models.DateField(
+        _('Rate expiration date'),
+    )
+    updated_by = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.SET_NULL,
+        null=True,
+    )
+    date_updated = models.DateTimeField(
+        _('Date and time rate was updated'),
+        auto_now=True,
+    )
+    freight_rate = models.ForeignKey(
+        'FreightRate',
+        on_delete=models.CASCADE,
+        related_name='rates',
+    )
+    container_type = models.ForeignKey(
+        'handling.ContainerType',
+        on_delete=models.CASCADE,
+        null=True,
+    )
+    surcharge = models.ForeignKey(
+        'Surcharge',
+        on_delete=models.SET_NULL,
+        null=True,
+    )

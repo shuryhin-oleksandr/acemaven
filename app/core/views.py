@@ -40,7 +40,17 @@ class CreateMixin:
 class BankAccountViewSet(CreateMixin, viewsets.ModelViewSet):
     queryset = BankAccount.objects.all()
     serializer_class = BankAccountSerializer
-    permission_classes = (IsAuthenticated, IsMasterOrBilling, )
+    permission_classes = (IsAuthenticated, )
+    permission_classes_by_action = {
+        'create': [IsAuthenticated, IsMasterOrBilling, ],
+        'destroy': [IsAuthenticated, IsMasterOrBilling, ],
+        'update': [IsAuthenticated, IsMasterOrBilling, ],
+        'partial_update': [IsAuthenticated, IsMasterOrBilling, ],
+    }
+
+    def get_queryset(self):
+        user = self.request.user
+        return self.queryset.filter(company=user.companies.first())
 
 
 class CompanyEditViewSet(mixins.RetrieveModelMixin,

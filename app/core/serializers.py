@@ -192,6 +192,7 @@ class BankAccountSerializer(serializers.ModelSerializer):
             'branch',
             'number',
             'account_type',
+            'company',
             'is_default',
         )
 

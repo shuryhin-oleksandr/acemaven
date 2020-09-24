@@ -184,6 +184,8 @@ class UserSignUpSerializer(serializers.Serializer):
 
 
 class BankAccountSerializer(serializers.ModelSerializer):
+    company = serializers.IntegerField(source='company.id', read_only=True)
+
     class Meta:
         model = BankAccount
         fields = (

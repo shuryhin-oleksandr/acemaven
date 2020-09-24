@@ -19,6 +19,11 @@ branch_validator = RegexValidator(
     message='Invalid format. Must be: 0000-0',
 )
 
+bank_account_number_validator = RegexValidator(
+    regex=r'^\d+$',
+    message='Invalid format. Must contains only numbers',
+)
+
 
 class CustomUserManager(BaseUserManager):
     """
@@ -321,8 +326,10 @@ class BankAccount(models.Model):
         max_length=6,
         validators=[branch_validator],
     )
-    number = models.IntegerField(
+    number = models.CharField(
         _('Account Number'),
+        max_length=50,
+        validators=[bank_account_number_validator],
     )
     account_type = models.CharField(
         _('Account Type'),

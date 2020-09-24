@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_jwt',
     'drf_yasg',
+    'rest_auth',
 
     'app.core',
     'app.booking',
@@ -175,3 +176,6 @@ JWT_AUTH = {
     'JWT_ALLOW_REFRESH': True,
     'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=7),
 }
+
+# Rest Auth
+OLD_PASSWORD_FIELD_ENABLED = True

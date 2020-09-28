@@ -9,6 +9,10 @@ from app.core.utils import master_account_processing
 from app.handling.models import LocalFee
 
 
+MASTER_ACCOUNT_FIELDS = ['email', 'first_name', 'last_name', 'master_phone', 'position', ]
+EXCLUDE_FIELDS = ['id', 'approved', *MASTER_ACCOUNT_FIELDS]
+
+
 class LocalFeeInline(admin.TabularInline):
     model = LocalFee
     extra = 0
@@ -111,17 +115,18 @@ class SignUpRequestAdmin(admin.ModelAdmin):
             else:
                 try:
                     with transaction.atomic():
-                        company_info = model_to_dict(obj, exclude=['id', 'master_email', 'approved'])
+                        company_info = model_to_dict(obj, exclude=EXCLUDE_FIELDS)
                         company = Company.objects.create(**company_info)
-                        master_account_processing(company, obj.master_email)
+                        master_account_info = {item if 'master_' not in item else item.replace('master_', ''): getattr(obj, item) for item in MASTER_ACCOUNT_FIELDS}
+                        master_account_processing(company, master_account_info)
                         obj.approved = True
                         obj.save()
-                    token = SignUpToken.objects.filter(user=get_user_model().objects.filter(email=obj.master_email).first()).first().token
+                    token = SignUpToken.objects.filter(user=get_user_model().objects.filter(email=obj.email).first()).first().token
                     self.message_user(request, "Company saved. Link to register master account was sent.")
                     self.message_user(request, f"Registration link - 192.168.1.33:8000/create-account?token={token}")
                     # TODO: Do not push test user message and token.
                 except Exception as error:
-                    self.message_user(request, f"Company with provided phone number already exists. "
+                    self.message_user(request, f"Company with provided phone number or tax id already exists. "
                                                f"Additional info [{error}]")
             return HttpResponseRedirect(".")
         return super().response_change(request, obj)

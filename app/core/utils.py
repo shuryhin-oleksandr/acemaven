@@ -16,8 +16,8 @@ def process_sign_up_token(user):
     send_registration_email.delay(sign_up_token.token, user.email)
 
 
-def master_account_processing(company, email):
-    user = get_user_model().objects.create(email=email)
+def master_account_processing(company, master_account_info):
+    user = get_user_model().objects.create(**master_account_info)
     Role.objects.create(company=company, user=user)
     user.set_roles(['master'])
     process_sign_up_token(user)

@@ -249,13 +249,33 @@ class SignUpRequest(models.Model):
         blank=True,
         null=True,
     )
-    master_email = models.EmailField(
-        _('Master email address'),
-        unique=True,
-    )
     approved = models.BooleanField(
         _('Approved'),
         default=False,
+    )
+    email = models.EmailField(
+        _('Master email address'),
+        unique=True,
+    )
+    first_name = models.CharField(
+        _('Master first name'),
+        max_length=150,
+        null=True,
+    )
+    last_name = models.CharField(
+        _('Master last name'),
+        max_length=150,
+        null=True,
+    )
+    master_phone = PhoneNumberField(
+        _('Master phone number'),
+        max_length=13,
+        null=True,
+    )
+    position = models.CharField(
+        _('Master position in company'),
+        max_length=100,
+        null=True,
     )
 
     def __str__(self):

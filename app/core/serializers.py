@@ -49,13 +49,17 @@ class SignUpRequestSerializer(serializers.ModelSerializer):
             'tax_id',
             'employees_number',
             'website',
-            'master_email',
+            'email',
+            'first_name',
+            'last_name',
+            'master_phone',
+            'position',
         )
 
     def validate(self, attrs):
         errors = {}
         phone = attrs.get('phone')
-        email = attrs.get('master_email')
+        email = attrs.get('email')
         tax_id = attrs.get('tax_id')
         users = get_user_model().objects.filter(email=email).exists()
         companies = Company.objects.filter(phone=phone).exists()

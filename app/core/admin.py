@@ -142,7 +142,7 @@ class SignUpRequestAdmin(admin.ModelAdmin):
                     with transaction.atomic():
                         company_info = model_to_dict(obj, exclude=EXCLUDE_FIELDS)
                         company = Company.objects.create(**company_info)
-                        master_account_info = {item if 'master_' not in item else item.replace('master_', ''): getattr(obj, item) for item in MASTER_ACCOUNT_FIELDS}
+                        master_account_info = {'email': obj.email}
                         master_account_processing(company, master_account_info)
                         obj.approved = True
                         obj.save()

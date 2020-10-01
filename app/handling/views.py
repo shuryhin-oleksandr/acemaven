@@ -8,8 +8,8 @@ from django.db.models import BooleanField, Case, QuerySet, When
 
 
 from app.handling.filters import CarrierFilterSet, PortFilterSet
-from app.handling.models import Carrier, Port
-from app.handling.serializers import CarrierSerializer, PortSerializer
+from app.handling.models import Carrier, Port, ShippingMode, ShippingType
+from app.handling.serializers import CarrierSerializer, PortSerializer, ShippingModeSerializer, ShippingTypeSerializer
 
 
 class CarrierViewSet(mixins.ListModelMixin,
@@ -41,3 +41,17 @@ class PortViewSet(mixins.ListModelMixin,
             output_field=BooleanField(),
         ))
         return queryset
+
+
+class ShippingModeViewSet(mixins.ListModelMixin,
+                          viewsets.GenericViewSet):
+    queryset = ShippingMode.objects.all()
+    serializer_class = ShippingModeSerializer
+    permission_classes = (IsAuthenticated, )
+
+
+class ShippingTypeViewSet(mixins.ListModelMixin,
+                          viewsets.GenericViewSet):
+    queryset = ShippingType.objects.all()
+    serializer_class = ShippingTypeSerializer
+    permission_classes = (IsAuthenticated, )

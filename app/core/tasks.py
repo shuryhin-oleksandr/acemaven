@@ -1,12 +1,27 @@
+import logging
 from config.celery import celery_app
 from django.core.mail import send_mail
 from django.conf import settings
-import logging
+
+from app.handling.models import LocalFee, ShippingMode
 
 logger = logging.getLogger("jettpro.task.logging")
 
+
 @celery_app.task
 def send_registration_email(token, recipient_email):
-    logger.info(f'New registration email going to be send to {recipient_email}')
+    logger.info(f'New registration email is going to be send to {recipient_email}')
     message_body = f'{settings.DOMAIN_ADDRESS}signup?token={token}'
     send_mail('Acemaven. Registration process.', message_body, settings.DEFAULT_FROM_EMAIL, [recipient_email])
+
+
+@celery_app.task
+def create_company_empty_fees(company):
+    logger.info(f'New empty fees are going to be created for company {str(company)}')
+    new_fees = [
+        {'fee_type': value_type[0], 'company_id': company, 'shipping_mode': shipping_mode}
+        for value_type in LocalFee.FEE_TYPE_CHOICES
+        for shipping_mode in ShippingMode.objects.all()
+    ]
+    new_fees_objects = [LocalFee(**field) for field in new_fees]
+    LocalFee.objects.bulk_create(new_fees_objects)

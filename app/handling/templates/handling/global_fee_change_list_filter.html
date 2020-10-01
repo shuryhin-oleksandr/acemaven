@@ -1,0 +1,11 @@
+{% load i18n %}
+<h3>{% blocktranslate with filter_title=title %} By {{ filter_title }} {% endblocktranslate %}</h3>
+<p>
+{% for choice in choices %}
+    <input type="button"
+           onclick="location.href='{{ choice.query_string|iriencode }}'"
+           value="{{ choice.display }}"
+           {% if choice.selected %}style="color: black"{% endif %}
+    >
+{% endfor %}
+</p>

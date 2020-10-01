@@ -21,7 +21,7 @@ class AirlineAdmin(admin.ModelAdmin):
 
 @admin.register(Carrier)
 class CarrierAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('title', 'shipping_type', )
 
 
 @admin.register(ReleaseType)
@@ -54,13 +54,32 @@ class ShippingTypeAdmin(admin.ModelAdmin):
     list_display = ('title',)
 
 
+class ListTopFilter(admin.filters.ChoicesFieldListFilter):
+    template = 'handling/global_fee_change_list_filter.html'
+
+
+class RelatedListTopFilter(admin.filters.RelatedFieldListFilter):
+    template = 'handling/global_fee_change_list_filter.html'
+
+
 @admin.register(GlobalFee)
 class GlobalFeeAdmin(admin.ModelAdmin):
-    list_display = ('title', 'fee_type', 'value', 'value_type', 'shipping_mode', 'is_active',)
+    change_list_template = 'handling/global_fee_change_list.html'
+    list_display = ('shipping_mode', 'value_type', 'value', 'is_active', )
+    radio_fields = {'value_type': admin.VERTICAL}
+    list_editable = ('value', 'value_type', 'is_active',)
+    list_filter = (
+        ('fee_type', ListTopFilter),
+    )
+    ordering = ('-shipping_mode', )
 
 
 @admin.register(LocalFee)
 class LocalFeeAdmin(admin.ModelAdmin):
-    list_display = ('title', 'fee_type', 'value', 'value_type', 'shipping_mode', 'company', 'is_active',)
-    search_fields = ('company', 'fee_type',)
-    list_filter = ('company', 'fee_type',)
+    change_list_template = 'handling/global_fee_change_list.html'
+    list_display = ('fee_type', 'value', 'value_type', 'shipping_mode', 'company', 'is_active',)
+    search_fields = ('company__name', 'fee_type',)
+    list_filter = (
+        ('company', RelatedListTopFilter, ),
+        ('fee_type', ListTopFilter, ),
+    )

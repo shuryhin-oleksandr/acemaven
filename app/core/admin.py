@@ -1,3 +1,5 @@
+from tabbed_admin import TabbedModelAdmin
+
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.db import transaction
@@ -7,6 +9,7 @@ from django.http import HttpResponseRedirect
 from app.core.models import CustomUser, Company, BankAccount, Role, SignUpRequest, SignUpToken
 from app.core.utils import master_account_processing
 from app.handling.models import LocalFee
+from app.core.tasks import create_company_empty_fees
 
 
 MASTER_ACCOUNT_FIELDS = ['email', 'first_name', 'last_name', 'master_phone', 'position', ]
@@ -14,8 +17,16 @@ EXCLUDE_FIELDS = ['id', 'approved', *MASTER_ACCOUNT_FIELDS]
 
 
 class LocalFeeInline(admin.TabularInline):
+    template = 'core/local_fee_inline_tabular.html'
     model = LocalFee
     extra = 0
+
+    def get_queryset(self, request):
+        fee_type = request.GET.get('fee_type', 'booking')
+        queryset = super().get_queryset(request)
+        if not self.has_view_or_change_permission(request):
+            queryset = queryset.none()
+        return queryset.filter(fee_type=fee_type)
 
 
 class RoleInline(admin.TabularInline):
@@ -78,23 +89,37 @@ class CustomUserAdmin(admin.ModelAdmin):
 
 
 @admin.register(Company)
-class CompanyAdmin(admin.ModelAdmin):
-    list_display = (
-        'name',
-        'type',
-        'phone',
-    )
-    list_filter = (
-        'name',
-    )
-    search_fields = (
-        'name',
-        'type',
-    )
-    inlines = (
+class CompanyAdmin(TabbedModelAdmin):
+    model = Company
+
+    tab_company = (
+        (None, {
+            'fields': (
+                'type',
+                'name',
+                (
+                    'address_line_first',
+                    'address_line_second',
+                ),
+                'state',
+                'city',
+                'zip_code',
+                'phone',
+                'tax_id',
+                'employees_number',
+                'website',
+            )
+        }),
         RoleInline,
-        BankAccountInline,
+    )
+
+    tab_fee = (
         LocalFeeInline,
+    )
+
+    tabs = (
+        ('Company', tab_company),
+        ('Fees', tab_fee),
     )
 
 
@@ -121,6 +146,7 @@ class SignUpRequestAdmin(admin.ModelAdmin):
                         master_account_processing(company, master_account_info)
                         obj.approved = True
                         obj.save()
+                    create_company_empty_fees.delay(company.id)
                     token = SignUpToken.objects.filter(user=get_user_model().objects.filter(email=obj.email).first()).first().token
                     self.message_user(request, "Company saved. Link to register master account was sent.")
                     self.message_user(request, f"Registration link - 192.168.1.33:8000/create-account?token={token}")

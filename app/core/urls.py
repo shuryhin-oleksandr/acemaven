@@ -12,7 +12,7 @@ from app.core.views import CompanyEditViewSet, SignUpRequestViewSet, SignUpCheck
     UserViewSet, UserProfileView, BankAccountViewSet
 
 
-app_name = 'projects'
+app_name = 'core'
 
 schema_view = get_schema_view(
    openapi.Info(

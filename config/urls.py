@@ -25,7 +25,8 @@ admin.site.index_title = 'Acemaven system management'
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/v1/', include('app.core.urls', namespace='core')),
+    path('api/v1/core/', include('app.core.urls', namespace='core')),
+    path('api/v1/handling/', include('app.handling.urls', namespace='handling')),
 ]
 
 if settings.DEBUG:

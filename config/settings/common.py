@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'rest_framework_jwt',
     'drf_yasg',
     'rest_auth',
+    'tabbed_admin',
 
     'app.core',
     'app.booking',
@@ -154,6 +155,8 @@ USE_L10N = True
 
 USE_TZ = True
 
+COUNTRY_OF_ORIGIN_CODE = 'BR'
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
@@ -179,3 +182,6 @@ JWT_AUTH = {
 
 # Rest Auth
 OLD_PASSWORD_FIELD_ENABLED = True
+
+# Tabbed Admin
+TABBED_ADMIN_USE_JQUERY_UI = True

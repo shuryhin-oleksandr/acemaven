@@ -52,6 +52,7 @@ class PackagingType(models.Model):
     description_pt = models.CharField(
         _('Description PT'),
         max_length=100,
+        null=True,
     )
     height = models.DecimalField(
         _('Height'),
@@ -71,6 +72,7 @@ class PackagingType(models.Model):
     dimension_unit = models.CharField(
         _('Dimension unit'),
         max_length=10,
+        null=True,
     )
     weight = models.DecimalField(
         _('Weight'),
@@ -80,7 +82,11 @@ class PackagingType(models.Model):
     weight_unit = models.CharField(
         _('Weight unit'),
         max_length=10,
+        null=True,
     )
+
+    def __str__(self):
+        return f'{self.code}, {self.description}'
 
 
 class ContainerType(models.Model):
@@ -317,10 +323,6 @@ class CommonFee(models.Model):
         (PERCENT, 'Percentage'),
     )
 
-    title = models.CharField(
-        _('Fee title'),
-        max_length=50,
-    )
     fee_type = models.CharField(
         _('Fee type'),
         max_length=20,
@@ -328,17 +330,19 @@ class CommonFee(models.Model):
     )
     is_active = models.BooleanField(
         _('Fee enabled'),
-        default=True,
+        default=False,
     )
     value = models.DecimalField(
         _('Fee value'),
         max_digits=15,
         decimal_places=2,
+        default=0,
     )
     value_type = models.CharField(
         _('Value type'),
         max_length=10,
         choices=VALUE_TYPE_CHOICES,
+        default=FIXED,
     )
 
     class Meta:
@@ -357,7 +361,7 @@ class GlobalFee(CommonFee):
     )
 
     def __str__(self):
-        return f'{self.title}, {self.fee_type}'
+        return f'{self.fee_type}'
 
 
 class LocalFee(CommonFee):
@@ -377,7 +381,7 @@ class LocalFee(CommonFee):
     )
 
     def __str__(self):
-        return f'{self.title}, {self.fee_type}, {self.company}'
+        return f'{self.fee_type}, {self.company}'
 
 
 class Currency(models.Model):
@@ -484,7 +488,7 @@ class Port(gis_models.Model):
         _('Has unload?'),
         default=False,
     )
-    name_with_dicriticals = models.CharField(
+    name_with_diacriticals = models.CharField(
         _('Name with diacriticals'),
         max_length=100,
     )

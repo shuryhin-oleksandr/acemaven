@@ -247,8 +247,7 @@ class Rate(models.Model):
         on_delete=models.CASCADE,
         null=True,
     )
-    surcharge = models.ForeignKey(
+    surcharges = models.ManyToManyField(
         'Surcharge',
-        on_delete=models.SET_NULL,
-        null=True,
+        related_name='rates',
     )

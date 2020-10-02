@@ -350,6 +350,7 @@ class BankAccount(models.Model):
         _('Account Number'),
         max_length=50,
         validators=[bank_account_number_validator],
+        unique=True,
     )
     account_type = models.CharField(
         _('Account Type'),

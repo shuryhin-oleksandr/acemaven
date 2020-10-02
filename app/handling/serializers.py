@@ -1,6 +1,16 @@
 from rest_framework import serializers
 
-from app.handling.models import Carrier, Port, ShippingMode, ShippingType
+from app.handling.models import Carrier, Port, ShippingMode, ShippingType, ContainerType
+from app.booking.serializers import AdditionalSurchargeSerializer
+
+
+class ContainerTypesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ContainerType
+        fields = (
+            'id',
+            'code',
+        )
 
 
 class CarrierSerializer(serializers.ModelSerializer):
@@ -24,11 +34,16 @@ class PortSerializer(serializers.ModelSerializer):
 
 
 class ShippingModeSerializer(serializers.ModelSerializer):
+    additional_surcharges = AdditionalSurchargeSerializer(many=True)
+    container_types = ContainerTypesSerializer(many=True)
+
     class Meta:
         model = ShippingMode
         fields = (
             'id',
             'title',
+            'additional_surcharges',
+            'container_types',
         )
 
 

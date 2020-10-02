@@ -254,26 +254,26 @@ class SignUpRequest(models.Model):
         default=False,
     )
     email = models.EmailField(
-        _('Master email address'),
+        _('Email address'),
         unique=True,
     )
     first_name = models.CharField(
-        _('Master first name'),
+        _('First name'),
         max_length=150,
         null=True,
     )
     last_name = models.CharField(
-        _('Master last name'),
+        _('Last name'),
         max_length=150,
         null=True,
     )
     master_phone = PhoneNumberField(
-        _('Master phone number'),
+        _('Phone number'),
         max_length=13,
         null=True,
     )
     position = models.CharField(
-        _('Master position in company'),
+        _('Position in company'),
         max_length=100,
         null=True,
     )

@@ -132,6 +132,35 @@ class SignUpRequestAdmin(admin.ModelAdmin):
         'phone',
         'approved',
     )
+    fieldsets = (
+        ('Company info', {
+            'fields': (
+                'type',
+                'name',
+                'address_line_first',
+                'address_line_second',
+                'state',
+                'city',
+                'zip_code',
+                'phone',
+                'tax_id',
+                (
+                    'employees_number',
+                    'website',
+                ),
+                'approved',
+            ),
+        }),
+        ('Contact person info', {
+            'fields': (
+                'email',
+                'first_name',
+                'last_name',
+                'master_phone',
+                'position',
+            ),
+        }),
+    )
 
     def response_change(self, request, obj):
         if "_company_sign_up" in request.POST:

@@ -203,6 +203,9 @@ class BankAccountSerializer(serializers.ModelSerializer):
         )
 
     def create(self, validated_data):
-        validated_data['company'] = self.context['request'].user.companies.first()
+        company = self.context['request'].user.companies.first()
+        validated_data['company'] = company
+        if not company.bank_accounts.exists():
+            validated_data['is_default'] = True
         bank_account = super().create(validated_data)
         return bank_account

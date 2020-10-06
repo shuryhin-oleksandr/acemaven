@@ -18,8 +18,17 @@ EXCLUDE_FIELDS = ['id', 'approved', *MASTER_ACCOUNT_FIELDS]
 
 class LocalFeeInline(admin.TabularInline):
     template = 'core/local_fee_inline_tabular.html'
+    fields = ('shipping_mode', 'value_type', 'value', 'is_active', )
+    readonly_fields = ('shipping_mode', )
+    radio_fields = {'value_type': admin.VERTICAL}
     model = LocalFee
     extra = 0
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def has_add_permission(self, request, obj):
+        return False
 
     def get_queryset(self, request):
         fee_type = request.GET.get('fee_type', 'booking')
@@ -106,9 +115,11 @@ class CompanyAdmin(TabbedModelAdmin):
                 'zip_code',
                 'phone',
                 'tax_id',
-                'employees_number',
-                'website',
-            )
+                (
+                    'employees_number',
+                    'website',
+                ),
+            ),
         }),
         RoleInline,
     )

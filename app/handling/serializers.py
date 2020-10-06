@@ -1,7 +1,16 @@
 from rest_framework import serializers
 
-from app.handling.models import Carrier, Port, ShippingMode, ShippingType, ContainerType
-from app.booking.serializers import AdditionalSurchargeSerializer
+from app.handling.models import Carrier, Port, ShippingMode, ShippingType, ContainerType, Currency
+from app.booking.models import AdditionalSurcharge
+
+
+class AdditionalSurchargeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AdditionalSurcharge
+        fields = (
+            'id',
+            'title',
+        )
 
 
 class ContainerTypesSerializer(serializers.ModelSerializer):
@@ -13,12 +22,18 @@ class ContainerTypesSerializer(serializers.ModelSerializer):
         )
 
 
-class CarrierSerializer(serializers.ModelSerializer):
+class CarrierBaseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Carrier
         fields = (
             'id',
             'title',
+        )
+
+
+class CarrierSerializer(CarrierBaseSerializer):
+    class Meta(CarrierBaseSerializer.Meta):
+        fields = CarrierBaseSerializer.Meta.fields + (
             'shipping_type',
         )
 
@@ -33,17 +48,23 @@ class PortSerializer(serializers.ModelSerializer):
         )
 
 
-class ShippingModeSerializer(serializers.ModelSerializer):
-    additional_surcharges = AdditionalSurchargeSerializer(many=True)
-    container_types = ContainerTypesSerializer(many=True)
-
+class ShippingModeBaseSerializer(serializers.ModelSerializer):
     class Meta:
         model = ShippingMode
         fields = (
             'id',
             'title',
-            'additional_surcharges',
+        )
+
+
+class ShippingModeSerializer(ShippingModeBaseSerializer):
+    container_types = ContainerTypesSerializer(many=True)
+    additional_surcharges = AdditionalSurchargeSerializer(many=True)
+
+    class Meta(ShippingModeBaseSerializer.Meta):
+        fields = ShippingModeBaseSerializer.Meta.fields + (
             'container_types',
+            'additional_surcharges',
         )
 
 
@@ -56,4 +77,13 @@ class ShippingTypeSerializer(serializers.ModelSerializer):
             'id',
             'title',
             'shipping_modes',
+        )
+
+
+class CurrencySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Currency
+        fields = (
+            'id',
+            'code',
         )

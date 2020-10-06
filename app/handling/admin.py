@@ -73,6 +73,19 @@ class GlobalFeeAdmin(admin.ModelAdmin):
     )
     ordering = ('-shipping_mode', )
 
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions
+
+    def get_queryset(self, request):
+        fee_type = request.GET.get('fee_type__exact', 'booking')
+        queryset = super().get_queryset(request)
+        if not self.has_view_or_change_permission(request):
+            queryset = queryset.none()
+        return queryset.filter(fee_type=fee_type)
+
 
 @admin.register(LocalFee)
 class LocalFeeAdmin(admin.ModelAdmin):

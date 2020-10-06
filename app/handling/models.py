@@ -235,6 +235,9 @@ class Carrier(models.Model):
         related_name='carriers',
     )
 
+    def __str__(self):
+        return f'{self.title}, {self.shipping_type}'
+
 
 class Airline(models.Model):
     """

@@ -1,3 +1,14 @@
 from django.contrib import admin
 
-# Register your models here.
+from app.booking.models import Surcharge, AdditionalSurcharge
+
+
+@admin.register(AdditionalSurcharge)
+class AdditionalSurchargeAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Surcharge)
+class SurchargeAdmin(admin.ModelAdmin):
+    pass
+

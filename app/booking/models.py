@@ -23,6 +23,7 @@ class Surcharge(models.Model):
     direction = models.CharField(
         _('Surcharge direction, whether import or export'),
         max_length=6,
+        choices=DIRECTION_CHOICES,
     )
     location = models.ForeignKey(
         'handling.Port',
@@ -86,6 +87,7 @@ class UsageFee(models.Model):
         _('Charge amount'),
         max_digits=15,
         decimal_places=2,
+        null=True,
     )
     updated_by = models.ForeignKey(
         get_user_model(),
@@ -117,7 +119,7 @@ class Charge(models.Model):
         (FIXED, 'fixed'),
     )
 
-    additional_surcharges = models.ForeignKey(
+    additional_surcharge = models.ForeignKey(
         'AdditionalSurcharge',
         on_delete=models.CASCADE,
     )
@@ -134,6 +136,7 @@ class Charge(models.Model):
         _('Charge amount'),
         max_digits=15,
         decimal_places=2,
+        null=True,
     )
     conditions = models.CharField(
         _('Conditions'),
@@ -152,7 +155,7 @@ class Charge(models.Model):
     )
 
     def __str__(self):
-        return f'{self.currency}, {self.conditions}, {self.conditions}'
+        return f'{self.currency}, {self.charge}, {self.conditions}'
 
 
 class AdditionalSurcharge(models.Model):

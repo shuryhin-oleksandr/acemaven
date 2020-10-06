@@ -28,3 +28,12 @@ class IsMasterOrBilling(BasePermission):
 
     def has_permission(self, request, view):
         return request.user.get_roles().filter(Q(name='master') | Q(name='billing')).exists()
+
+
+class IsMasterOrAgent(BasePermission):
+    """
+    Allows access only to users with role 'Master' or 'Agent'.
+    """
+
+    def has_permission(self, request, view):
+        return request.user.get_roles().filter(Q(name='master') | Q(name='agent')).exists()

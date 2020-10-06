@@ -4,12 +4,15 @@ from django_filters import rest_framework
 from rest_framework.filters import SearchFilter
 
 from django.conf import settings
-from django.db.models import BooleanField, Case, QuerySet, When
-
+from django.db.models import BooleanField, Case, QuerySet, When, Q
 
 from app.handling.filters import CarrierFilterSet, PortFilterSet
-from app.handling.models import Carrier, Port, ShippingMode, ShippingType
-from app.handling.serializers import CarrierSerializer, PortSerializer, ShippingModeSerializer, ShippingTypeSerializer
+from app.handling.models import Carrier, Port, ShippingMode, ShippingType, Currency
+from app.handling.serializers import CarrierSerializer, CurrencySerializer, PortSerializer, ShippingModeSerializer, \
+    ShippingTypeSerializer
+
+
+COUNTRY_CODE = settings.COUNTRY_OF_ORIGIN_CODE
 
 
 class CarrierViewSet(mixins.ListModelMixin,
@@ -36,7 +39,7 @@ class PortViewSet(mixins.ListModelMixin,
             # Ensure queryset is re-evaluated on each request.
             queryset = queryset.all()
         queryset = queryset.annotate(is_local=Case(
-            When(code__startswith=settings.COUNTRY_OF_ORIGIN_CODE, then=True),
+            When(code__startswith=COUNTRY_CODE, then=True),
             default=False,
             output_field=BooleanField(),
         ))
@@ -55,3 +58,13 @@ class ShippingTypeViewSet(mixins.ListModelMixin,
     queryset = ShippingType.objects.all()
     serializer_class = ShippingTypeSerializer
     permission_classes = (IsAuthenticated, )
+
+
+class CurrencyViewSet(mixins.ListModelMixin,
+                      viewsets.GenericViewSet):
+    queryset = Currency.objects.all()
+    serializer_class = CurrencySerializer
+    permission_classes = (IsAuthenticated, )
+
+    def get_queryset(self):
+        return Currency.objects.filter(Q(country__code=COUNTRY_CODE) | (Q(code__in=['USD', 'EUR']))).distinct()

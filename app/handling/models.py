@@ -501,4 +501,4 @@ class Port(gis_models.Model):
     )
 
     def __str__(self):
-        return f'Port {self.code}, {self.name}'
+        return f'{self.code}, {self.name}, {self.code[:2]}'

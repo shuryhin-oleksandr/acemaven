@@ -100,7 +100,7 @@ class CustomUserAdmin(admin.ModelAdmin):
 @admin.register(Company)
 class CompanyAdmin(TabbedModelAdmin):
     model = Company
-
+    list_display = ('id', 'name', 'type', )
     tab_company = (
         (None, {
             'fields': (

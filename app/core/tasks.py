@@ -16,10 +16,10 @@ def send_registration_email(token, recipient_email):
 
 
 @celery_app.task
-def create_company_empty_fees(company):
-    logger.info(f'New empty fees are going to be created for company {str(company)}')
+def create_company_empty_fees(company_id):
+    logger.info(f'New empty fees are going to be created for company {company_id}')
     new_fees = [
-        {'fee_type': value_type[0], 'company_id': company, 'shipping_mode': shipping_mode}
+        {'fee_type': value_type[0], 'company_id': company_id, 'shipping_mode': shipping_mode}
         for value_type in LocalFee.FEE_TYPE_CHOICES
         for shipping_mode in ShippingMode.objects.all()
     ]

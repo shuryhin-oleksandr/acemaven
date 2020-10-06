@@ -186,7 +186,7 @@ class SignUpRequestAdmin(admin.ModelAdmin):
                         master_account_processing(company, master_account_info)
                         obj.approved = True
                         obj.save()
-                    create_company_empty_fees.delay(company.id)
+                        transaction.on_commit(lambda: create_company_empty_fees.delay(company.id))
                     token = SignUpToken.objects.filter(user=get_user_model().objects.filter(email=obj.email).first()).first().token
                     self.message_user(request, "Company saved. Link to register master account was sent.")
                     self.message_user(request, f"Registration link - 192.168.1.33:8000/create-account?token={token}")

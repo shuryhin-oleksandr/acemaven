@@ -101,6 +101,7 @@ class CustomUserAdmin(admin.ModelAdmin):
 class CompanyAdmin(TabbedModelAdmin):
     model = Company
     list_display = ('id', 'name', 'type', )
+    list_display_links = ('id', 'name', )
     tab_company = (
         (None, {
             'fields': (

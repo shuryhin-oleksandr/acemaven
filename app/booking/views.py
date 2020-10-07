@@ -1,7 +1,9 @@
+from django_filters import rest_framework
 from rest_framework import mixins, viewsets
 from rest_framework.permissions import IsAuthenticated
 
 from app.core.permissions import IsMasterOrAgent
+from app.booking.filters import SurchargeFilterSet
 from app.booking.models import Surcharge, UsageFee, Charge, FreightRate, Rate
 from app.booking.serializers import SurchargeSerializer, SurchargeEditSerializer, SurchargeListSerializer, \
     SurchargeRetrieveSerializer, UsageFeeSerializer, ChargeSerializer
@@ -34,6 +36,8 @@ class SurchargeViesSet(RateSurchargeGetQuerysetMixin,
     queryset = Surcharge.objects.all()
     serializer_class = SurchargeSerializer
     permission_classes = (IsAuthenticated, IsMasterOrAgent, )
+    filter_class = SurchargeFilterSet
+    filter_backends = (rest_framework.DjangoFilterBackend,)
 
     def get_serializer_class(self):
         if self.action == 'list':

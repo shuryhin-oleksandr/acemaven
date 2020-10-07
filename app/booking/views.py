@@ -1,5 +1,5 @@
 from django_filters import rest_framework
-from rest_framework import mixins, viewsets
+from rest_framework import mixins, viewsets, filters
 from rest_framework.permissions import IsAuthenticated
 
 from app.core.permissions import IsMasterOrAgent
@@ -37,7 +37,8 @@ class SurchargeViesSet(RateSurchargeGetQuerysetMixin,
     serializer_class = SurchargeSerializer
     permission_classes = (IsAuthenticated, IsMasterOrAgent, )
     filter_class = SurchargeFilterSet
-    filter_backends = (rest_framework.DjangoFilterBackend,)
+    filter_backends = (filters.OrderingFilter, rest_framework.DjangoFilterBackend,)
+    ordering_fields = ('shipping_mode', 'carrier', 'location', 'start_date', 'expiration_date', )
 
     def get_serializer_class(self):
         if self.action == 'list':

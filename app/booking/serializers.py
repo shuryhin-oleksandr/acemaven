@@ -101,7 +101,6 @@ class SurchargeEditSerializer(serializers.ModelSerializer):
             'start_date',
             'expiration_date',
             'shipping_mode',
-            'carrier_disclosure',
         )
 
 

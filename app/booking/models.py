@@ -45,10 +45,6 @@ class Surcharge(models.Model):
         on_delete=models.CASCADE,
         related_name='surcharges',
     )
-    carrier_disclosure = models.BooleanField(
-        _('Whether carrier name disclosed or not'),
-        default=False,
-    )
     container_types = models.ManyToManyField(
         'handling.ContainerType',
         related_name='surcharges',
@@ -185,6 +181,10 @@ class FreightRate(models.Model):
         'handling.Carrier',
         on_delete=models.CASCADE,
         related_name='freight_rates',
+    )
+    carrier_disclosure = models.BooleanField(
+        _('Whether carrier name disclosed or not'),
+        default=False,
     )
     origin = models.ForeignKey(
         'handling.Port',

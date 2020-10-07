@@ -2,7 +2,7 @@ from rest_framework import mixins, viewsets
 from rest_framework.permissions import IsAuthenticated
 
 from app.core.permissions import IsMasterOrAgent
-from app.booking.models import Surcharge, UsageFee, Charge
+from app.booking.models import Surcharge, UsageFee, Charge, FreightRate, Rate
 from app.booking.serializers import SurchargeSerializer, SurchargeEditSerializer, SurchargeListSerializer, \
     SurchargeRetrieveSerializer, UsageFeeSerializer, ChargeSerializer
 
@@ -18,7 +18,19 @@ class FeeGetQuerysetMixin:
         return self.queryset.filter(surcharge__company=user.companies.first())
 
 
-class SurchargeViesSet(viewsets.ModelViewSet):
+class RateSurchargeGetQuerysetMixin:
+    """
+    Class, that provides custom get_queryset() method,
+    returns objects connected only to users company.
+    """
+
+    def get_queryset(self):
+        user = self.request.user
+        return self.queryset.filter(company=user.companies.first())
+
+
+class SurchargeViesSet(RateSurchargeGetQuerysetMixin,
+                       viewsets.ModelViewSet):
     queryset = Surcharge.objects.all()
     serializer_class = SurchargeSerializer
     permission_classes = (IsAuthenticated, IsMasterOrAgent, )
@@ -31,10 +43,6 @@ class SurchargeViesSet(viewsets.ModelViewSet):
         if self.action in ('update', 'partial_update'):
             return SurchargeEditSerializer
         return self.serializer_class
-
-    def get_queryset(self):
-        user = self.request.user
-        return self.queryset.filter(company=user.companies.first())
 
 
 class UsageFeeViesSet(FeeGetQuerysetMixin,

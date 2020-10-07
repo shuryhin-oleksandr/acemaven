@@ -1,8 +1,19 @@
 from rest_framework import serializers
 
-from app.booking.models import Surcharge, UsageFee, Charge, AdditionalSurcharge
+from app.booking.models import Surcharge, UsageFee, Charge, AdditionalSurcharge, FreightRate, Rate
 from app.handling.serializers import ContainerTypesSerializer, CurrencySerializer, CarrierBaseSerializer, \
     PortSerializer, ShippingModeBaseSerializer
+
+
+class UserUpdateMixin:
+    """
+    Class, that provides custom update() method with user saving from request.
+    """
+
+    def update(self, instance, validated_data):
+        validated_data['updated_by'] = self.context['request'].user
+        super().update(instance, validated_data)
+        return instance
 
 
 class AdditionalSurchargeSerializer(serializers.ModelSerializer):
@@ -14,13 +25,12 @@ class AdditionalSurchargeSerializer(serializers.ModelSerializer):
         )
 
 
-class UsageFeeSerializer(serializers.ModelSerializer):
+class UsageFeeSerializer(UserUpdateMixin, serializers.ModelSerializer):
     class Meta:
         model = UsageFee
         fields = (
             'id',
             'container_type',
-            'surcharge',
             'currency',
             'charge',
         )
@@ -32,16 +42,18 @@ class UsageFeeEditSerializer(UsageFeeSerializer):
 
     class Meta(UsageFeeSerializer.Meta):
         model = UsageFee
-        fields = UsageFeeSerializer.Meta.fields
+        fields = UsageFeeSerializer.Meta.fields + (
+            'updated_by',
+            'date_updated',
+        )
 
 
-class ChargeSerializer(serializers.ModelSerializer):
+class ChargeSerializer(UserUpdateMixin, serializers.ModelSerializer):
     class Meta:
         model = Charge
         fields = (
             'id',
             'additional_surcharge',
-            'surcharge',
             'currency',
             'charge',
             'conditions',
@@ -54,7 +66,10 @@ class ChargeEditSerializer(ChargeSerializer):
 
     class Meta(ChargeSerializer.Meta):
         model = Charge
-        fields = ChargeSerializer.Meta.fields
+        fields = ChargeSerializer.Meta.fields + (
+            'updated_by',
+            'date_updated',
+        )
 
 
 class SurchargeListSerializer(serializers.ModelSerializer):
@@ -94,7 +109,7 @@ class SurchargeSerializer(SurchargeEditSerializer):
     usage_fees = UsageFeeSerializer(many=True)
     charges = ChargeSerializer(many=True)
 
-    class Meta(SurchargeEditSerializer):
+    class Meta(SurchargeEditSerializer.Meta):
         model = Surcharge
         fields = SurchargeEditSerializer.Meta.fields + (
             'usage_fees',
@@ -102,15 +117,16 @@ class SurchargeSerializer(SurchargeEditSerializer):
         )
 
     def create(self, validated_data):
-        company = self.context['request'].user.companies.first()
+        user = self.context['request'].user
+        company = user.companies.first()
         validated_data['company'] = company
         usage_fees = validated_data.pop('usage_fees', [])
         charges = validated_data.pop('charges', [])
         surcharge = super().create(validated_data)
-        usage_fees = [{**item, **{'surcharge': surcharge}} for item in usage_fees]
+        usage_fees = [{**item, **{'surcharge': surcharge, 'updated_by': user}} for item in usage_fees]
         new_usage_fees = [UsageFee(**fields) for fields in usage_fees]
         UsageFee.objects.bulk_create(new_usage_fees)
-        charges = [{**item, **{'surcharge': surcharge}} for item in charges]
+        charges = [{**item, **{'surcharge': surcharge, 'updated_by': user}} for item in charges]
         new_charges = [Charge(**fields) for fields in charges]
         Charge.objects.bulk_create(new_charges)
         return surcharge
@@ -126,3 +142,25 @@ class SurchargeRetrieveSerializer(SurchargeSerializer):
     class Meta(SurchargeSerializer.Meta):
         model = Surcharge
         fields = SurchargeSerializer.Meta.fields
+
+
+class FreightRateSerializer(serializers.ModelSerializer):
+    carrier = serializers.CharField(source='carrier.title')
+    origin = serializers.CharField(source='origin.code')
+    destination = serializers.CharField(source='destination.code')
+    shipping_mode = serializers.CharField(source='shipping_mode.title')
+    expiration_date = serializers.SerializerMethodField()
+
+    class Meta:
+        model = FreightRate
+        fields = (
+            'id',
+            'carrier',
+            'origin',
+            'destination',
+            'shipping_mode',
+            'expiration_date',
+        )
+
+    def get_expiration_date(self, obj):
+        return obj

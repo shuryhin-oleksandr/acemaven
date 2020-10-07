@@ -1,5 +1,7 @@
 from rest_framework import serializers
 
+from django.db.models import Min
+
 from app.booking.models import Surcharge, UsageFee, Charge, AdditionalSurcharge, FreightRate, Rate
 from app.handling.serializers import ContainerTypesSerializer, CurrencySerializer, CarrierBaseSerializer, \
     PortSerializer, ShippingModeBaseSerializer
@@ -105,7 +107,7 @@ class SurchargeEditSerializer(serializers.ModelSerializer):
 
 
 class SurchargeSerializer(SurchargeEditSerializer):
-    usage_fees = UsageFeeSerializer(many=True)
+    usage_fees = UsageFeeSerializer(many=True, required=False)
     charges = ChargeSerializer(many=True)
 
     class Meta(SurchargeEditSerializer.Meta):
@@ -143,7 +145,7 @@ class SurchargeRetrieveSerializer(SurchargeSerializer):
         fields = SurchargeSerializer.Meta.fields
 
 
-class FreightRateSerializer(serializers.ModelSerializer):
+class FreightRateListSerializer(serializers.ModelSerializer):
     carrier = serializers.CharField(source='carrier.title')
     origin = serializers.CharField(source='origin.code')
     destination = serializers.CharField(source='destination.code')
@@ -159,7 +161,8 @@ class FreightRateSerializer(serializers.ModelSerializer):
             'destination',
             'shipping_mode',
             'expiration_date',
+            'is_active',
         )
 
     def get_expiration_date(self, obj):
-        return obj
+        return obj.rates.aggregate(date=Min('expiration_date')).get('date')

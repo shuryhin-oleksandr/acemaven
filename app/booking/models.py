@@ -199,6 +199,10 @@ class FreightRate(models.Model):
     transit_time = models.PositiveIntegerField(
         _('Transit time in days'),
     )
+    is_active = models.BooleanField(
+        _('Freight rate is active or paused'),
+        default=True,
+    )
     shipping_mode = models.ForeignKey(
         'handling.ShippingMode',
         on_delete=models.CASCADE,

@@ -78,6 +78,7 @@ class SurchargeListSerializer(serializers.ModelSerializer):
     carrier = serializers.CharField(source='carrier.title')
     location = serializers.CharField(source='location.code')
     shipping_mode = serializers.CharField(source='shipping_mode.title')
+    shipping_type = serializers.CharField(source='shipping_mode.shipping_type.title')
 
     class Meta:
         model = Surcharge
@@ -89,6 +90,7 @@ class SurchargeListSerializer(serializers.ModelSerializer):
             'start_date',
             'expiration_date',
             'shipping_mode',
+            'shipping_type',
         )
 
 
@@ -137,12 +139,15 @@ class SurchargeRetrieveSerializer(SurchargeSerializer):
     carrier = CarrierBaseSerializer()
     location = PortSerializer()
     shipping_mode = ShippingModeBaseSerializer()
+    shipping_type = serializers.CharField(source='shipping_mode.shipping_type.title')
     usage_fees = UsageFeeEditSerializer(many=True)
     charges = ChargeEditSerializer(many=True)
 
     class Meta(SurchargeSerializer.Meta):
         model = Surcharge
-        fields = SurchargeSerializer.Meta.fields
+        fields = SurchargeSerializer.Meta.fields + (
+            'shipping_type',
+        )
 
 
 class FreightRateListSerializer(serializers.ModelSerializer):
@@ -165,4 +170,5 @@ class FreightRateListSerializer(serializers.ModelSerializer):
         )
 
     def get_expiration_date(self, obj):
-        return obj.rates.aggregate(date=Min('expiration_date')).get('date')
+        date = obj.rates.aggregate(date=Min('expiration_date')).get('date')
+        return date.strftime('%m/%d/%Y') if date else None

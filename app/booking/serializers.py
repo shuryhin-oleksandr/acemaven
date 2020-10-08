@@ -94,17 +94,24 @@ class SurchargeListSerializer(serializers.ModelSerializer):
         )
 
 
-class SurchargeEditSerializer(serializers.ModelSerializer):
+class SurchargeCheckDatesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Surcharge
         fields = (
-            'id',
             'carrier',
             'direction',
+            'shipping_mode',
             'location',
+        )
+
+
+class SurchargeEditSerializer(SurchargeCheckDatesSerializer):
+    class Meta(SurchargeCheckDatesSerializer.Meta):
+        model = Surcharge
+        fields = SurchargeCheckDatesSerializer.Meta.fields + (
+            'id',
             'start_date',
             'expiration_date',
-            'shipping_mode',
         )
 
 

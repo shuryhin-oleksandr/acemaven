@@ -14,7 +14,7 @@ class CarrierFilterSet(django_filters.FilterSet):
 
 
 class PortFilterSet(django_filters.FilterSet):
-    is_local = django_filters.BooleanFilter(field_name='is_local', label='Is local')
+    is_local = django_filters.BooleanFilter(label='Is local')
 
     class Meta:
         model = Port

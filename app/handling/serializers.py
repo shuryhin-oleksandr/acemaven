@@ -39,8 +39,6 @@ class CarrierSerializer(CarrierBaseSerializer):
 
 
 class PortSerializer(serializers.ModelSerializer):
-    display_name = serializers.SerializerMethodField()
-
     class Meta:
         model = Port
         fields = (
@@ -49,9 +47,6 @@ class PortSerializer(serializers.ModelSerializer):
             'name',
             'display_name',
         )
-
-    def get_display_name(self, obj):
-        return str(obj)
 
 
 class ShippingModeBaseSerializer(serializers.ModelSerializer):

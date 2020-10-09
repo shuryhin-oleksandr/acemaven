@@ -18,6 +18,16 @@ class UserUpdateMixin:
         return instance
 
 
+class UserFullNameGetMixin:
+    """
+    Class, that provides custom serializer method with user full name.
+    """
+
+    def get_updated_by(self, obj):
+        if user := obj.updated_by:
+            return user.get_full_name()
+
+
 class AdditionalSurchargeSerializer(serializers.ModelSerializer):
     class Meta:
         model = AdditionalSurcharge
@@ -38,9 +48,10 @@ class UsageFeeSerializer(UserUpdateMixin, serializers.ModelSerializer):
         )
 
 
-class UsageFeeEditSerializer(UsageFeeSerializer):
+class UsageFeeEditSerializer(UserFullNameGetMixin, UsageFeeSerializer):
     container_type = ContainerTypesSerializer()
     currency = CurrencySerializer()
+    updated_by = serializers.SerializerMethodField()
 
     class Meta(UsageFeeSerializer.Meta):
         model = UsageFee
@@ -62,9 +73,10 @@ class ChargeSerializer(UserUpdateMixin, serializers.ModelSerializer):
         )
 
 
-class ChargeEditSerializer(ChargeSerializer):
+class ChargeEditSerializer(UserFullNameGetMixin, ChargeSerializer):
     additional_surcharge = AdditionalSurchargeSerializer()
     currency = CurrencySerializer()
+    updated_by = serializers.SerializerMethodField()
 
     class Meta(ChargeSerializer.Meta):
         model = Charge
@@ -76,9 +88,9 @@ class ChargeEditSerializer(ChargeSerializer):
 
 class SurchargeListSerializer(serializers.ModelSerializer):
     carrier = serializers.CharField(source='carrier.title')
-    location = serializers.CharField(source='location.code')
+    location = serializers.CharField(source='location.display_name')
     shipping_mode = serializers.CharField(source='shipping_mode.title')
-    shipping_type = serializers.CharField(source='shipping_mode.shipping_type.title')
+    shipping_type = serializers.CharField(source='shipping_mode.shipping_type.title', initial='')
 
     class Meta:
         model = Surcharge
@@ -157,11 +169,38 @@ class SurchargeRetrieveSerializer(SurchargeSerializer):
         )
 
 
+class RateSerializer(UserUpdateMixin, serializers.ModelSerializer):
+    class Meta:
+        model = Rate
+        fields = (
+            'id',
+            'container_type',
+            'currency',
+            'rate',
+            'start_date',
+            'expiration_date',
+        )
+
+
+class RateEditSerializer(UserFullNameGetMixin, RateSerializer):
+    container_type = ContainerTypesSerializer()
+    currency = CurrencySerializer()
+    updated_by = serializers.SerializerMethodField()
+
+    class Meta(RateSerializer.Meta):
+        model = Rate
+        fields = RateSerializer.Meta.fields + (
+            'updated_by',
+            'date_updated',
+        )
+
+
 class FreightRateListSerializer(serializers.ModelSerializer):
     carrier = serializers.CharField(source='carrier.title')
-    origin = serializers.CharField(source='origin.code')
-    destination = serializers.CharField(source='destination.code')
+    origin = serializers.CharField(source='origin.display_name')
+    destination = serializers.CharField(source='destination.display_name')
     shipping_mode = serializers.CharField(source='shipping_mode.title')
+    shipping_type = serializers.CharField(source='shipping_mode.shipping_type.title')
     expiration_date = serializers.SerializerMethodField()
 
     class Meta:
@@ -172,6 +211,7 @@ class FreightRateListSerializer(serializers.ModelSerializer):
             'origin',
             'destination',
             'shipping_mode',
+            'shipping_type',
             'expiration_date',
             'is_active',
         )
@@ -179,3 +219,63 @@ class FreightRateListSerializer(serializers.ModelSerializer):
     def get_expiration_date(self, obj):
         date = obj.rates.aggregate(date=Min('expiration_date')).get('date')
         return date.strftime('%m/%d/%Y') if date else None
+
+
+class FreightRateEditSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FreightRate
+        fields = (
+            'id',
+            'carrier',
+            'carrier_disclosure',
+            'origin',
+            'destination',
+            'transit_time',
+            'is_active',
+            'shipping_mode',
+        )
+
+
+class FreightRateSerializer(FreightRateEditSerializer):
+    rates = RateSerializer(many=True)
+
+    class Meta(FreightRateEditSerializer.Meta):
+        model = FreightRate
+        fields = FreightRateEditSerializer.Meta.fields + (
+            'rates',
+        )
+
+    def create(self, validated_data):
+        user = self.context['request'].user
+        company = user.companies.first()
+        validated_data['company'] = company
+        rates = validated_data.pop('rates', [])
+        freight_rate = super().create(validated_data)
+        rates = [{**item, **{'freight_rate': freight_rate, 'updated_by': user}} for item in rates]
+        new_rates = [Rate(**fields) for fields in rates]
+        Rate.objects.bulk_create(new_rates)
+        return freight_rate
+
+
+class FreightRateRetrieveSerializer(FreightRateSerializer):
+    carrier = CarrierBaseSerializer()
+    origin = PortSerializer()
+    destination = PortSerializer()
+    shipping_mode = ShippingModeBaseSerializer()
+    shipping_type = serializers.CharField(source='shipping_mode.shipping_type.title')
+    rates = RateEditSerializer(many=True)
+
+    class Meta(FreightRateSerializer.Meta):
+        model = FreightRate
+        fields = FreightRateSerializer.Meta.fields + (
+            'shipping_type',
+        )
+
+
+class CheckRateDateSerializer(serializers.Serializer):
+    carrier = serializers.IntegerField()
+    origin = serializers.IntegerField()
+    destination = serializers.IntegerField()
+    shipping_mode = serializers.IntegerField()
+    start_date = serializers.DateField()
+    expiration_date = serializers.DateField()

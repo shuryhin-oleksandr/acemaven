@@ -1,10 +1,15 @@
 from rest_framework import serializers
 
 from django.db.models import Min
+from django.conf import settings
 
 from app.booking.models import Surcharge, UsageFee, Charge, AdditionalSurcharge, FreightRate, Rate
+from app.booking.utils import rate_surcharges_filter
 from app.handling.serializers import ContainerTypesSerializer, CurrencySerializer, CarrierBaseSerializer, \
     PortSerializer, ShippingModeBaseSerializer
+
+
+COUNTRY_CODE = settings.COUNTRY_OF_ORIGIN_CODE
 
 
 class UserUpdateMixin:
@@ -169,7 +174,7 @@ class SurchargeRetrieveSerializer(SurchargeSerializer):
         )
 
 
-class RateSerializer(UserUpdateMixin, serializers.ModelSerializer):
+class RateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rate
         fields = (
@@ -181,17 +186,28 @@ class RateSerializer(UserUpdateMixin, serializers.ModelSerializer):
             'expiration_date',
         )
 
+    def update(self, instance, validated_data):
+        user = self.context['request'].user
+        company = user.companies.first()
+        validated_data['updated_by'] = user
+        rate = super().update(instance, validated_data)
+        surcharges = rate_surcharges_filter(rate, company)
+        rate.surcharges.set(surcharges)
+        return instance
+
 
 class RateEditSerializer(UserFullNameGetMixin, RateSerializer):
     container_type = ContainerTypesSerializer()
     currency = CurrencySerializer()
     updated_by = serializers.SerializerMethodField()
+    surcharges = SurchargeRetrieveSerializer(many=True)
 
     class Meta(RateSerializer.Meta):
         model = Rate
         fields = RateSerializer.Meta.fields + (
             'updated_by',
             'date_updated',
+            'surcharges',
         )
 
 
@@ -253,7 +269,10 @@ class FreightRateSerializer(FreightRateEditSerializer):
         freight_rate = super().create(validated_data)
         rates = [{**item, **{'freight_rate': freight_rate, 'updated_by': user}} for item in rates]
         new_rates = [Rate(**fields) for fields in rates]
-        Rate.objects.bulk_create(new_rates)
+        for rate in new_rates:
+            surcharges = rate_surcharges_filter(rate, company)
+            rate.save()
+            rate.surcharges.set(surcharges)
         return freight_rate
 
 

@@ -500,6 +500,9 @@ class Port(gis_models.Model):
         default=True,
     )
 
+    class Meta:
+        ordering = ('code', )
+
     def __str__(self):
         return self.display_name
 

@@ -39,6 +39,8 @@ class CarrierSerializer(CarrierBaseSerializer):
 
 
 class PortSerializer(serializers.ModelSerializer):
+    is_local = serializers.BooleanField(read_only=True)
+
     class Meta:
         model = Port
         fields = (
@@ -46,6 +48,7 @@ class PortSerializer(serializers.ModelSerializer):
             'code',
             'name',
             'display_name',
+            'is_local',
         )
 
 

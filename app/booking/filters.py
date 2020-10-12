@@ -7,7 +7,7 @@ class SurchargeFilterSet(django_filters.FilterSet):
     shipping_type = django_filters.CharFilter(field_name='shipping_mode__shipping_type__title')
     shipping_mode = django_filters.CharFilter(field_name='shipping_mode__title', lookup_expr='icontains')
     carrier = django_filters.CharFilter(field_name='carrier__title', lookup_expr='icontains')
-    location = django_filters.CharFilter(field_name='port__code', lookup_expr='icontains')
+    location = django_filters.CharFilter(field_name='location__code', lookup_expr='icontains')
 
     class Meta:
         model = Surcharge
@@ -27,8 +27,8 @@ class FreightRateFilterSet(django_filters.FilterSet):
     shipping_type = django_filters.CharFilter(field_name='shipping_mode__shipping_type__title')
     shipping_mode = django_filters.CharFilter(field_name='shipping_mode__title', lookup_expr='icontains')
     carrier = django_filters.CharFilter(field_name='carrier__title', lookup_expr='icontains')
-    origin = django_filters.CharFilter(field_name='port__code', lookup_expr='icontains')
-    destination = django_filters.CharFilter(field_name='port__code', lookup_expr='icontains')
+    origin = django_filters.CharFilter(field_name='origin__code', lookup_expr='icontains')
+    destination = django_filters.CharFilter(field_name='destination__code', lookup_expr='icontains')
 
     class Meta:
         model = FreightRate

@@ -234,7 +234,7 @@ class FreightRateListSerializer(serializers.ModelSerializer):
 
     def get_expiration_date(self, obj):
         date = obj.rates.aggregate(date=Min('expiration_date')).get('date')
-        return date.strftime('%m/%d/%Y') if date else None
+        return date.strftime('%d/%m/%Y') if date else None
 
 
 class FreightRateEditSerializer(serializers.ModelSerializer):

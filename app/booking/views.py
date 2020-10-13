@@ -59,7 +59,7 @@ class SurchargeViesSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         data = serializer.data
         dates = self.get_queryset().filter(**data).order_by('start_date').values('start_date', 'expiration_date')
-        results = [{key: value.strftime('%m/%d/%Y') for key, value in item.items()} for item in dates]
+        results = [{key: value.strftime('%d/%m/%Y') for key, value in item.items()} for item in dates]
         return Response(data=results, status=status.HTTP_201_CREATED)
 
 

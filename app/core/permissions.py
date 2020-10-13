@@ -9,7 +9,9 @@ class IsMaster(BasePermission):
     """
 
     def has_permission(self, request, view):
-        return request.user.get_roles().filter(name='master').exists()
+        if request.user.role_set.exists():
+            return request.user.get_roles().filter(name='master').exists()
+        return False
 
 
 class IsBilling(BasePermission):
@@ -18,7 +20,9 @@ class IsBilling(BasePermission):
     """
 
     def has_permission(self, request, view):
-        return request.user.get_roles().filter(name='billing').exists()
+        if request.user.role_set.exists():
+            return request.user.get_roles().filter(name='billing').exists()
+        return False
 
 
 class IsMasterOrBilling(BasePermission):
@@ -27,7 +31,9 @@ class IsMasterOrBilling(BasePermission):
     """
 
     def has_permission(self, request, view):
-        return request.user.get_roles().filter(Q(name='master') | Q(name='billing')).exists()
+        if request.user.role_set.exists():
+            return request.user.get_roles().filter(Q(name='master') | Q(name='billing')).exists()
+        return False
 
 
 class IsMasterOrAgent(BasePermission):
@@ -36,4 +42,6 @@ class IsMasterOrAgent(BasePermission):
     """
 
     def has_permission(self, request, view):
-        return request.user.get_roles().filter(Q(name='master') | Q(name='agent')).exists()
+        if request.user.role_set.exists():
+            return request.user.get_roles().filter(Q(name='master') | Q(name='agent')).exists()
+        return False

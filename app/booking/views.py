@@ -1,5 +1,5 @@
 from django_filters import rest_framework
-from rest_framework import mixins, viewsets, filters, generics, status
+from rest_framework import mixins, viewsets, filters, status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -153,4 +153,3 @@ class RateViesSet(mixins.CreateModelMixin,
     def get_queryset(self):
         user = self.request.user
         return self.queryset.filter(freight_rate__company=user.companies.first())
-

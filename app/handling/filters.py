@@ -15,9 +15,22 @@ class CarrierFilterSet(django_filters.FilterSet):
 
 class PortFilterSet(django_filters.FilterSet):
     is_local = django_filters.BooleanFilter(label='Is local')
+    shipping_type = django_filters.CharFilter(method='shipping_type_filter', label='Shipping type')
 
     class Meta:
         model = Port
         fields = (
             'is_local',
+            'shipping_type',
         )
+
+    def shipping_type_filter(self, queryset, name, value):
+        filter_fields = {
+            'sea': {
+                'has_seaport': True,
+            },
+            'air': {
+                'has_airport': True,
+            },
+        }
+        return queryset.filter(**filter_fields.get(value, {}))

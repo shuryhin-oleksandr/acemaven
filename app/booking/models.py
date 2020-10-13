@@ -228,12 +228,15 @@ class Rate(models.Model):
         _('Rate amount'),
         max_digits=15,
         decimal_places=2,
+        null=True,
     )
     start_date = models.DateField(
         _('Rate start date'),
+        null=True,
     )
     expiration_date = models.DateField(
         _('Rate expiration date'),
+        null=True,
     )
     updated_by = models.ForeignKey(
         get_user_model(),

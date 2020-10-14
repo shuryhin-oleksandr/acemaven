@@ -122,6 +122,17 @@ class SurchargeCheckDatesSerializer(serializers.ModelSerializer):
         )
 
 
+class FreightRateCheckDatesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FreightRate
+        fields = (
+            'carrier',
+            'shipping_mode',
+            'origin',
+            'destination',
+        )
+
+
 class SurchargeEditSerializer(SurchargeCheckDatesSerializer):
     class Meta(SurchargeCheckDatesSerializer.Meta):
         model = Surcharge

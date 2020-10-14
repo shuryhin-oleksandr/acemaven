@@ -13,7 +13,7 @@ from app.booking.models import Surcharge, UsageFee, Charge, FreightRate, Rate
 from app.booking.serializers import SurchargeSerializer, SurchargeEditSerializer, SurchargeListSerializer, \
     SurchargeRetrieveSerializer, UsageFeeSerializer, ChargeSerializer, FreightRateListSerializer, \
     SurchargeCheckDatesSerializer, FreightRateEditSerializer, FreightRateSerializer, FreightRateRetrieveSerializer, \
-    RateSerializer, CheckRateDateSerializer
+    RateSerializer, CheckRateDateSerializer, FreightRateCheckDatesSerializer
 from app.booking.utils import date_format
 from app.handling.models import Port
 
@@ -108,6 +108,18 @@ class FreightRateViesSet(viewsets.ModelViewSet):
                 output_field=CharField()
             ))
         return queryset
+
+    @action(methods=['post'], detail=False, url_path='check-date')
+    def check_date(self, request, *args, **kwargs):
+        serializer = FreightRateCheckDatesSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.data
+        freight_rates = self.get_queryset().filter(**data).order_by('rates__start_date')
+        results = [[{
+            key: (value.strftime('%m/%d/%Y') if key != 'container_type' else value) for key, value in rate.items()
+        } for rate in freight_rate.rates.values('container_type', 'start_date', 'expiration_date')]
+            for freight_rate in freight_rates]
+        return Response(data=results, status=status.HTTP_201_CREATED)
 
     @action(methods=['post'], detail=False, url_path='check-surcharge')
     def check_surcharge(self, request, *args, **kwargs):

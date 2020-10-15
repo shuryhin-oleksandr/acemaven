@@ -281,9 +281,10 @@ class FreightRateSerializer(FreightRateEditSerializer):
         rates = [{**item, **{'freight_rate': freight_rate, 'updated_by': user}} for item in rates]
         new_rates = [Rate(**fields) for fields in rates]
         for rate in new_rates:
-            surcharges = rate_surcharges_filter(rate, company)
-            rate.save()
-            rate.surcharges.set(surcharges)
+            if rate.start_date and rate.expiration_date:
+                surcharges = rate_surcharges_filter(rate, company)
+                rate.save()
+                rate.surcharges.set(surcharges)
         return freight_rate
 
 

@@ -151,8 +151,10 @@ class FreightRateViesSet(viewsets.ModelViewSet):
             Q(Q(**start_date_fields), Q(**end_date_fields), _connector='OR'),
             company=user.companies.first()
         ).order_by('start_date').first()
-        serializer = SurchargeRetrieveSerializer(surcharge)
-        return Response(data=serializer.data, status=status.HTTP_201_CREATED)
+        data = {}
+        if surcharge:
+            data = SurchargeRetrieveSerializer(surcharge).data
+        return Response(data=data, status=status.HTTP_201_CREATED)
 
 
 class RateViesSet(mixins.CreateModelMixin,

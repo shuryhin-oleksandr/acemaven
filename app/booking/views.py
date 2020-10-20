@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django_filters import rest_framework
 from rest_framework import mixins, viewsets, filters, status
 from rest_framework.decorators import action
@@ -116,7 +118,7 @@ class FreightRateViesSet(viewsets.ModelViewSet):
         data = serializer.data
         freight_rates = self.get_queryset().filter(**data).order_by('rates__start_date')
         results = [[{
-            key: (value.strftime('%m/%d/%Y') if key != 'container_type' else value) for key, value in rate.items()
+            key: (value.strftime('%m/%d/%Y') if isinstance(value, datetime) else value) for key, value in rate.items()
         } for rate in freight_rate.rates.values('container_type', 'start_date', 'expiration_date')]
             for freight_rate in freight_rates]
         return Response(data=results, status=status.HTTP_201_CREATED)

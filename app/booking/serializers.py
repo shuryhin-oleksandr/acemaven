@@ -33,7 +33,7 @@ class UserFullNameGetMixin:
             return user.get_full_name()
 
 
-class AdditionalSurchargeSerializer(serializers.ModelSerializer):
+class AdditionalSurchargesSerializer(serializers.ModelSerializer):
     class Meta:
         model = AdditionalSurcharge
         fields = (
@@ -79,7 +79,7 @@ class ChargeSerializer(UserUpdateMixin, serializers.ModelSerializer):
 
 
 class ChargeEditSerializer(UserFullNameGetMixin, ChargeSerializer):
-    additional_surcharge = AdditionalSurchargeSerializer()
+    additional_surcharge = AdditionalSurchargesSerializer()
     currency = CurrencySerializer()
     updated_by = serializers.SerializerMethodField()
 
@@ -281,9 +281,9 @@ class FreightRateSerializer(FreightRateEditSerializer):
         rates = [{**item, **{'freight_rate': freight_rate, 'updated_by': user}} for item in rates]
         new_rates = [Rate(**fields) for fields in rates]
         for rate in new_rates:
+            rate.save()
             if rate.start_date and rate.expiration_date:
                 surcharges = rate_surcharges_filter(rate, company)
-                rate.save()
                 rate.surcharges.set(surcharges)
         return freight_rate
 

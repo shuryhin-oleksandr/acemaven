@@ -14,13 +14,13 @@ class CompanyBaseSerializer(serializers.ModelSerializer):
         model = Company
         fields = (
             'id',
+            'type',
         )
 
 
 class CompanySerializer(CompanyBaseSerializer):
     class Meta(CompanyBaseSerializer.Meta):
         fields = CompanyBaseSerializer.Meta.fields + (
-            'type',
             'name',
             'address_line_first',
             'address_line_second',

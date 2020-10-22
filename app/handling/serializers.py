@@ -62,7 +62,7 @@ class ShippingModeBaseSerializer(serializers.ModelSerializer):
 
 
 class ShippingModeSerializer(ShippingModeBaseSerializer):
-    container_types = ContainerTypesSerializer(many=True)
+    container_types = serializers.SerializerMethodField()
     additional_surcharges = AdditionalSurchargeSerializer(many=True)
 
     class Meta(ShippingModeBaseSerializer.Meta):
@@ -70,6 +70,12 @@ class ShippingModeSerializer(ShippingModeBaseSerializer):
             'container_types',
             'additional_surcharges',
         )
+
+    def get_container_types(self, obj):
+        is_freight_rate = self.context.get('request').query_params.get('is_freight_rate')
+        queryset = obj.container_types.all()
+        data = [] if obj.title == 'ULD' and is_freight_rate else ContainerTypesSerializer(queryset, many=True).data
+        return data
 
 
 class ShippingTypeSerializer(serializers.ModelSerializer):

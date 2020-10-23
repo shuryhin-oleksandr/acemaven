@@ -173,8 +173,12 @@ class UserSignUpSerializer(serializers.Serializer):
 
     def validate(self, attrs):
         errors = {}
+        users = get_user_model().objects.filter(email=attrs.get('email'))
+        if users.exists():
+            errors['email'] = f'Email [{attrs.get("email")}] already exists.'
         if attrs.get('password') != attrs.get('confirm_password'):
             errors['password'] = "Password fields didn't match."
+        if errors:
             raise serializers.ValidationError(errors)
         return attrs
 

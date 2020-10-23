@@ -7,9 +7,9 @@ from django.conf import settings
 from django.db.models import BooleanField, Case, QuerySet, When, Q
 
 from app.handling.filters import CarrierFilterSet, PortFilterSet
-from app.handling.models import Carrier, Port, ShippingMode, ShippingType, Currency
+from app.handling.models import Carrier, Port, ShippingMode, ShippingType, Currency, PackagingType
 from app.handling.serializers import CarrierSerializer, CurrencySerializer, PortSerializer, ShippingModeSerializer, \
-    ShippingTypeSerializer
+    ShippingTypeSerializer, PackagingTypeBaseSerializer
 
 
 COUNTRY_CODE = settings.COUNTRY_OF_ORIGIN_CODE
@@ -57,6 +57,13 @@ class ShippingTypeViewSet(mixins.ListModelMixin,
                           viewsets.GenericViewSet):
     queryset = ShippingType.objects.all()
     serializer_class = ShippingTypeSerializer
+    permission_classes = (IsAuthenticated, )
+
+
+class PackagingTypeViewSet(mixins.ListModelMixin,
+                           viewsets.GenericViewSet):
+    queryset = PackagingType.objects.all()
+    serializer_class = PackagingTypeBaseSerializer
     permission_classes = (IsAuthenticated, )
 
 

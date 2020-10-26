@@ -123,6 +123,8 @@ class SurchargeCheckDatesSerializer(serializers.ModelSerializer):
 
 
 class FreightRateCheckDatesSerializer(serializers.ModelSerializer):
+    freight_rate = serializers.IntegerField(required=False)
+
     class Meta:
         model = FreightRate
         fields = (
@@ -130,6 +132,7 @@ class FreightRateCheckDatesSerializer(serializers.ModelSerializer):
             'shipping_mode',
             'origin',
             'destination',
+            'freight_rate',
         )
 
 

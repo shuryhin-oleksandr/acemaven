@@ -116,7 +116,8 @@ class FreightRateViesSet(viewsets.ModelViewSet):
         serializer = FreightRateCheckDatesSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.data
-        freight_rates = self.get_queryset().filter(**data)
+        freight_rate = data.pop('freight_rate') if 'freight_rate' in data else None
+        freight_rates = self.get_queryset().filter(**data).exclude(id=freight_rate)
         results = [[{
             key: (value.strftime('%m/%d/%Y') if isinstance(value, datetime) else value) for key, value in rate.items()
         } for rate in freight_rate.rates.values('container_type', 'start_date', 'expiration_date')]

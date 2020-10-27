@@ -26,7 +26,7 @@ bank_account_number_validator = RegexValidator(
 
 zip_code_validator = RegexValidator(
     regex=r'^[a-zA-Z0-9]+[-]?[a-zA-Z0-9]+$',
-    message='Invalid format. Must contains only letters, numbers or one hyphen.'
+    message='Invalid format. Must contains only letters, numbers or one hyphen. '
             'A word cannot begin or end with a hyphen.',
 )
 

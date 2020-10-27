@@ -88,6 +88,7 @@ class CustomUser(AbstractUser):
     )
     photo = models.ImageField(
         _('Profile Photo'),
+        max_length=255,
         blank=True,
         null=True,
         upload_to='profile_pics',

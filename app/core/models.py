@@ -24,6 +24,11 @@ bank_account_number_validator = RegexValidator(
     message='Invalid format. Must contains only numbers',
 )
 
+zip_code_validator = RegexValidator(
+    regex=r'^[a-zA-Z0-9]+[-]?[a-zA-Z0-9]+$',
+    message='Invalid format. Must contains only letters, numbers or character [-].',
+)
+
 
 class CustomUserManager(BaseUserManager):
     """
@@ -165,7 +170,8 @@ class Company(models.Model):
     )
     zip_code = models.CharField(
         _('Zip Code'),
-        max_length=100,
+        max_length=12,
+        validators=[zip_code_validator],
     )
     phone = PhoneNumberField(
         _('Phone number'),
@@ -228,7 +234,8 @@ class SignUpRequest(models.Model):
     )
     zip_code = models.CharField(
         _('Zip Code'),
-        max_length=100,
+        max_length=12,
+        validators=[zip_code_validator],
     )
     phone = PhoneNumberField(
         _('Phone number'),

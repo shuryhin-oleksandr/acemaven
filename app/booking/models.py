@@ -1,4 +1,7 @@
+from decimal import Decimal
+
 from django.contrib.auth import get_user_model
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -84,6 +87,7 @@ class UsageFee(models.Model):
         max_digits=15,
         decimal_places=2,
         null=True,
+        validators=[MinValueValidator(Decimal('0.00'))],
     )
     updated_by = models.ForeignKey(
         get_user_model(),
@@ -133,6 +137,7 @@ class Charge(models.Model):
         max_digits=15,
         decimal_places=2,
         null=True,
+        validators=[MinValueValidator(Decimal('0.00'))],
     )
     conditions = models.CharField(
         _('Conditions'),
@@ -229,6 +234,7 @@ class Rate(models.Model):
         max_digits=15,
         decimal_places=2,
         null=True,
+        validators=[MinValueValidator(Decimal('0.00'))],
     )
     start_date = models.DateField(
         _('Rate start date'),

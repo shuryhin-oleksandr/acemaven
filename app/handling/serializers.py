@@ -4,6 +4,16 @@ from app.handling.models import Carrier, Port, ShippingMode, ShippingType, Conta
 from app.booking.models import AdditionalSurcharge
 
 
+class PackagingTypeBaseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PackagingType
+        fields = (
+            'id',
+            'code',
+            'description',
+        )
+
+
 class AdditionalSurchargeSerializer(serializers.ModelSerializer):
     class Meta:
         model = AdditionalSurcharge
@@ -19,6 +29,9 @@ class ContainerTypesSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'code',
+            'shipping_mode',
+            'is_frozen',
+            'can_be_dangerous',
         )
 
 
@@ -63,12 +76,15 @@ class ShippingModeBaseSerializer(serializers.ModelSerializer):
 
 class ShippingModeSerializer(ShippingModeBaseSerializer):
     container_types = serializers.SerializerMethodField()
+    packaging_types = PackagingTypeBaseSerializer(many=True)
     additional_surcharges = AdditionalSurchargeSerializer(many=True)
 
     class Meta(ShippingModeBaseSerializer.Meta):
         fields = ShippingModeBaseSerializer.Meta.fields + (
             'container_types',
+            'packaging_types',
             'additional_surcharges',
+            'is_need_volume',
         )
 
     def get_container_types(self, obj):
@@ -93,15 +109,6 @@ class ShippingTypeSerializer(serializers.ModelSerializer):
 class CurrencySerializer(serializers.ModelSerializer):
     class Meta:
         model = Currency
-        fields = (
-            'id',
-            'code',
-        )
-
-
-class PackagingTypeBaseSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PackagingType
         fields = (
             'id',
             'code',

@@ -26,6 +26,10 @@ class ShippingMode(models.Model):
         _('Shipping Mode Title'),
         max_length=100,
     )
+    is_need_volume = models.BooleanField(
+        _('Is need volume'),
+        default=False,
+    )
     shipping_type = models.ForeignKey(
         'ShippingType',
         on_delete=models.CASCADE,
@@ -83,6 +87,10 @@ class PackagingType(models.Model):
         _('Weight unit'),
         max_length=10,
         null=True,
+    )
+    shipping_modes = models.ManyToManyField(
+        'ShippingMode',
+        related_name='packaging_types',
     )
 
     def __str__(self):
@@ -181,6 +189,14 @@ class ContainerType(models.Model):
         _('ISO description'),
         max_length=150,
         null=True,
+    )
+    is_frozen = models.BooleanField(
+        _('Is frozen'),
+        default=False,
+    )
+    can_be_dangerous = models.BooleanField(
+        _('Can be dangerous'),
+        default=False,
     )
 
     def __str__(self):

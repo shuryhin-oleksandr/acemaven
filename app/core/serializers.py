@@ -213,3 +213,7 @@ class BankAccountSerializer(serializers.ModelSerializer):
             validated_data['is_default'] = True
         bank_account = super().create(validated_data)
         return bank_account
+
+
+class SelectChoiceSerializer(serializers.Serializer):
+    frozen_choices = serializers.ListField(required=False)

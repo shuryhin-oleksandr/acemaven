@@ -7,6 +7,14 @@ from app.core.models import Role, SignUpToken
 from app.core.tasks import send_registration_email
 
 
+COLD = 'cold'
+FROZEN = 'frozen'
+FROZEN_CHOICES = (
+    (FROZEN, 'Frozen'),
+    (COLD, 'Cold'),
+)
+
+
 def get_random_string(length):
     return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
 
@@ -21,3 +29,10 @@ def master_account_processing(company, master_account_info):
     Role.objects.create(company=company, user=user)
     user.set_roles(['master'])
     process_sign_up_token(user)
+
+
+def choice_to_value_name(choices):
+    value_name_list = []
+    for value, name in choices:
+        value_name_list.append({'id': value, 'title': name})
+    return value_name_list

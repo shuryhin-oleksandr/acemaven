@@ -9,7 +9,8 @@ from django.contrib.auth import get_user_model, authenticate
 from app.core.models import BankAccount, Company, SignUpRequest, SignUpToken
 from app.core.permissions import IsMaster, IsMasterOrBilling
 from app.core.serializers import CompanySerializer, SignUpRequestSerializer, UserBaseSerializer, UserCreateSerializer, \
-    UserSignUpSerializer, BankAccountSerializer, UserMasterSerializer, UserSerializer
+    UserSignUpSerializer, BankAccountSerializer, UserMasterSerializer, UserSerializer, SelectChoiceSerializer
+from app.core.utils import choice_to_value_name, FROZEN_CHOICES
 
 
 class CheckTokenMixin:
@@ -148,3 +149,24 @@ class UserProfileView(mixins.RetrieveModelMixin,
 
     def get(self, request):
         return self.retrieve(request)
+
+
+class SelectChoiceView(generics.GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = SelectChoiceSerializer
+
+    def get(self, request, *args, **kwargs):
+        data = {}
+        models = request.query_params.get('models')
+        if models:
+            models = models.split(',')
+            allowed_models = {
+                'frozen_choices': FROZEN_CHOICES,
+            }
+            for model in models:
+                if model in allowed_models:
+                    data[model] = choice_to_value_name(allowed_models[model])
+            serializer = self.get_serializer(data=data)
+            serializer.is_valid(raise_exception=True)
+            return Response(data=serializer.data, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_400_BAD_REQUEST)

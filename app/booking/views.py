@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from django_filters import rest_framework
-from rest_framework import mixins, viewsets, filters, status
+from rest_framework import mixins, viewsets, filters, status, generics
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -15,8 +15,8 @@ from app.booking.models import Surcharge, UsageFee, Charge, FreightRate, Rate
 from app.booking.serializers import SurchargeSerializer, SurchargeEditSerializer, SurchargeListSerializer, \
     SurchargeRetrieveSerializer, UsageFeeSerializer, ChargeSerializer, FreightRateListSerializer, \
     SurchargeCheckDatesSerializer, FreightRateEditSerializer, FreightRateSerializer, FreightRateRetrieveSerializer, \
-    RateSerializer, CheckRateDateSerializer, FreightRateCheckDatesSerializer
-from app.booking.utils import date_format
+    RateSerializer, CheckRateDateSerializer, FreightRateCheckDatesSerializer, WMCalculateSerializer
+from app.booking.utils import date_format, wm_calculate
 from app.handling.models import Port
 
 
@@ -170,3 +170,15 @@ class RateViesSet(mixins.CreateModelMixin,
     def get_queryset(self):
         user = self.request.user
         return self.queryset.filter(freight_rate__company=user.companies.first())
+
+
+class WMCalculateView(generics.GenericAPIView):
+    serializer_class = WMCalculateSerializer
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.data
+        total = wm_calculate(data)
+        return Response(data={'total': total}, status=status.HTTP_201_CREATED)

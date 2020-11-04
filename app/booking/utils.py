@@ -35,3 +35,23 @@ def rate_surcharges_filter(rate, company):
         company=company,
     )
     return surcharges
+
+
+def wm_calculate(data):
+    shipping_type = data.get('shipping_type')
+    weight_measurement = data.get('weight_measurement')
+    length_measurement = data.get('length_measurement')
+    weight = float(data.get('weight'))
+    height = float(data.get('height'))
+    length = float(data.get('length'))
+    width = float(data.get('width'))
+    volume = data.get('volume')
+    if shipping_type == 'air':
+        gross_weight = weight if weight_measurement == 'kg' else weight * 1000
+        divider = 6000 if length_measurement == 'cm' else 0.006
+    else:
+        gross_weight = weight if weight_measurement == 't' else weight / 1000
+        divider = 1 if length_measurement == 'm' else 1000000
+    total_volume = height * length * width * volume / divider
+    total_weight = gross_weight if gross_weight > total_volume else total_volume
+    return round(total_weight, 2)

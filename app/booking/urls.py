@@ -1,7 +1,9 @@
+from django.urls import path
+
 from rest_framework.routers import DefaultRouter
 
 from app.booking.views import SurchargeViesSet, UsageFeeViesSet, ChargeViesSet, FreightRateViesSet, \
-    RateViesSet
+    RateViesSet, WMCalculateView
 
 
 app_name = 'booking'
@@ -14,3 +16,7 @@ router.register(r'freight-rate', FreightRateViesSet, basename='freight_rate')
 router.register(r'rate', RateViesSet, basename='rate')
 
 urlpatterns = router.urls
+
+urlpatterns += [
+    path('calculate/', WMCalculateView.as_view()),
+]

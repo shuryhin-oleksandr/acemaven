@@ -3,8 +3,9 @@ from rest_framework import serializers
 from django.db.models import Min
 from django.conf import settings
 
-from app.booking.models import Surcharge, UsageFee, Charge, AdditionalSurcharge, FreightRate, Rate
+from app.booking.models import Surcharge, UsageFee, Charge, AdditionalSurcharge, FreightRate, Rate, CargoGroup
 from app.booking.utils import rate_surcharges_filter
+from app.handling.models import ShippingType
 from app.handling.serializers import ContainerTypesSerializer, CurrencySerializer, CarrierBaseSerializer, \
     PortSerializer, ShippingModeBaseSerializer
 
@@ -331,3 +332,31 @@ class CheckRateDateSerializer(serializers.Serializer):
     shipping_mode = serializers.IntegerField()
     start_date = serializers.DateField()
     expiration_date = serializers.DateField()
+
+
+class CargoGroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CargoGroup
+        fields = (
+            ''
+        )
+
+
+class FreightRateSearchSerializer(serializers.Serializer):
+    shipping_mode = serializers.IntegerField()
+    origin = serializers.IntegerField()
+    destination = serializers.IntegerField()
+    date_from = serializers.DateField()
+    date_to = serializers.DateField()
+    cargo_groups = CargoGroupSerializer(many=True)
+
+
+class WMCalculateSerializer(serializers.Serializer):
+    shipping_type = serializers.ChoiceField(choices=ShippingType.objects.values_list('title', flat=True))
+    weight_measurement = serializers.ChoiceField(choices=['kg', 't'])
+    length_measurement = serializers.ChoiceField(choices=['cm', 'm'])
+    weight = serializers.DecimalField(max_digits=15, decimal_places=4, min_value=0)
+    height = serializers.DecimalField(max_digits=15, decimal_places=4, min_value=0)
+    length = serializers.DecimalField(max_digits=15, decimal_places=4, min_value=0)
+    width = serializers.DecimalField(max_digits=15, decimal_places=4, min_value=0)
+    volume = serializers.IntegerField(min_value=1)

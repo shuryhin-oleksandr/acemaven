@@ -7,6 +7,7 @@ from django.contrib.auth import get_user_model
 from app.core.models import BankAccount, Company, SignUpRequest, Role
 from app.core.utils import process_sign_up_token
 from app.core.validators import PasswordValidator
+from app.handling.serializers import ReleaseTypeSerializer
 
 
 class CompanyBaseSerializer(serializers.ModelSerializer):
@@ -217,3 +218,4 @@ class BankAccountSerializer(serializers.ModelSerializer):
 
 class SelectChoiceSerializer(serializers.Serializer):
     frozen_choices = serializers.ListField(required=False)
+    release_type = ReleaseTypeSerializer(many=True, required=False)

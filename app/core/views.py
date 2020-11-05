@@ -12,6 +12,7 @@ from app.core.serializers import CompanySerializer, SignUpRequestSerializer, Use
     UserSignUpSerializer, BankAccountSerializer, UserMasterSerializer, UserSerializer, SelectChoiceSerializer
 from app.core.utils import choice_to_value_name
 from app.booking.models import CargoGroup
+from app.handling.models import ReleaseType
 
 
 class CheckTokenMixin:
@@ -162,12 +163,22 @@ class SelectChoiceView(generics.GenericAPIView):
         if models:
             models = models.split(',')
             allowed_models = {
-                'frozen_choices': CargoGroup.FROZEN_CHOICES,
+                'frozen_choices': {
+                    'choice_type': 'choice',
+                    'data': CargoGroup.FROZEN_CHOICES,
+                },
+                'release_type': {
+                    'choice_type': 'model',
+                    'data': ReleaseType,
+                },
             }
             for model in models:
                 if model in allowed_models:
-                    data[model] = choice_to_value_name(allowed_models[model])
-            serializer = self.get_serializer(data=data)
-            serializer.is_valid(raise_exception=True)
+                    value = allowed_models.get(model)
+                    if (choice_type := value.get('choice_type')) == 'choice':
+                        data[model] = choice_to_value_name(value.get('data'))
+                    elif choice_type == 'model':
+                        data[model] = value.get('data').objects.all()
+            serializer = self.get_serializer(data)
             return Response(data=serializer.data, status=status.HTTP_200_OK)
         return Response(status=status.HTTP_400_BAD_REQUEST)

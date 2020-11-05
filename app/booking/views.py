@@ -165,6 +165,7 @@ class FreightRateViesSet(viewsets.ModelViewSet):
     def freight_rate_search(self, request, *args, **kwargs):
         serializer = FreightRateSearchSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        data = serializer.data
         return Response(status=status.HTTP_200_OK)
 
 

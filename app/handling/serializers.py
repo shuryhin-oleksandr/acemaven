@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
-from app.handling.models import Carrier, Port, ShippingMode, ShippingType, ContainerType, Currency, PackagingType
+from app.handling.models import Carrier, Port, ShippingMode, ShippingType, ContainerType, Currency, PackagingType, \
+    ReleaseType
 from app.booking.models import AdditionalSurcharge
 
 
@@ -112,4 +113,14 @@ class CurrencySerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'code',
+        )
+
+
+class ReleaseTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ReleaseType
+        fields = (
+            'id',
+            'code',
+            'title',
         )

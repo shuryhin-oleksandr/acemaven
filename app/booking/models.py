@@ -267,3 +267,115 @@ class Rate(models.Model):
         'Surcharge',
         related_name='rates',
     )
+
+
+class Booking(models.Model):
+    """
+    Model for booking instance.
+    """
+
+    date_from = models.DateField(
+        _('Booing date from'),
+    )
+    date_to = models.DateField(
+        _('Booking date to'),
+    )
+    is_paid = models.BooleanField(
+        _('Whether booking paid or not'),
+        default=False,
+    )
+    client = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.SET_NULL,
+        null=True,
+    )
+    freight_rate = models.ForeignKey(
+        'FreightRate',
+        on_delete=models.CASCADE,
+        related_name='bookings',
+    )
+    shipper = models.ForeignKey(
+        'core.Shipper',
+        on_delete=models.SET_NULL,
+        related_name='bookings',
+        null=True,
+    )
+
+    def __str__(self):
+        return f'Booking of rate [{self.freight_rate}]'
+
+
+class CargoGroup(models.Model):
+    """
+    Model for cargo group.
+    """
+
+    COLD = 'cold'
+    FROZEN = 'frozen'
+    FROZEN_CHOICES = (
+        (FROZEN, 'Frozen'),
+        (COLD, 'Cold'),
+    )
+
+    container_type = models.ForeignKey(
+        'handling.ContainerType',
+        on_delete=models.CASCADE,
+        null=True,
+    )
+    packaging_type = models.ForeignKey(
+        'handling.PackagingType',
+        on_delete=models.CASCADE,
+        null=True,
+    )
+    volume = models.PositiveIntegerField(
+        _('Number of items'),
+        validators=[MinValueValidator(1)],
+        null=True,
+    )
+    height = models.DecimalField(
+        _('Height'),
+        max_digits=15,
+        decimal_places=2,
+        null=True,
+    )
+    length = models.DecimalField(
+        _('Length'),
+        max_digits=15,
+        decimal_places=2,
+        null=True,
+    )
+    width = models.DecimalField(
+        _('Width'),
+        max_digits=15,
+        decimal_places=2,
+        null=True,
+    )
+    weight = models.DecimalField(
+        _('Weight'),
+        max_digits=15,
+        decimal_places=2,
+        null=True,
+    )
+    dangerous = models.BooleanField(
+        _('Dangerous freight'),
+        default=False,
+    )
+    frozen = models.CharField(
+        _('Frozen or chilled cargo'),
+        max_length=10,
+        choices=FROZEN_CHOICES,
+        null=True,
+    )
+    description = models.CharField(
+        _('Cargo description'),
+        max_length=100,
+        null=True,
+    )
+    booking = models.ForeignKey(
+        'Booking',
+        on_delete=models.CASCADE,
+        related_name='cargo_groups',
+    )
+
+    def __str__(self):
+        return f'Cargo group [{self.id}] of booking [{self.booking}]'

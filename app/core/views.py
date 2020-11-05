@@ -10,7 +10,8 @@ from app.core.models import BankAccount, Company, SignUpRequest, SignUpToken
 from app.core.permissions import IsMaster, IsMasterOrBilling
 from app.core.serializers import CompanySerializer, SignUpRequestSerializer, UserBaseSerializer, UserCreateSerializer, \
     UserSignUpSerializer, BankAccountSerializer, UserMasterSerializer, UserSerializer, SelectChoiceSerializer
-from app.core.utils import choice_to_value_name, FROZEN_CHOICES
+from app.core.utils import choice_to_value_name
+from app.booking.models import CargoGroup
 
 
 class CheckTokenMixin:
@@ -161,7 +162,7 @@ class SelectChoiceView(generics.GenericAPIView):
         if models:
             models = models.split(',')
             allowed_models = {
-                'frozen_choices': FROZEN_CHOICES,
+                'frozen_choices': CargoGroup.FROZEN_CHOICES,
             }
             for model in models:
                 if model in allowed_models:

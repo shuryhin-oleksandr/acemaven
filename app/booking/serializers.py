@@ -338,7 +338,15 @@ class CargoGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = CargoGroup
         fields = (
-            ''
+            'container_type',
+            'packaging_type',
+            'volume',
+            'height',
+            'length',
+            'width',
+            'weight',
+            'dangerous',
+            'frozen',
         )
 
 

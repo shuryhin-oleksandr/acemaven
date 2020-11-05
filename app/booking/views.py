@@ -15,7 +15,9 @@ from app.booking.models import Surcharge, UsageFee, Charge, FreightRate, Rate
 from app.booking.serializers import SurchargeSerializer, SurchargeEditSerializer, SurchargeListSerializer, \
     SurchargeRetrieveSerializer, UsageFeeSerializer, ChargeSerializer, FreightRateListSerializer, \
     SurchargeCheckDatesSerializer, FreightRateEditSerializer, FreightRateSerializer, FreightRateRetrieveSerializer, \
-    RateSerializer, CheckRateDateSerializer, FreightRateCheckDatesSerializer, WMCalculateSerializer
+    RateSerializer, CheckRateDateSerializer, FreightRateCheckDatesSerializer, WMCalculateSerializer, \
+    FreightRateSearchSerializer
+
 from app.booking.utils import date_format, wm_calculate
 from app.handling.models import Port
 
@@ -159,6 +161,12 @@ class FreightRateViesSet(viewsets.ModelViewSet):
             data = SurchargeRetrieveSerializer(surcharge).data
         return Response(data=data, status=status.HTTP_201_CREATED)
 
+    @action(methods=['post'], detail=False, url_path='search')
+    def freight_rate_search(self, request, *args, **kwargs):
+        serializer = FreightRateSearchSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return Response(status=status.HTTP_200_OK)
+
 
 class RateViesSet(mixins.CreateModelMixin,
                   mixins.UpdateModelMixin,
@@ -180,5 +188,9 @@ class WMCalculateView(generics.GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.data
-        total = wm_calculate(data)
-        return Response(data={'total': total}, status=status.HTTP_201_CREATED)
+        total_per_pack, total = wm_calculate(data)
+        results = {
+            'total_per_pack': total_per_pack,
+            'total': total,
+        }
+        return Response(data=results, status=status.HTTP_200_OK)

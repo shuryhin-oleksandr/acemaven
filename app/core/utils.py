@@ -7,14 +7,6 @@ from app.core.models import Role, SignUpToken
 from app.core.tasks import send_registration_email
 
 
-COLD = 'cold'
-FROZEN = 'frozen'
-FROZEN_CHOICES = (
-    (FROZEN, 'Frozen'),
-    (COLD, 'Cold'),
-)
-
-
 def get_random_string(length):
     return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
 

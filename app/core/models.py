@@ -387,3 +387,63 @@ class BankAccount(models.Model):
         if self.is_default:
             BankAccount.objects.filter(company=self.company).update(is_default=False)
         super(BankAccount, self).save(*args, **kwargs)
+
+
+class Shipper(models.Model):
+    """
+    Model for the shipper company.
+    """
+
+    name = models.CharField(
+        _('Company Name'),
+        max_length=100,
+    )
+    address_line_first = models.CharField(
+        _('First address line'),
+        max_length=100,
+        null=True,
+    )
+    address_line_second = models.CharField(
+        _('Second address line'),
+        max_length=100,
+        blank=True,
+        null=True,
+    )
+    state = models.CharField(
+        _('State'),
+        max_length=100,
+        null=True,
+    )
+    city = models.CharField(
+        _('City'),
+        max_length=100,
+    )
+    zip_code = models.CharField(
+        _('Zip Code'),
+        max_length=12,
+        validators=[zip_code_validator],
+        null=True,
+    )
+    contact_name = models.CharField(
+        _('Shippers contact name'),
+        max_length=100,
+    )
+    phone = PhoneNumberField(
+        _('Phone number'),
+        max_length=13,
+    )
+    phone_additional = PhoneNumberField(
+        _('Additional phone number'),
+        max_length=13,
+        null=True,
+    )
+    email = models.EmailField(
+        _('email address'),
+    )
+    company = models.ForeignKey(
+        'Company',
+        on_delete=models.CASCADE,
+    )
+
+    def __str__(self):
+        return f'Shipper {self.name}, {self.phone}'

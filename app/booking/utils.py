@@ -37,8 +37,9 @@ def rate_surcharges_filter(rate, company):
     return surcharges
 
 
-def wm_calculate(data):
-    shipping_type = data.get('shipping_type')
+def wm_calculate(data, shipping_type=None):
+    if not shipping_type:
+        shipping_type = data.get('shipping_type')
     weight_measurement = data.get('weight_measurement')
     length_measurement = data.get('length_measurement')
     weight = float(data.get('weight'))

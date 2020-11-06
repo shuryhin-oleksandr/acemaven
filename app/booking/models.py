@@ -172,6 +172,14 @@ class AdditionalSurcharge(models.Model):
         'handling.ShippingMode',
         related_name='additional_surcharges',
     )
+    is_dangerous = models.BooleanField(
+        _('Is dangerous'),
+        default=False,
+    )
+    is_cold = models.BooleanField(
+        _('Is cold'),
+        default=False,
+    )
 
     def __str__(self):
         return f'{self.title}'
@@ -289,6 +297,16 @@ class Booking(models.Model):
         on_delete=models.SET_NULL,
         null=True,
     )
+    release_type = models.ForeignKey(
+        'handling.ReleaseType',
+        on_delete=models.SET_NULL,
+        null=True,
+    )
+    number_of_documents = models.PositiveIntegerField(
+        _('Number of documents for chosen release type'),
+        validators=[MinValueValidator(1)],
+        null=True,
+    )
     freight_rate = models.ForeignKey(
         'FreightRate',
         on_delete=models.CASCADE,
@@ -310,10 +328,10 @@ class CargoGroup(models.Model):
     Model for cargo group.
     """
 
-    COLD = 'cold'
     FROZEN = 'frozen'
+    COLD = 'cold'
     FROZEN_CHOICES = (
-        (FROZEN, 'Frozen'),
+        (FROZEN, 'Chilled'),
         (COLD, 'Cold'),
     )
 

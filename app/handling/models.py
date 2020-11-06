@@ -30,6 +30,14 @@ class ShippingMode(models.Model):
         _('Is need volume'),
         default=False,
     )
+    has_freight_containers = models.BooleanField(
+        _('Has container types in freight rate'),
+        default=False,
+    )
+    has_surcharge_containers = models.BooleanField(
+        _('Has container types in surcharge'),
+        default=False,
+    )
     shipping_type = models.ForeignKey(
         'ShippingType',
         on_delete=models.CASCADE,
@@ -411,6 +419,14 @@ class Currency(models.Model):
     code = models.CharField(
         _('Currency three char code'),
         max_length=3,
+    )
+    is_active = models.BooleanField(
+        _('Is active in the platform'),
+        default=False,
+    )
+    is_main = models.BooleanField(
+        _('Is main currency in the platform'),
+        default=False,
     )
 
     def __str__(self):

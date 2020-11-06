@@ -21,12 +21,21 @@ class Country(models.Model):
         on_delete=models.SET_NULL,
     )
     is_active = models.BooleanField(
-        _('Currency is active'),
+        _('Country is active'),
         default=True,
+    )
+    chosen_for_platform = models.BooleanField(
+        _('Country was chosen as main for platform'),
+        default=False,
     )
 
     def __str__(self):
         return f'{self.name} ({self.code})'
+
+    def save(self, *args, **kwargs):
+        if self.chosen_for_platform:
+            Country.objects.all().update(chosen_for_platform=False)
+        super(Country, self).save(*args, **kwargs)
 
 
 class Region(models.Model):
@@ -61,7 +70,7 @@ class State(models.Model):
         on_delete=models.CASCADE,
     )
     is_active = models.BooleanField(
-        _('Currency is active'),
+        _('State is active'),
         default=True,
     )
     region = models.ForeignKey(

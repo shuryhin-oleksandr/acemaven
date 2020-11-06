@@ -19,8 +19,7 @@ from app.booking.serializers import SurchargeSerializer, SurchargeEditSerializer
     FreightRateSearchSerializer
 
 from app.booking.utils import date_format, wm_calculate
-from app.handling.models import Port
-
+from app.handling.models import Port, ShippingMode, GlobalFee
 
 COUNTRY_CODE = settings.COUNTRY_OF_ORIGIN_CODE
 
@@ -56,6 +55,16 @@ class SurchargeViesSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         return self.queryset.filter(company=user.companies.first())
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        new_surcharge_id = serializer.data.get('id')
+        surcharge = Surcharge.objects.get(id=new_surcharge_id)
+        data = SurchargeRetrieveSerializer(surcharge).data
+        return Response(data=data, status=status.HTTP_201_CREATED, headers=headers)
 
     @action(methods=['post'], detail=False, url_path='check-date')
     def check_date(self, request, *args, **kwargs):

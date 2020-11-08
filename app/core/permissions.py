@@ -45,3 +45,14 @@ class IsMasterOrAgent(BasePermission):
         if request.user.role_set.exists():
             return request.user.get_roles().filter(Q(name='master') | Q(name='agent')).exists()
         return False
+
+
+class IsClientCompany(BasePermission):
+    """
+    Allows access only to users with role 'Master' or 'Billing' or 'Client'.
+    """
+
+    def has_permission(self, request, view):
+        if request.user.role_set.exists():
+            return request.user.get_roles().filter(Q(name='master') | Q(name='billing') | Q(name='client')).exists()
+        return False

@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from app.handling.models import GlobalFee, LocalFee, ShippingType, ShippingMode, PackagingType, ContainerType, \
-    IMOClass, ReleaseType, Carrier, Airline, Currency, Port
+    IMOClass, ReleaseType, Carrier, Airline, Currency, Port, ExchangeRate
 
 
 @admin.register(Port)
@@ -11,7 +11,7 @@ class PortAdmin(admin.ModelAdmin):
 
 @admin.register(Currency)
 class CurrencyAdmin(admin.ModelAdmin):
-    pass
+    search_fields = ('code', )
 
 
 @admin.register(Airline)
@@ -52,6 +52,11 @@ class ShippingModeAdmin(admin.ModelAdmin):
 @admin.register(ShippingType)
 class ShippingTypeAdmin(admin.ModelAdmin):
     list_display = ('title',)
+
+
+@admin.register(ExchangeRate)
+class ExchangeRateTypeAdmin(admin.ModelAdmin):
+    list_display = ('currency', 'rate', 'spread',)
 
 
 class ListTopFilter(admin.filters.ChoicesFieldListFilter):

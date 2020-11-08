@@ -8,8 +8,9 @@ from rest_framework.response import Response
 
 from django.conf import settings
 from django.db.models import CharField, Case, When, Value, Q
+from django.forms import model_to_dict
 
-from app.core.permissions import IsMasterOrAgent
+from app.core.permissions import IsMasterOrAgent, IsClientCompany
 from app.booking.filters import SurchargeFilterSet, FreightRateFilterSet
 from app.booking.models import Surcharge, UsageFee, Charge, FreightRate, Rate
 from app.booking.serializers import SurchargeSerializer, SurchargeEditSerializer, SurchargeListSerializer, \
@@ -18,8 +19,9 @@ from app.booking.serializers import SurchargeSerializer, SurchargeEditSerializer
     RateSerializer, CheckRateDateSerializer, FreightRateCheckDatesSerializer, WMCalculateSerializer, \
     FreightRateSearchSerializer
 
-from app.booking.utils import date_format, wm_calculate
-from app.handling.models import Port, ShippingMode, GlobalFee
+from app.booking.utils import date_format, wm_calculate, calculate_additional_surcharges, calculate_freight_rate, \
+    add_currency_value
+from app.handling.models import Port, ShippingMode, GlobalFee, ExchangeRate, Currency
 
 COUNTRY_CODE = settings.COUNTRY_OF_ORIGIN_CODE
 
@@ -98,6 +100,9 @@ class FreightRateViesSet(viewsets.ModelViewSet):
     queryset = FreightRate.objects.all()
     serializer_class = FreightRateSerializer
     permission_classes = (IsAuthenticated, IsMasterOrAgent, )
+    permission_classes_by_action = {
+        'search': [IsAuthenticated, IsClientCompany, ],
+    }
     filter_class = FreightRateFilterSet
     filter_backends = (filters.OrderingFilter, rest_framework.DjangoFilterBackend,)
     ordering_fields = ('shipping_mode', 'carrier', 'origin', 'destination', )
@@ -175,7 +180,106 @@ class FreightRateViesSet(viewsets.ModelViewSet):
         serializer = FreightRateSearchSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.data
-        return Response(status=status.HTTP_200_OK)
+
+        cargo_groups = data.pop('cargo_groups')
+        container_type_ids_list = [group.get('container_type') for group in cargo_groups if 'container_type' in group]
+        shipping_mode = ShippingMode.objects.filter(id=data.get('shipping_mode')).first()
+        dangerous_list = list(filter(lambda x: x.get('dangerous'), cargo_groups))
+        cold_list = list(filter(lambda x: x.get('frozen') == 'cold', cargo_groups))
+
+        date_from = date_format(data.pop('date_from'))
+        date_to = date_format(data.pop('date_to'))
+        data['rates__start_date__lte'] = date_from
+        data['rates__expiration_date__gte'] = date_to
+        data['rates__surcharges__start_date__lte'] = date_from
+        data['rates__surcharges__expiration_date__gte'] = date_to
+
+        freight_rates = FreightRate.objects.filter(**data)
+
+        if shipping_mode.has_freight_containers:
+            for container_type_id in container_type_ids_list:
+                freight_rates = freight_rates.filter(
+                    rates__rate__isnull=False,
+                    rates__container_type__id=container_type_id
+                )
+        if shipping_mode.has_surcharge_containers:
+            for container_type_id in container_type_ids_list:
+                freight_rates = freight_rates.filter(
+                    rates__surcharges__usage_fees__charge__isnull=False,
+                    rates__surcharges__usage_fees__container_type__id=container_type_id
+                )
+
+        if dangerous_list:
+            freight_rates = freight_rates.filter(
+                rates__surcharges__charges__additional_surcharge__is_dangerous=True,
+                rates__surcharges__charges__charge__isnull=False
+            )
+        if cold_list:
+            freight_rates = freight_rates.filter(
+                rates__surcharges__charges__additional_surcharge__is_cold=True,
+                rates__surcharges__charges__charge__isnull=False
+            )
+
+        local_fees = request.user.companies.first().fees.filter(shipping_mode=shipping_mode)
+        global_fees = GlobalFee.objects.filter(shipping_mode=shipping_mode)
+        local_booking_fee = local_fees.filter(fee_type=GlobalFee.BOOKING, is_active=True).first()
+        local_service_fee = local_fees.filter(fee_type=GlobalFee.SERVICE, is_active=True).first()
+        booking_fee = local_booking_fee if local_booking_fee else global_fees.filter(fee_type=GlobalFee.BOOKING, is_active=True).first()
+        service_fee = local_service_fee if local_service_fee else global_fees.filter(fee_type=GlobalFee.SERVICE, is_active=True).first()
+        results = []
+        main_currency_code = Currency.objects.filter(is_main=True).first().code
+        for freight_rate in freight_rates:
+            totals = dict()
+            result = dict()
+            result['freight_rate'] = model_to_dict(freight_rate)
+            result['cargo_groups'] = []
+            if shipping_mode.is_need_volume:
+                rate = freight_rate.rates.first()
+                exchange_rate = ExchangeRate.objects.filter(currency__code=rate.currency.code).first()
+                for cargo_group in cargo_groups:
+                    new_cargo_group = dict()
+                    total_weight_per_pack, total_weight = wm_calculate(cargo_group, shipping_mode.shipping_type.title)
+
+                    new_cargo_group['freight'] = calculate_freight_rate(totals, rate, booking_fee, main_currency_code, exchange_rate, total_weight_per_pack=total_weight_per_pack, total_weight=total_weight)
+
+                    charges = rate.surcharges.filter(start_date__lte=date_from, expiration_date__gte=date_to).first().charges.all()
+                    calculate_additional_surcharges(totals, charges, cargo_group, shipping_mode.is_need_volume, new_cargo_group, total_weight_per_pack)
+
+                    result['cargo_groups'].append(new_cargo_group)
+            else:
+                rates = freight_rate.rates.all()
+                for cargo_group in cargo_groups:
+                    new_cargo_group = dict()
+                    rate = rates.filter(container_type=cargo_group.get('container_type')).first()
+                    exchange_rate = ExchangeRate.objects.filter(currency__code=rate.currency.code).first()
+
+                    new_cargo_group['freight'] = calculate_freight_rate(totals, rate, booking_fee, main_currency_code, exchange_rate, volume=cargo_group.get('volume'))
+
+                    charges = rate.surcharges.filter(start_date__lte=date_from, expiration_date__gte=date_to).first().charges.all()
+                    calculate_additional_surcharges(totals, charges, cargo_group, shipping_mode.is_need_volume, new_cargo_group)
+
+                    result['cargo_groups'].append(new_cargo_group)
+
+            doc_fee = dict()
+            surcharge = freight_rate.rates.first().surcharges.filter(start_date__lte=date_from, expiration_date__gte=date_to).first()
+            charge = surcharge.charges.filter(additional_surcharge__is_document=True).first()
+            doc_fee['currency'] = charge.currency.code
+            doc_fee['cost'] = charge.charge
+            doc_fee['subtotal'] = charge.charge
+            result['doc_fee'] = doc_fee
+            add_currency_value(totals, charge.currency.code, charge.charge)
+
+            service_fee_dict = dict()
+            service_fee_dict['currency'] = main_currency_code
+            service_fee = service_fee.value if service_fee else 0
+            service_fee_dict['cost'] = service_fee
+            service_fee_dict['subtotal'] = service_fee
+            result['service_fee'] = service_fee_dict
+            add_currency_value(totals, main_currency_code, service_fee)
+
+            results.append(result)
+
+        return Response(data=results, status=status.HTTP_200_OK)
 
 
 class RateViesSet(mixins.CreateModelMixin,

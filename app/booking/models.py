@@ -180,6 +180,18 @@ class AdditionalSurcharge(models.Model):
         _('Is cold'),
         default=False,
     )
+    is_handling = models.BooleanField(
+        _('Is handling'),
+        default=False,
+    )
+    is_document = models.BooleanField(
+        _('Is document'),
+        default=False,
+    )
+    is_other = models.BooleanField(
+        _('Is other'),
+        default=False,
+    )
 
     def __str__(self):
         return f'{self.title}'

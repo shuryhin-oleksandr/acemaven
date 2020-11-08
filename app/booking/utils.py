@@ -1,7 +1,8 @@
 from django.conf import settings
 from django.db.models import Q
 
-from app.booking.models import Surcharge
+from app.booking.models import Surcharge, Charge
+from app.handling.models import GlobalFee
 
 
 COUNTRY_CODE = settings.COUNTRY_OF_ORIGIN_CODE
@@ -57,3 +58,67 @@ def wm_calculate(data, shipping_type=None):
     total_weight_per_pack = gross_weight if gross_weight > total_volume else total_volume
     total_weight = total_weight_per_pack * volume
     return round(total_weight_per_pack, 2), round(total_weight, 2)
+
+
+def add_currency_value(totals, code, subtotal):
+    totals[code] = totals[code] + subtotal if code in totals else subtotal
+
+
+def calculate_additional_surcharges(totals, charges, cargo_group, is_need_volume, new_cargo_group, total_weight_per_pack=0):
+    for charge in charges:
+        data = dict()
+        if not charge.additional_surcharge.is_document:
+            if charge.additional_surcharge.is_dangerous and not cargo_group.get('dangerous'):
+                continue
+            elif charge.additional_surcharge.is_cold and not cargo_group.get('frozen'):
+                continue
+            fixed_cost = False
+            cost_per_pack = charge.charge
+            if is_need_volume:
+                if (condition := charge.conditions) == Charge.WM:
+                    cost_per_pack = total_weight_per_pack * charge.charge
+                elif condition == Charge.PER_WEIGHT:
+                    cost_per_pack = cargo_group.get('weight') * charge.charge
+                elif condition == Charge.FIXED:
+                    fixed_cost = True
+            subtotal = cost_per_pack * cargo_group.get('volume') if not fixed_cost else cost_per_pack
+            code = charge.currency.code
+            data['currency'] = code
+            data['cost'] = cost_per_pack
+            data['subtotal'] = subtotal
+            new_cargo_group[charge.additional_surcharge.title] = data
+            add_currency_value(totals, code, subtotal)
+
+
+def calculate_fee(booking_fee, rate, main_currency_code, exchange_rate, subtotal):
+    if booking_fee.fee_type == GlobalFee.FIXED:
+        if rate.currency.code != main_currency_code:
+            booking_fee_value_in_foreign_curr = booking_fee.value / (exchange_rate.rate * exchange_rate.spread)
+        else:
+            booking_fee_value_in_foreign_curr = booking_fee.value
+        booking_fee_value_in_local_curr = booking_fee.value
+    else:
+        booking_fee_value_in_foreign_curr = subtotal * booking_fee.value
+        if rate.currency.code != main_currency_code:
+            booking_fee_value_in_local_curr = booking_fee_value_in_foreign_curr / (
+                        exchange_rate.rate * exchange_rate.spread)
+        else:
+            booking_fee_value_in_local_curr = booking_fee_value_in_foreign_curr
+    subtotal += booking_fee_value_in_foreign_curr
+    return subtotal, booking_fee_value_in_local_curr
+
+
+def calculate_freight_rate(totals, rate, booking_fee, main_currency_code, exchange_rate, volume=1, total_weight_per_pack=1, total_weight=1):
+    freight = dict()
+    code = rate.currency.code
+    freight['currency'] = code
+    freight['cost'] = total_weight_per_pack * rate.rate
+    subtotal = volume * total_weight * rate.rate
+    booking_fee_value_in_local_curr = 0
+    if booking_fee:
+        subtotal, booking_fee_value_in_local_curr = calculate_fee(booking_fee, rate, main_currency_code, exchange_rate,
+                                                                  subtotal)
+    freight['subtotal'] = subtotal
+    freight['booking_fee'] = booking_fee_value_in_local_curr
+    add_currency_value(totals, code, subtotal)
+    return freight

@@ -541,3 +541,28 @@ class Port(gis_models.Model):
     @property
     def display_name(self):
         return f'{self.code}, {self.name}, {self.code[:2]}'
+
+
+class ExchangeRate(models.Model):
+    """
+    System platform exchange rate against main currency model.
+    """
+
+    rate = models.DecimalField(
+        _('Exchange rate'),
+        max_digits=15,
+        decimal_places=4,
+    )
+    spread = models.DecimalField(
+        _('Spread'),
+        max_digits=10,
+        decimal_places=2,
+    )
+    currency = models.ForeignKey(
+        'Currency',
+        on_delete=models.CASCADE,
+        limit_choices_to=models.Q(is_active=True, is_main=False),
+    )
+
+    def __str__(self):
+        return f'Exchange rate from {self.currency.code}'

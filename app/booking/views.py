@@ -194,7 +194,7 @@ class FreightRateViesSet(viewsets.ModelViewSet):
         data['rates__surcharges__start_date__lte'] = date_from
         data['rates__surcharges__expiration_date__gte'] = date_to
 
-        freight_rates = FreightRate.objects.filter(**data)
+        freight_rates = FreightRate.objects.filter(**data, is_active=True)
 
         if shipping_mode.has_freight_containers:
             for container_type_id in container_type_ids_list:
@@ -244,6 +244,7 @@ class FreightRateViesSet(viewsets.ModelViewSet):
 
                     charges = rate.surcharges.filter(start_date__lte=date_from, expiration_date__gte=date_to).first().charges.all()
                     calculate_additional_surcharges(totals, charges, cargo_group, shipping_mode.is_need_volume, new_cargo_group, total_weight_per_pack)
+                    new_cargo_group['cargo_group'] = model_to_dict(cargo_group)
 
                     result['cargo_groups'].append(new_cargo_group)
             else:
@@ -257,6 +258,7 @@ class FreightRateViesSet(viewsets.ModelViewSet):
 
                     charges = rate.surcharges.filter(start_date__lte=date_from, expiration_date__gte=date_to).first().charges.all()
                     calculate_additional_surcharges(totals, charges, cargo_group, shipping_mode.is_need_volume, new_cargo_group)
+                    new_cargo_group['cargo_group'] = model_to_dict(cargo_group)
 
                     result['cargo_groups'].append(new_cargo_group)
 

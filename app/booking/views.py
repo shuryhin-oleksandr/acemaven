@@ -279,6 +279,16 @@ class FreightRateViesSet(viewsets.ModelViewSet):
             result['service_fee'] = service_fee_dict
             add_currency_value(totals, main_currency_code, service_fee)
 
+            booking_fee = totals.pop('booking_fee')
+            pay_to_book = service_fee + booking_fee
+            result['totals'] = totals
+            result['pay_to_book'] = {
+                'service_fee': service_fee,
+                'booking_fee': booking_fee,
+                'pay_to_book': pay_to_book,
+                'currency': main_currency_code,
+            }
+
             results.append(result)
 
         return Response(data=results, status=status.HTTP_200_OK)

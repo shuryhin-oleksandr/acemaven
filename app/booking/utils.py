@@ -120,5 +120,6 @@ def calculate_freight_rate(totals, rate, booking_fee, main_currency_code, exchan
                                                                   subtotal)
     freight['subtotal'] = subtotal
     freight['booking_fee'] = booking_fee_value_in_local_curr
+    add_currency_value(totals, 'booking_fee', booking_fee_value_in_local_curr)
     add_currency_value(totals, code, subtotal)
     return freight

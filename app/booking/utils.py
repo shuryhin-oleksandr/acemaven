@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.conf import settings
 from django.db.models import Q
 
@@ -43,10 +45,10 @@ def wm_calculate(data, shipping_type=None):
         shipping_type = data.get('shipping_type')
     weight_measurement = data.get('weight_measurement')
     length_measurement = data.get('length_measurement')
-    weight = float(data.get('weight'))
-    height = float(data.get('height'))
-    length = float(data.get('length'))
-    width = float(data.get('width'))
+    weight = Decimal(data.get('weight'))
+    height = Decimal(data.get('height'))
+    length = Decimal(data.get('length'))
+    width = Decimal(data.get('width'))
     volume = data.get('volume')
     if shipping_type == 'air':
         gross_weight = weight if weight_measurement == 'kg' else weight * 1000

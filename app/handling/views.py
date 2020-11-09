@@ -3,16 +3,13 @@ from rest_framework.permissions import IsAuthenticated
 from django_filters import rest_framework
 from rest_framework.filters import SearchFilter
 
-from django.conf import settings
 from django.db.models import BooleanField, Case, QuerySet, When, Q
 
 from app.handling.filters import CarrierFilterSet, PortFilterSet
 from app.handling.models import Carrier, Port, ShippingMode, ShippingType, Currency, PackagingType
 from app.handling.serializers import CarrierSerializer, CurrencySerializer, PortSerializer, ShippingModeSerializer, \
     ShippingTypeSerializer, PackagingTypeBaseSerializer
-
-
-COUNTRY_CODE = settings.COUNTRY_OF_ORIGIN_CODE
+from app.location.models import Country
 
 
 class CarrierViewSet(mixins.ListModelMixin,
@@ -74,4 +71,5 @@ class CurrencyViewSet(mixins.ListModelMixin,
     permission_classes = (IsAuthenticated, )
 
     def get_queryset(self):
-        return Currency.objects.filter(Q(country__code=COUNTRY_CODE) | (Q(code__in=['USD', 'EUR']))).distinct()
+        country_code = Country.objects.filter(is_main=True).first().code
+        return Currency.objects.filter(Q(country__code=country_code) | (Q(is_active=True))).distinct()

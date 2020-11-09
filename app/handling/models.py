@@ -1,5 +1,8 @@
+from decimal import Decimal
+
 from django.db import models
 from django.contrib.gis.db import models as gis_models
+from django.core.validators import MinValueValidator
 from django.utils.translation import gettext_lazy as _
 
 
@@ -552,11 +555,13 @@ class ExchangeRate(models.Model):
         _('Exchange rate'),
         max_digits=15,
         decimal_places=4,
+        validators=[MinValueValidator(Decimal('0.0001'))],
     )
     spread = models.DecimalField(
         _('Spread'),
         max_digits=10,
         decimal_places=2,
+        validators=[MinValueValidator(Decimal('0.01'))],
     )
     currency = models.ForeignKey(
         'Currency',

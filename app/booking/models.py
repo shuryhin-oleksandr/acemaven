@@ -367,24 +367,28 @@ class CargoGroup(models.Model):
         max_digits=15,
         decimal_places=2,
         null=True,
+        validators=[MinValueValidator(Decimal('0.01'))],
     )
     length = models.DecimalField(
         _('Length'),
         max_digits=15,
         decimal_places=2,
         null=True,
+        validators=[MinValueValidator(Decimal('0.01'))],
     )
     width = models.DecimalField(
         _('Width'),
         max_digits=15,
         decimal_places=2,
         null=True,
+        validators=[MinValueValidator(Decimal('0.01'))],
     )
     weight = models.DecimalField(
         _('Weight'),
         max_digits=15,
         decimal_places=2,
         null=True,
+        validators=[MinValueValidator(Decimal('0.01'))],
     )
     dangerous = models.BooleanField(
         _('Dangerous freight'),

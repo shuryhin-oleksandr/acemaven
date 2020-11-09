@@ -83,10 +83,10 @@ def calculate_additional_surcharges(totals,
                 if (condition := charge.conditions) == Charge.WM:
                     cost_per_pack = total_weight_per_pack * charge.charge
                 elif condition == Charge.PER_WEIGHT:
-                    cost_per_pack = cargo_group.get('weight') * charge.charge
+                    cost_per_pack = Decimal(cargo_group.get('weight')) * charge.charge
                 elif condition == Charge.FIXED:
                     fixed_cost = True
-            subtotal = cost_per_pack * cargo_group.get('volume') if not fixed_cost else cost_per_pack
+            subtotal = cost_per_pack * Decimal(cargo_group.get('volume')) if not fixed_cost else cost_per_pack
             code = charge.currency.code
             data['currency'] = code
             data['cost'] = cost_per_pack

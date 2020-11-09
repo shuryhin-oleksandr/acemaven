@@ -156,9 +156,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-COUNTRY_OF_ORIGIN_CODE = 'BR'
-
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 

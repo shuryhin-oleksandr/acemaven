@@ -258,7 +258,7 @@ class FreightRateViesSet(viewsets.ModelViewSet):
                                                     shipping_mode.is_need_volume,
                                                     new_cargo_group,
                                                     total_weight_per_pack)
-                    new_cargo_group['cargo_group'] = model_to_dict(cargo_group)
+                    new_cargo_group['cargo_group'] = cargo_group
 
                     result['cargo_groups'].append(new_cargo_group)
             else:

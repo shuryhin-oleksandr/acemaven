@@ -64,7 +64,12 @@ def add_currency_value(totals, code, subtotal):
     totals[code] = totals[code] + subtotal if code in totals else subtotal
 
 
-def calculate_additional_surcharges(totals, charges, cargo_group, is_need_volume, new_cargo_group, total_weight_per_pack=0):
+def calculate_additional_surcharges(totals,
+                                    charges,
+                                    cargo_group,
+                                    is_need_volume,
+                                    new_cargo_group,
+                                    total_weight_per_pack=0):
     for charge in charges:
         data = dict()
         if not charge.additional_surcharge.is_document:
@@ -108,7 +113,14 @@ def calculate_fee(booking_fee, rate, main_currency_code, exchange_rate, subtotal
     return subtotal, booking_fee_value_in_local_curr
 
 
-def calculate_freight_rate(totals, rate, booking_fee, main_currency_code, exchange_rate, volume=1, total_weight_per_pack=1, total_weight=1):
+def calculate_freight_rate(totals,
+                           rate,
+                           booking_fee,
+                           main_currency_code,
+                           exchange_rate,
+                           volume=1,
+                           total_weight_per_pack=1,
+                           total_weight=1):
     freight = dict()
     code = rate.currency.code
     freight['currency'] = code
@@ -116,7 +128,10 @@ def calculate_freight_rate(totals, rate, booking_fee, main_currency_code, exchan
     subtotal = volume * total_weight * rate.rate
     booking_fee_value_in_local_curr = 0
     if booking_fee:
-        subtotal, booking_fee_value_in_local_curr = calculate_fee(booking_fee, rate, main_currency_code, exchange_rate,
+        subtotal, booking_fee_value_in_local_curr = calculate_fee(booking_fee,
+                                                                  rate,
+                                                                  main_currency_code,
+                                                                  exchange_rate,
                                                                   subtotal)
     freight['subtotal'] = subtotal
     freight['booking_fee'] = booking_fee_value_in_local_curr

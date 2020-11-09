@@ -35,8 +35,9 @@ class PortViewSet(mixins.ListModelMixin,
         if isinstance(queryset, QuerySet):
             # Ensure queryset is re-evaluated on each request.
             queryset = queryset.all()
+        country_code = Country.objects.filter(is_main=True).first().code
         queryset = queryset.annotate(is_local=Case(
-            When(code__startswith=COUNTRY_CODE, then=True),
+            When(code__startswith=country_code, then=True),
             default=False,
             output_field=BooleanField(),
         ))

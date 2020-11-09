@@ -1,16 +1,12 @@
 from rest_framework import serializers
 
 from django.db.models import Min
-from django.conf import settings
 
 from app.booking.models import Surcharge, UsageFee, Charge, AdditionalSurcharge, FreightRate, Rate, CargoGroup
 from app.booking.utils import rate_surcharges_filter
 from app.handling.models import ShippingType
 from app.handling.serializers import ContainerTypesSerializer, CurrencySerializer, CarrierBaseSerializer, \
     PortSerializer, ShippingModeBaseSerializer
-
-
-COUNTRY_CODE = settings.COUNTRY_OF_ORIGIN_CODE
 
 
 class UserUpdateMixin:

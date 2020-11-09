@@ -252,6 +252,21 @@ class FreightRateListSerializer(serializers.ModelSerializer):
         return date.strftime('%d/%m/%Y') if date else None
 
 
+class FreightRateSearchListSerializer(FreightRateListSerializer):
+    carrier = serializers.SerializerMethodField()
+    company = serializers.CharField(source='company.name')
+
+    class Meta(FreightRateListSerializer.Meta):
+        model = FreightRate
+        fields = FreightRateListSerializer.Meta.fields + (
+            'transit_time',
+            'company',
+        )
+
+    def get_carrier(self, obj):
+        return obj.carrier.title if not obj.carrier_disclosure else 'disclosed'
+
+
 class FreightRateEditSerializer(serializers.ModelSerializer):
     class Meta:
         model = FreightRate

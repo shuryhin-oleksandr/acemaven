@@ -8,20 +8,19 @@ from rest_framework.response import Response
 
 from django.conf import settings
 from django.db.models import CharField, Case, When, Value, Q
-from django.forms import model_to_dict
 
-from app.core.permissions import IsMasterOrAgent, IsClientCompany
 from app.booking.filters import SurchargeFilterSet, FreightRateFilterSet
 from app.booking.models import Surcharge, UsageFee, Charge, FreightRate, Rate
 from app.booking.serializers import SurchargeSerializer, SurchargeEditSerializer, SurchargeListSerializer, \
     SurchargeRetrieveSerializer, UsageFeeSerializer, ChargeSerializer, FreightRateListSerializer, \
     SurchargeCheckDatesSerializer, FreightRateEditSerializer, FreightRateSerializer, FreightRateRetrieveSerializer, \
     RateSerializer, CheckRateDateSerializer, FreightRateCheckDatesSerializer, WMCalculateSerializer, \
-    FreightRateSearchSerializer
-
+    FreightRateSearchSerializer, FreightRateSearchListSerializer
 from app.booking.utils import date_format, wm_calculate, calculate_additional_surcharges, calculate_freight_rate, \
     add_currency_value
+from app.core.permissions import IsMasterOrAgent, IsClientCompany
 from app.handling.models import Port, ShippingMode, GlobalFee, ExchangeRate, Currency, ContainerType, PackagingType
+
 
 COUNTRY_CODE = settings.COUNTRY_OF_ORIGIN_CODE
 
@@ -233,7 +232,7 @@ class FreightRateViesSet(viewsets.ModelViewSet):
         for freight_rate in freight_rates:
             totals = dict()
             result = dict()
-            result['freight_rate'] = model_to_dict(freight_rate)
+            result['freight_rate'] = FreightRateSearchListSerializer(freight_rate).data
             result['cargo_groups'] = []
             if shipping_mode.is_need_volume:
                 rate = freight_rate.rates.first()

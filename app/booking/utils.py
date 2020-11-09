@@ -91,7 +91,7 @@ def calculate_additional_surcharges(totals,
             data['currency'] = code
             data['cost'] = cost_per_pack
             data['subtotal'] = subtotal
-            new_cargo_group[charge.additional_surcharge.title] = data
+            new_cargo_group[charge.additional_surcharge.title.split()[0].lower()] = data
             add_currency_value(totals, code, subtotal)
 
 

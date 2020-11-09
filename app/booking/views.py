@@ -21,7 +21,7 @@ from app.booking.serializers import SurchargeSerializer, SurchargeEditSerializer
 
 from app.booking.utils import date_format, wm_calculate, calculate_additional_surcharges, calculate_freight_rate, \
     add_currency_value
-from app.handling.models import Port, ShippingMode, GlobalFee, ExchangeRate, Currency
+from app.handling.models import Port, ShippingMode, GlobalFee, ExchangeRate, Currency, ContainerType, PackagingType
 
 COUNTRY_CODE = settings.COUNTRY_OF_ORIGIN_CODE
 
@@ -260,8 +260,9 @@ class FreightRateViesSet(viewsets.ModelViewSet):
                                                     total_weight_per_pack)
                     new_cargo_group['volume'] = cargo_group.get('volume')
                     container_type = cargo_group.get('container_type')
-                    new_cargo_group['type'] = container_type.code if container_type else \
-                        cargo_group.get('packaging_type').description
+                    packaging_type = cargo_group.get('packaging_type')
+                    new_cargo_group['type'] = ContainerType.objects.filter(id=container_type).first().code \
+                        if container_type else PackagingType.objects.filter(id=packaging_type).first().description
 
                     result['cargo_groups'].append(new_cargo_group)
             else:
@@ -286,7 +287,8 @@ class FreightRateViesSet(viewsets.ModelViewSet):
                                                     shipping_mode.is_need_volume,
                                                     new_cargo_group)
                     new_cargo_group['volume'] = cargo_group.get('volume')
-                    new_cargo_group['type'] = cargo_group.get('container_type').code
+                    container_type = cargo_group.get('container_type')
+                    new_cargo_group['type'] = ContainerType.objects.filter(id=container_type).first().code
 
                     result['cargo_groups'].append(new_cargo_group)
 

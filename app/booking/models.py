@@ -343,8 +343,8 @@ class CargoGroup(models.Model):
     FROZEN = 'frozen'
     COLD = 'cold'
     FROZEN_CHOICES = (
-        (FROZEN, 'Chilled'),
-        (COLD, 'Cold'),
+        (FROZEN, 'Frozen'),
+        (COLD, 'Chilled'),
     )
 
     container_type = models.ForeignKey(

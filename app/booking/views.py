@@ -6,7 +6,6 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from django.conf import settings
 from django.db.models import CharField, Case, When, Value, Q
 
 from app.booking.filters import SurchargeFilterSet, FreightRateFilterSet
@@ -20,9 +19,7 @@ from app.booking.utils import date_format, wm_calculate, calculate_additional_su
     add_currency_value
 from app.core.permissions import IsMasterOrAgent, IsClientCompany
 from app.handling.models import Port, ShippingMode, GlobalFee, ExchangeRate, Currency, ContainerType, PackagingType
-
-
-COUNTRY_CODE = settings.COUNTRY_OF_ORIGIN_CODE
+from app.location.models import Country
 
 
 class FeeGetQuerysetMixin:
@@ -119,8 +116,9 @@ class FreightRateViesSet(viewsets.ModelViewSet):
         user = self.request.user
         queryset = self.queryset.filter(company=user.companies.first())
         if self.action == 'list':
+            country_code = Country.objects.filter(is_main=True).first().code
             return queryset.annotate(direction=Case(
-                When(origin__code__startswith=COUNTRY_CODE, then=Value('export')),
+                When(origin__code__startswith=country_code, then=Value('export')),
                 default=Value('import'),
                 output_field=CharField()
             ))
@@ -146,7 +144,8 @@ class FreightRateViesSet(viewsets.ModelViewSet):
         data = serializer.data
         user = self.request.user
         port = Port.objects.get(id=data['origin'])
-        direction = 'export' if port.code.startswith(COUNTRY_CODE) else 'import'
+        country_code = Country.objects.filter(is_main=True).first().code
+        direction = 'export' if port.code.startswith(country_code) else 'import'
         location = data['origin'] if direction == 'export' else data['destination']
         start_date = date_format(data['start_date'])
         expiration_date = date_format(data['expiration_date'])

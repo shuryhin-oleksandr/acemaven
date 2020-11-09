@@ -24,7 +24,7 @@ class Country(models.Model):
         _('Country is active'),
         default=True,
     )
-    chosen_for_platform = models.BooleanField(
+    is_main = models.BooleanField(
         _('Country was chosen as main for platform'),
         default=False,
     )
@@ -33,8 +33,8 @@ class Country(models.Model):
         return f'{self.name} ({self.code})'
 
     def save(self, *args, **kwargs):
-        if self.chosen_for_platform:
-            Country.objects.all().update(chosen_for_platform=False)
+        if self.is_main:
+            Country.objects.all().update(is_main=False)
         super(Country, self).save(*args, **kwargs)
 
 

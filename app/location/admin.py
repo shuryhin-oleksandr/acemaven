@@ -5,7 +5,8 @@ from app.location.models import Country, Region, State, InternationalZone
 
 @admin.register(Country)
 class CountryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'code', 'currency',)
+    list_display = ('name', 'code', 'currency', 'is_main', )
+    search_fields = ('name', 'code', )
 
 
 @admin.register(Region)

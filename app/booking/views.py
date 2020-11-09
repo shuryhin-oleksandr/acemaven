@@ -226,6 +226,7 @@ class FreightRateViesSet(viewsets.ModelViewSet):
             global_fees.filter(fee_type=GlobalFee.BOOKING, is_active=True).first()
         service_fee = local_service_fee if local_service_fee else \
             global_fees.filter(fee_type=GlobalFee.SERVICE, is_active=True).first()
+        service_fee = service_fee.value if service_fee else 0
         results = []
         main_currency_code = Currency.objects.filter(is_main=True).first().code
         for freight_rate in freight_rates:
@@ -309,7 +310,6 @@ class FreightRateViesSet(viewsets.ModelViewSet):
 
             service_fee_dict = dict()
             service_fee_dict['currency'] = main_currency_code
-            service_fee = service_fee.value if service_fee else 0
             service_fee_dict['cost'] = service_fee
             service_fee_dict['subtotal'] = service_fee
             result['service_fee'] = service_fee_dict

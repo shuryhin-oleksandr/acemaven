@@ -293,8 +293,13 @@ class FreightRateViesSet(viewsets.ModelViewSet):
                     result['cargo_groups'].append(new_cargo_group)
 
             doc_fee = dict()
-            surcharge = freight_rate.rates.first().surcharges.filter(start_date__lte=date_from,
-                                                                     expiration_date__gte=date_to).first()
+            filter_data = {}
+            if shipping_mode.has_freight_containers:
+                filter_data['container_type__id'] = container_type_ids_list[0]
+            surcharge = freight_rate.rates.filter(**filter_data).first().surcharges.filter(
+                start_date__lte=date_from,
+                expiration_date__gte=date_to,
+            ).first()
             charge = surcharge.charges.filter(additional_surcharge__is_document=True).first()
             doc_fee['currency'] = charge.currency.code
             doc_fee['cost'] = charge.charge

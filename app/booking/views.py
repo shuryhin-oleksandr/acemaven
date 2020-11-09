@@ -258,7 +258,10 @@ class FreightRateViesSet(viewsets.ModelViewSet):
                                                     shipping_mode.is_need_volume,
                                                     new_cargo_group,
                                                     total_weight_per_pack)
-                    new_cargo_group['cargo_group'] = cargo_group
+                    new_cargo_group['volume'] = cargo_group.get('volume')
+                    container_type = cargo_group.get('container_type')
+                    new_cargo_group['type'] = container_type.code if container_type else \
+                        cargo_group.get('packaging_type').description
 
                     result['cargo_groups'].append(new_cargo_group)
             else:
@@ -282,7 +285,8 @@ class FreightRateViesSet(viewsets.ModelViewSet):
                                                     cargo_group,
                                                     shipping_mode.is_need_volume,
                                                     new_cargo_group)
-                    new_cargo_group['cargo_group'] = cargo_group
+                    new_cargo_group['volume'] = cargo_group.get('volume')
+                    new_cargo_group['type'] = cargo_group.get('container_type').code
 
                     result['cargo_groups'].append(new_cargo_group)
 

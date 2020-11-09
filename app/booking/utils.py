@@ -54,7 +54,7 @@ def wm_calculate(data, shipping_type=None):
     else:
         gross_weight = weight if weight_measurement == 't' else weight / 1000
         divider = 1 if length_measurement == 'm' else 1000000
-    total_volume = height * length * width / divider
+    total_volume = height * length * width / Decimal(divider)
     total_weight_per_pack = gross_weight if gross_weight > total_volume else total_volume
     total_weight = total_weight_per_pack * volume
     return round(total_weight_per_pack, 2), round(total_weight, 2)

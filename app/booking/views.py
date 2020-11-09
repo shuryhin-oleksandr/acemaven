@@ -224,8 +224,10 @@ class FreightRateViesSet(viewsets.ModelViewSet):
         global_fees = GlobalFee.objects.filter(shipping_mode=shipping_mode)
         local_booking_fee = local_fees.filter(fee_type=GlobalFee.BOOKING, is_active=True).first()
         local_service_fee = local_fees.filter(fee_type=GlobalFee.SERVICE, is_active=True).first()
-        booking_fee = local_booking_fee if local_booking_fee else global_fees.filter(fee_type=GlobalFee.BOOKING, is_active=True).first()
-        service_fee = local_service_fee if local_service_fee else global_fees.filter(fee_type=GlobalFee.SERVICE, is_active=True).first()
+        booking_fee = local_booking_fee if local_booking_fee else \
+            global_fees.filter(fee_type=GlobalFee.BOOKING, is_active=True).first()
+        service_fee = local_service_fee if local_service_fee else \
+            global_fees.filter(fee_type=GlobalFee.SERVICE, is_active=True).first()
         results = []
         main_currency_code = Currency.objects.filter(is_main=True).first().code
         for freight_rate in freight_rates:
@@ -240,10 +242,22 @@ class FreightRateViesSet(viewsets.ModelViewSet):
                     new_cargo_group = dict()
                     total_weight_per_pack, total_weight = wm_calculate(cargo_group, shipping_mode.shipping_type.title)
 
-                    new_cargo_group['freight'] = calculate_freight_rate(totals, rate, booking_fee, main_currency_code, exchange_rate, total_weight_per_pack=total_weight_per_pack, total_weight=total_weight)
+                    new_cargo_group['freight'] = calculate_freight_rate(totals,
+                                                                        rate,
+                                                                        booking_fee,
+                                                                        main_currency_code,
+                                                                        exchange_rate,
+                                                                        total_weight_per_pack=total_weight_per_pack,
+                                                                        total_weight=total_weight)
 
-                    charges = rate.surcharges.filter(start_date__lte=date_from, expiration_date__gte=date_to).first().charges.all()
-                    calculate_additional_surcharges(totals, charges, cargo_group, shipping_mode.is_need_volume, new_cargo_group, total_weight_per_pack)
+                    charges = rate.surcharges.filter(start_date__lte=date_from,
+                                                     expiration_date__gte=date_to).first().charges.all()
+                    calculate_additional_surcharges(totals,
+                                                    charges,
+                                                    cargo_group,
+                                                    shipping_mode.is_need_volume,
+                                                    new_cargo_group,
+                                                    total_weight_per_pack)
                     new_cargo_group['cargo_group'] = model_to_dict(cargo_group)
 
                     result['cargo_groups'].append(new_cargo_group)
@@ -254,16 +268,27 @@ class FreightRateViesSet(viewsets.ModelViewSet):
                     rate = rates.filter(container_type=cargo_group.get('container_type')).first()
                     exchange_rate = ExchangeRate.objects.filter(currency__code=rate.currency.code).first()
 
-                    new_cargo_group['freight'] = calculate_freight_rate(totals, rate, booking_fee, main_currency_code, exchange_rate, volume=cargo_group.get('volume'))
+                    new_cargo_group['freight'] = calculate_freight_rate(totals,
+                                                                        rate,
+                                                                        booking_fee,
+                                                                        main_currency_code,
+                                                                        exchange_rate,
+                                                                        volume=cargo_group.get('volume'))
 
-                    charges = rate.surcharges.filter(start_date__lte=date_from, expiration_date__gte=date_to).first().charges.all()
-                    calculate_additional_surcharges(totals, charges, cargo_group, shipping_mode.is_need_volume, new_cargo_group)
+                    charges = rate.surcharges.filter(start_date__lte=date_from,
+                                                     expiration_date__gte=date_to).first().charges.all()
+                    calculate_additional_surcharges(totals,
+                                                    charges,
+                                                    cargo_group,
+                                                    shipping_mode.is_need_volume,
+                                                    new_cargo_group)
                     new_cargo_group['cargo_group'] = model_to_dict(cargo_group)
 
                     result['cargo_groups'].append(new_cargo_group)
 
             doc_fee = dict()
-            surcharge = freight_rate.rates.first().surcharges.filter(start_date__lte=date_from, expiration_date__gte=date_to).first()
+            surcharge = freight_rate.rates.first().surcharges.filter(start_date__lte=date_from,
+                                                                     expiration_date__gte=date_to).first()
             charge = surcharge.charges.filter(additional_surcharge__is_document=True).first()
             doc_fee['currency'] = charge.currency.code
             doc_fee['cost'] = charge.charge

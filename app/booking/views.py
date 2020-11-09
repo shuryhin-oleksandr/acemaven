@@ -260,7 +260,7 @@ class FreightRateViesSet(viewsets.ModelViewSet):
                     new_cargo_group['volume'] = cargo_group.get('volume')
                     container_type = cargo_group.get('container_type')
                     packaging_type = cargo_group.get('packaging_type')
-                    new_cargo_group['type'] = ContainerType.objects.filter(id=container_type).first().code \
+                    new_cargo_group['cargo_type'] = ContainerType.objects.filter(id=container_type).first().code \
                         if container_type else PackagingType.objects.filter(id=packaging_type).first().description
 
                     result['cargo_groups'].append(new_cargo_group)
@@ -287,7 +287,7 @@ class FreightRateViesSet(viewsets.ModelViewSet):
                                                     new_cargo_group)
                     new_cargo_group['volume'] = cargo_group.get('volume')
                     container_type = cargo_group.get('container_type')
-                    new_cargo_group['type'] = ContainerType.objects.filter(id=container_type).first().code
+                    new_cargo_group['cargo_type'] = ContainerType.objects.filter(id=container_type).first().code
 
                     result['cargo_groups'].append(new_cargo_group)
 

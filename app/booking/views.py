@@ -231,6 +231,8 @@ class FreightRateViesSet(viewsets.ModelViewSet):
         main_currency_code = Currency.objects.filter(is_main=True).first().code
         for freight_rate in freight_rates:
             totals = dict()
+            totals['total_freight_rate'] = dict()
+            totals['total_surcharge'] = dict()
             result = dict()
             result['freight_rate'] = FreightRateSearchListSerializer(freight_rate).data
             result['cargo_groups'] = []
@@ -316,6 +318,10 @@ class FreightRateViesSet(viewsets.ModelViewSet):
 
             booking_fee = totals.pop('booking_fee')
             pay_to_book = service_fee + booking_fee
+            total_freight_rate = totals.pop('total_freight_rate')
+            total_surcharge = totals.pop('total_surcharge')
+            result['total_freight_rate'] = total_freight_rate
+            result['total_surcharge'] = total_surcharge
             result['totals'] = totals
             result['pay_to_book'] = {
                 'service_fee': service_fee,

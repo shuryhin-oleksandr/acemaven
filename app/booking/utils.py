@@ -93,6 +93,7 @@ def calculate_additional_surcharges(totals,
             data['subtotal'] = subtotal
             new_cargo_group[charge.additional_surcharge.title.split()[0].lower()] = data
             add_currency_value(totals, code, subtotal)
+            add_currency_value(totals['total_surcharge'], code, subtotal)
 
 
 def calculate_fee(booking_fee, rate, main_currency_code, exchange_rate, subtotal):
@@ -137,4 +138,5 @@ def calculate_freight_rate(totals,
     freight['booking_fee'] = booking_fee_value_in_local_curr
     add_currency_value(totals, 'booking_fee', booking_fee_value_in_local_curr)
     add_currency_value(totals, code, subtotal)
+    add_currency_value(totals['total_freight_rate'], code, subtotal)
     return freight

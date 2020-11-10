@@ -217,7 +217,7 @@ class FreightRateViesSet(viewsets.ModelViewSet):
                 rates__surcharges__charges__additional_surcharge__is_cold=True,
                 rates__surcharges__charges__charge__isnull=False
             )
-
+        freight_rates = freight_rates.distinct()
         local_fees = request.user.companies.first().fees.filter(shipping_mode=shipping_mode)
         global_fees = GlobalFee.objects.filter(shipping_mode=shipping_mode)
         local_booking_fee = local_fees.filter(fee_type=GlobalFee.BOOKING, is_active=True).first()

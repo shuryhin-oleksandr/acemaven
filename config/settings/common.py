@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'rest_auth',
     'tabbed_admin',
+    'debug_toolbar',
 
     'app.core',
     'app.booking',
@@ -88,6 +89,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'

@@ -347,6 +347,20 @@ class CargoGroup(models.Model):
         (COLD, 'Chilled'),
     )
 
+    KG = 'kg'
+    T = 't'
+    WEIGHT_MEASUREMENT_CHOICES = (
+        (KG, 'kg'),
+        (T, 't'),
+    )
+
+    CM = 'cm'
+    M = 'm'
+    LENGTH_MEASUREMENT_CHOICES = (
+        (CM, 'cm'),
+        (M, 'm'),
+    )
+
     container_type = models.ForeignKey(
         'handling.ContainerType',
         on_delete=models.CASCADE,
@@ -355,6 +369,18 @@ class CargoGroup(models.Model):
     packaging_type = models.ForeignKey(
         'handling.PackagingType',
         on_delete=models.CASCADE,
+        null=True,
+    )
+    weight_measurement = models.CharField(
+        _('Weight Measurement'),
+        max_length=2,
+        choices=WEIGHT_MEASUREMENT_CHOICES,
+        null=True,
+    )
+    length_measurement = models.CharField(
+        _('Length Measurement'),
+        max_length=2,
+        choices=LENGTH_MEASUREMENT_CHOICES,
         null=True,
     )
     volume = models.PositiveIntegerField(
@@ -409,7 +435,54 @@ class CargoGroup(models.Model):
         'Booking',
         on_delete=models.CASCADE,
         related_name='cargo_groups',
+        null=True,
+    )
+    quote = models.ForeignKey(
+        'Quote',
+        on_delete=models.CASCADE,
+        related_name='quote_cargo_groups',
+        null=True,
     )
 
     def __str__(self):
         return f'Cargo group [{self.id}] of booking [{self.booking}]'
+
+
+class Quote(models.Model):
+    """
+    Model for quote.
+    """
+
+    origin = models.ForeignKey(
+        'handling.Port',
+        on_delete=models.CASCADE,
+        related_name='origin_quotes',
+    )
+    destination = models.ForeignKey(
+        'handling.Port',
+        on_delete=models.CASCADE,
+        related_name='destination_quotes',
+    )
+    shipping_mode = models.ForeignKey(
+        'handling.ShippingMode',
+        on_delete=models.CASCADE,
+        related_name='quotes',
+    )
+    start_date = models.DateField(
+        _('Quote start date'),
+    )
+    expiration_date = models.DateField(
+        _('Quote expiration date'),
+    )
+    company = models.ForeignKey(
+        'core.Company',
+        on_delete=models.CASCADE,
+        related_name='quotes',
+    )
+    is_active = models.BooleanField(
+        _('Quote is active or paused'),
+        default=True,
+    )
+
+    def __str__(self):
+        return f'Quote {self.origin.code} - {self.destination.code}'

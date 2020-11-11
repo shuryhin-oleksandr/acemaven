@@ -66,6 +66,7 @@ def add_currency_value(totals, code, subtotal):
 
 def calculate_additional_surcharges(totals,
                                     charges,
+                                    usage_fees,
                                     cargo_group,
                                     is_need_volume,
                                     new_cargo_group,

@@ -9,12 +9,12 @@ from rest_framework.response import Response
 from django.db.models import CharField, Case, When, Value, Q
 
 from app.booking.filters import SurchargeFilterSet, FreightRateFilterSet
-from app.booking.models import Surcharge, UsageFee, Charge, FreightRate, Rate
+from app.booking.models import Surcharge, UsageFee, Charge, FreightRate, Rate, Quote
 from app.booking.serializers import SurchargeSerializer, SurchargeEditSerializer, SurchargeListSerializer, \
     SurchargeRetrieveSerializer, UsageFeeSerializer, ChargeSerializer, FreightRateListSerializer, \
     SurchargeCheckDatesSerializer, FreightRateEditSerializer, FreightRateSerializer, FreightRateRetrieveSerializer, \
     RateSerializer, CheckRateDateSerializer, FreightRateCheckDatesSerializer, WMCalculateSerializer, \
-    FreightRateSearchSerializer, FreightRateSearchListSerializer
+    FreightRateSearchSerializer, FreightRateSearchListSerializer, QuoteSerializer
 from app.booking.utils import date_format, wm_calculate, calculate_additional_surcharges, calculate_freight_rate, \
     add_currency_value
 from app.core.permissions import IsMasterOrAgent, IsClientCompany
@@ -217,7 +217,7 @@ class FreightRateViesSet(viewsets.ModelViewSet):
                 rates__surcharges__charges__additional_surcharge__is_cold=True,
                 rates__surcharges__charges__charge__isnull=False
             )
-        freight_rates = freight_rates.distinct()
+        freight_rates = freight_rates.order_by('transit_time').distinct()
         local_fees = request.user.companies.first().fees.filter(shipping_mode=shipping_mode)
         global_fees = GlobalFee.objects.filter(shipping_mode=shipping_mode)
         local_booking_fee = local_fees.filter(fee_type=GlobalFee.BOOKING, is_active=True).first()
@@ -251,10 +251,13 @@ class FreightRateViesSet(viewsets.ModelViewSet):
                                                                         total_weight_per_pack=total_weight_per_pack,
                                                                         total_weight=total_weight)
 
-                    charges = rate.surcharges.filter(start_date__lte=date_from,
-                                                     expiration_date__gte=date_to).first().charges.all()
+                    surcharge = rate.surcharges.filter(start_date__lte=date_from,
+                                                       expiration_date__gte=date_to).first()
+                    charges = surcharge.charges.all()
+                    usage_fees = surcharge.usage_fees.all()
                     calculate_additional_surcharges(totals,
                                                     charges,
+                                                    usage_fees,
                                                     cargo_group,
                                                     shipping_mode.is_need_volume,
                                                     new_cargo_group,
@@ -280,10 +283,13 @@ class FreightRateViesSet(viewsets.ModelViewSet):
                                                                         exchange_rate,
                                                                         volume=cargo_group.get('volume'))
 
-                    charges = rate.surcharges.filter(start_date__lte=date_from,
-                                                     expiration_date__gte=date_to).first().charges.all()
+                    surcharge = rate.surcharges.filter(start_date__lte=date_from,
+                                                       expiration_date__gte=date_to).first()
+                    charges = surcharge.charges.all()
+                    usage_fees = surcharge.usage_fees.all()
                     calculate_additional_surcharges(totals,
                                                     charges,
+                                                    usage_fees,
                                                     cargo_group,
                                                     shipping_mode.is_need_volume,
                                                     new_cargo_group)
@@ -360,3 +366,9 @@ class WMCalculateView(generics.GenericAPIView):
             'total': total,
         }
         return Response(data=results, status=status.HTTP_200_OK)
+
+
+class QuoteViesSet(viewsets.ModelViewSet):
+    queryset = Quote.objects.all()
+    serializer_class = QuoteSerializer
+    permission_classes = (IsAuthenticated, )

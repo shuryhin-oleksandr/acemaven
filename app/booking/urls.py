@@ -3,7 +3,7 @@ from django.urls import path
 from rest_framework.routers import DefaultRouter
 
 from app.booking.views import SurchargeViesSet, UsageFeeViesSet, ChargeViesSet, FreightRateViesSet, \
-    RateViesSet, WMCalculateView
+    RateViesSet, WMCalculateView, QuoteViesSet
 
 
 app_name = 'booking'
@@ -14,6 +14,7 @@ router.register(r'usage-fee', UsageFeeViesSet, basename='usage_fee')
 router.register(r'charge', ChargeViesSet, basename='charge')
 router.register(r'freight-rate', FreightRateViesSet, basename='freight_rate')
 router.register(r'rate', RateViesSet, basename='rate')
+router.register(r'quote', QuoteViesSet, basename='quote')
 
 urlpatterns = router.urls
 

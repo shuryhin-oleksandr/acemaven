@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from django.db.models import Min
 
-from app.booking.models import Surcharge, UsageFee, Charge, AdditionalSurcharge, FreightRate, Rate, CargoGroup
+from app.booking.models import Surcharge, UsageFee, Charge, AdditionalSurcharge, FreightRate, Rate, CargoGroup, Quote
 from app.booking.utils import rate_surcharges_filter
 from app.handling.models import ShippingType
 from app.handling.serializers import ContainerTypesSerializer, CurrencySerializer, CarrierBaseSerializer, \
@@ -351,6 +351,8 @@ class CargoGroupSerializer(serializers.ModelSerializer):
         fields = (
             'container_type',
             'packaging_type',
+            'weight_measurement',
+            'length_measurement',
             'volume',
             'height',
             'length',
@@ -372,10 +374,38 @@ class FreightRateSearchSerializer(serializers.Serializer):
 
 class WMCalculateSerializer(serializers.Serializer):
     shipping_type = serializers.ChoiceField(choices=ShippingType.objects.values_list('title', flat=True))
-    weight_measurement = serializers.ChoiceField(choices=['kg', 't'])
-    length_measurement = serializers.ChoiceField(choices=['cm', 'm'])
+    weight_measurement = serializers.ChoiceField(choices=CargoGroup.WEIGHT_MEASUREMENT_CHOICES)
+    length_measurement = serializers.ChoiceField(choices=CargoGroup.LENGTH_MEASUREMENT_CHOICES)
     weight = serializers.DecimalField(max_digits=15, decimal_places=4, min_value=0)
     height = serializers.DecimalField(max_digits=15, decimal_places=4, min_value=0)
     length = serializers.DecimalField(max_digits=15, decimal_places=4, min_value=0)
     width = serializers.DecimalField(max_digits=15, decimal_places=4, min_value=0)
     volume = serializers.IntegerField(min_value=1)
+
+
+class QuoteSerializer(serializers.ModelSerializer):
+    cargo_groups = CargoGroupSerializer(source='quote_cargo_groups', many=True)
+
+    class Meta:
+        model = Quote
+        fields = (
+            'id',
+            'origin',
+            'destination',
+            'shipping_mode',
+            'start_date',
+            'expiration_date',
+            'is_active',
+            'cargo_groups',
+        )
+
+    def create(self, validated_data):
+        user = self.context['request'].user
+        company = user.companies.first()
+        validated_data['company'] = company
+        cargo_groups = validated_data.pop('quote_cargo_groups', [])
+        quote = super().create(validated_data)
+        cargo_groups = [{**item, **{'quote': quote}} for item in cargo_groups]
+        new_cargo_groups = [CargoGroup(**fields) for fields in cargo_groups]
+        CargoGroup.objects.bulk_create(new_cargo_groups)
+        return quote

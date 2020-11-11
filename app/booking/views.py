@@ -9,12 +9,12 @@ from rest_framework.response import Response
 from django.db.models import CharField, Case, When, Value, Q
 
 from app.booking.filters import SurchargeFilterSet, FreightRateFilterSet
-from app.booking.models import Surcharge, UsageFee, Charge, FreightRate, Rate, Quote
+from app.booking.models import Surcharge, UsageFee, Charge, FreightRate, Rate, Quote, Booking
 from app.booking.serializers import SurchargeSerializer, SurchargeEditSerializer, SurchargeListSerializer, \
     SurchargeRetrieveSerializer, UsageFeeSerializer, ChargeSerializer, FreightRateListSerializer, \
     SurchargeCheckDatesSerializer, FreightRateEditSerializer, FreightRateSerializer, FreightRateRetrieveSerializer, \
     RateSerializer, CheckRateDateSerializer, FreightRateCheckDatesSerializer, WMCalculateSerializer, \
-    FreightRateSearchSerializer, FreightRateSearchListSerializer, QuoteSerializer
+    FreightRateSearchSerializer, FreightRateSearchListSerializer, QuoteSerializer, BookingSerializer
 from app.booking.utils import date_format, wm_calculate, calculate_additional_surcharges, calculate_freight_rate, \
     add_currency_value
 from app.core.permissions import IsMasterOrAgent, IsClientCompany
@@ -371,4 +371,10 @@ class WMCalculateView(generics.GenericAPIView):
 class QuoteViesSet(viewsets.ModelViewSet):
     queryset = Quote.objects.all()
     serializer_class = QuoteSerializer
+    permission_classes = (IsAuthenticated, )
+
+
+class BookingViesSet(viewsets.ModelViewSet):
+    queryset = Booking.objects.all()
+    serializer_class = BookingSerializer
     permission_classes = (IsAuthenticated, )

@@ -2,8 +2,11 @@ from rest_framework import serializers
 
 from django.db.models import Min
 
-from app.booking.models import Surcharge, UsageFee, Charge, AdditionalSurcharge, FreightRate, Rate, CargoGroup, Quote
+from app.booking.models import Surcharge, UsageFee, Charge, AdditionalSurcharge, FreightRate, Rate, CargoGroup, Quote, \
+    Booking
 from app.booking.utils import rate_surcharges_filter
+from app.core.models import Shipper
+from app.core.serializers import ShipperSerializer
 from app.handling.models import ShippingType
 from app.handling.serializers import ContainerTypesSerializer, CurrencySerializer, CarrierBaseSerializer, \
     PortSerializer, ShippingModeBaseSerializer
@@ -409,3 +412,37 @@ class QuoteSerializer(serializers.ModelSerializer):
         new_cargo_groups = [CargoGroup(**fields) for fields in cargo_groups]
         CargoGroup.objects.bulk_create(new_cargo_groups)
         return quote
+
+
+class BookingSerializer(serializers.ModelSerializer):
+    shipper = ShipperSerializer()
+    cargo_groups = CargoGroupSerializer(many=True)
+
+    class Meta:
+        model = Booking
+        fields = (
+            'id',
+            'date_from',
+            'date_to',
+            'release_type',
+            'number_of_documents',
+            'freight_rate',
+            'shipper',
+            'cargo_groups',
+        )
+
+    def create(self, validated_data):
+        user = self.context['request'].user
+        company = user.companies.first()
+        validated_data['company'] = company
+        shipper = validated_data.pop('shipper')
+        shipper['company'] = company
+        new_shipper = Shipper.objects.create(**shipper)
+        validated_data['shipper'] = new_shipper
+        cargo_groups = validated_data.pop('cargo_groups', [])
+        booking = super().create(validated_data)
+        cargo_groups = [{**item, **{'booking': booking}} for item in cargo_groups]
+        new_cargo_groups = [CargoGroup(**fields) for fields in cargo_groups]
+        CargoGroup.objects.bulk_create(new_cargo_groups)
+        return booking
+

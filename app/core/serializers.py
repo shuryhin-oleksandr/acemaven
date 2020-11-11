@@ -4,7 +4,7 @@ from rest_framework import serializers
 from django.db import transaction
 from django.contrib.auth import get_user_model
 
-from app.core.models import BankAccount, Company, SignUpRequest, Role
+from app.core.models import BankAccount, Company, SignUpRequest, Role, Shipper
 from app.core.utils import process_sign_up_token
 from app.core.validators import PasswordValidator
 from app.handling.serializers import ReleaseTypeSerializer
@@ -219,3 +219,21 @@ class BankAccountSerializer(serializers.ModelSerializer):
 class SelectChoiceSerializer(serializers.Serializer):
     frozen_choices = serializers.ListField(required=False)
     release_type = ReleaseTypeSerializer(many=True, required=False)
+
+
+class ShipperSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Shipper
+        fields = (
+            'id',
+            'name',
+            'address_line_first',
+            'address_line_second',
+            'state',
+            'city',
+            'zip_code',
+            'contact_name',
+            'phone',
+            'phone_additional',
+            'email',
+        )

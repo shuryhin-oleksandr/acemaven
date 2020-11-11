@@ -304,9 +304,10 @@ class Booking(models.Model):
         _('Whether booking paid or not'),
         default=False,
     )
-    client = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.SET_NULL,
+    company = models.ForeignKey(
+        'core.Company',
+        on_delete=models.CASCADE,
+        related_name='bookings',
         null=True,
     )
     release_type = models.ForeignKey(

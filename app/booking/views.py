@@ -8,29 +8,21 @@ from rest_framework.response import Response
 
 from django.db.models import CharField, Case, When, Value, Q
 
-from app.booking.filters import SurchargeFilterSet, FreightRateFilterSet
+from app.booking.filters import SurchargeFilterSet, FreightRateFilterSet, QuoteFilterSet
+from app.booking.mixins import FeeGetQuerysetMixin
 from app.booking.models import Surcharge, UsageFee, Charge, FreightRate, Rate, Quote, Booking
 from app.booking.serializers import SurchargeSerializer, SurchargeEditSerializer, SurchargeListSerializer, \
     SurchargeRetrieveSerializer, UsageFeeSerializer, ChargeSerializer, FreightRateListSerializer, \
     SurchargeCheckDatesSerializer, FreightRateEditSerializer, FreightRateSerializer, FreightRateRetrieveSerializer, \
     RateSerializer, CheckRateDateSerializer, FreightRateCheckDatesSerializer, WMCalculateSerializer, \
-    FreightRateSearchSerializer, FreightRateSearchListSerializer, QuoteSerializer, BookingSerializer
+    FreightRateSearchSerializer, FreightRateSearchListSerializer, QuoteSerializer, BookingSerializer, \
+    QuoteListSerializer
 from app.booking.utils import date_format, wm_calculate, calculate_additional_surcharges, calculate_freight_rate, \
     add_currency_value
+from app.core.mixins import PermissionClassByActionMixin
 from app.core.permissions import IsMasterOrAgent, IsClientCompany
 from app.handling.models import Port, ShippingMode, GlobalFee, ExchangeRate, Currency, ContainerType, PackagingType
 from app.location.models import Country
-
-
-class FeeGetQuerysetMixin:
-    """
-    Class, that provides custom get_queryset() method,
-    returns objects connected only to users company.
-    """
-
-    def get_queryset(self):
-        user = self.request.user
-        return self.queryset.filter(surcharge__company=user.companies.first())
 
 
 class SurchargeViesSet(viewsets.ModelViewSet):
@@ -92,12 +84,13 @@ class ChargeViesSet(FeeGetQuerysetMixin,
     permission_classes = (IsAuthenticated, IsMasterOrAgent, )
 
 
-class FreightRateViesSet(viewsets.ModelViewSet):
+class FreightRateViesSet(PermissionClassByActionMixin,
+                         viewsets.ModelViewSet):
     queryset = FreightRate.objects.all()
     serializer_class = FreightRateSerializer
     permission_classes = (IsAuthenticated, IsMasterOrAgent, )
     permission_classes_by_action = {
-        'search': [IsAuthenticated, IsClientCompany, ],
+        'freight_rate_search': [IsAuthenticated, IsClientCompany, ],
     }
     filter_class = FreightRateFilterSet
     filter_backends = (filters.OrderingFilter, rest_framework.DjangoFilterBackend,)
@@ -372,6 +365,14 @@ class QuoteViesSet(viewsets.ModelViewSet):
     queryset = Quote.objects.all()
     serializer_class = QuoteSerializer
     permission_classes = (IsAuthenticated, )
+    filter_class = QuoteFilterSet
+    filter_backends = (filters.OrderingFilter, rest_framework.DjangoFilterBackend,)
+    ordering_fields = ('shipping_mode', 'origin', 'destination', 'date_from', 'is_active',)
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return QuoteListSerializer
+        return self.serializer_class
 
 
 class BookingViesSet(viewsets.ModelViewSet):

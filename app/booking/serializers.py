@@ -297,7 +297,7 @@ class FreightRateSerializer(FreightRateEditSerializer):
         rates = validated_data.pop('rates', [])
         errors = {}
         empty_rates = []
-        if validated_data['shipping_mode'].title == 'FCL':
+        if validated_data['shipping_mode'].has_freight_containers:
             existing_freight_rates = FreightRate.objects.filter(
                 **{key: value for key, value in validated_data.items()
                    if key not in ('transit_time', 'carrier_disclosure')}
@@ -361,6 +361,7 @@ class CargoGroupSerializer(serializers.ModelSerializer):
             'length',
             'width',
             'weight',
+            'total_wm',
             'dangerous',
             'description',
             'frozen',
@@ -413,6 +414,27 @@ class QuoteSerializer(serializers.ModelSerializer):
         new_cargo_groups = [CargoGroup(**fields) for fields in cargo_groups]
         CargoGroup.objects.bulk_create(new_cargo_groups)
         return quote
+
+
+class QuoteListSerializer(QuoteSerializer):
+    origin = PortSerializer()
+    destination = PortSerializer()
+    shipping_mode = ShippingModeBaseSerializer()
+    shipping_type = serializers.CharField(source='shipping_mode.shipping_type.title')
+    week_range = serializers.SerializerMethodField()
+
+    class Meta(QuoteSerializer.Meta):
+        model = Quote
+        fields = QuoteSerializer.Meta.fields + (
+            'shipping_type',
+            'week_range',
+        )
+
+    def get_week_range(self, obj):
+        return {
+            'week_from': obj.date_from.isocalendar()[1],
+            'week_to': obj.date_to.isocalendar()[1]
+        }
 
 
 class BookingSerializer(serializers.ModelSerializer):

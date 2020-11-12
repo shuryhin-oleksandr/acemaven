@@ -1,6 +1,7 @@
 import django_filters
+from django.db.models import Q
 
-from app.booking.models import FreightRate, Surcharge
+from app.booking.models import FreightRate, Surcharge, Quote
 
 
 class SurchargeFilterSet(django_filters.FilterSet):
@@ -40,3 +41,24 @@ class FreightRateFilterSet(django_filters.FilterSet):
             'origin',
             'destination',
         )
+
+
+class QuoteFilterSet(django_filters.FilterSet):
+    shipping_type = django_filters.CharFilter(field_name='shipping_mode__shipping_type__title')
+    shipping_mode = django_filters.CharFilter(field_name='shipping_mode__title', lookup_expr='icontains')
+    origin = django_filters.CharFilter(field_name='origin__code', lookup_expr='icontains')
+    destination = django_filters.CharFilter(field_name='destination__code', lookup_expr='icontains')
+    route = django_filters.CharFilter(method='route_filter', label='Route filter')
+
+    class Meta:
+        model = Quote
+        fields = (
+            'shipping_type',
+            'shipping_mode',
+            'origin',
+            'destination',
+            'route',
+        )
+
+    def route_filter(self, queryset, _, value):
+        return queryset.filter(Q(origin__code__icontains=value) | Q(destination__code__icontains=value))

@@ -24,7 +24,7 @@ class PortFilterSet(django_filters.FilterSet):
             'shipping_type',
         )
 
-    def shipping_type_filter(self, queryset, name, value):
+    def shipping_type_filter(self, queryset, _, value):
         filter_fields = {
             'sea': {
                 'has_seaport': True,

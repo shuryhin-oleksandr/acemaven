@@ -1,12 +1,12 @@
 from rest_framework import generics, mixins, viewsets, status
-from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_jwt.settings import api_settings
 
 from django.contrib.auth import get_user_model, authenticate
 
-from app.core.models import BankAccount, Company, SignUpRequest, SignUpToken
+from app.core.mixins import PermissionClassByActionMixin, CheckTokenMixin, CreateMixin
+from app.core.models import BankAccount, Company, SignUpRequest
 from app.core.permissions import IsMaster, IsMasterOrBilling
 from app.core.serializers import CompanySerializer, SignUpRequestSerializer, UserBaseSerializer, UserCreateSerializer, \
     UserSignUpSerializer, BankAccountSerializer, UserMasterSerializer, UserSerializer, SelectChoiceSerializer
@@ -15,32 +15,9 @@ from app.booking.models import CargoGroup
 from app.handling.models import ReleaseType
 
 
-class CheckTokenMixin:
-    """
-    Class, that provides custom get_object() method.
-    """
-
-    def get_object(self):
-        token = self.request.query_params.get('token')
-        obj = get_object_or_404(SignUpToken.objects.all(), token=token)
-        return obj
-
-
-class CreateMixin:
-    """
-    Class, that provides custom create() method for bulk object creation optionally.
-    """
-
-    def create(self, request, *args, **kwargs):
-        many = True if isinstance(request.data, list) else False
-        serializer = self.get_serializer(data=request.data, many=many)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-
-
-class BankAccountViewSet(CreateMixin, viewsets.ModelViewSet):
+class BankAccountViewSet(PermissionClassByActionMixin,
+                         CreateMixin,
+                         viewsets.ModelViewSet):
     queryset = BankAccount.objects.all()
     serializer_class = BankAccountSerializer
     permission_classes = (IsAuthenticated, )
@@ -87,7 +64,8 @@ class SignUpCheckView(mixins.RetrieveModelMixin,
         return self.retrieve(request)
 
 
-class UserViewSet(CreateMixin,
+class UserViewSet(PermissionClassByActionMixin,
+                  CreateMixin,
                   viewsets.ModelViewSet):
     queryset = get_user_model().objects.all()
     serializer_class = UserCreateSerializer

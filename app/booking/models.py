@@ -417,6 +417,13 @@ class CargoGroup(models.Model):
         null=True,
         validators=[MinValueValidator(Decimal('0.01'))],
     )
+    total_wm = models.DecimalField(
+        _('Total w/m'),
+        max_digits=15,
+        decimal_places=2,
+        null=True,
+        validators=[MinValueValidator(Decimal('0.01'))],
+    )
     dangerous = models.BooleanField(
         _('Dangerous freight'),
         default=False,
@@ -475,14 +482,18 @@ class Quote(models.Model):
     date_to = models.DateField(
         _('Quote expiration date'),
     )
-    company = models.ForeignKey(
-        'core.Company',
-        on_delete=models.CASCADE,
-        related_name='quotes',
+    date_created = models.DateField(
+        _('Quote creation date'),
+        auto_now_add=True,
     )
     is_active = models.BooleanField(
         _('Quote is active or paused'),
         default=True,
+    )
+    company = models.ForeignKey(
+        'core.Company',
+        on_delete=models.CASCADE,
+        related_name='quotes',
     )
 
     def __str__(self):

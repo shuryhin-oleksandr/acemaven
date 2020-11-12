@@ -4,12 +4,16 @@ from django_filters import rest_framework
 from rest_framework.filters import SearchFilter
 
 from django.db.models import BooleanField, Case, QuerySet, When, Q
+from django.conf import settings
 
 from app.handling.filters import CarrierFilterSet, PortFilterSet
 from app.handling.models import Carrier, Port, ShippingMode, ShippingType, Currency, PackagingType
 from app.handling.serializers import CarrierSerializer, CurrencySerializer, PortSerializer, ShippingModeSerializer, \
     ShippingTypeSerializer, PackagingTypeBaseSerializer
 from app.location.models import Country
+
+
+MAIN_COUNTRY_CODE = settings.MAIN_COUNTRY_CODE
 
 
 class CarrierViewSet(mixins.ListModelMixin,
@@ -35,9 +39,8 @@ class PortViewSet(mixins.ListModelMixin,
         if isinstance(queryset, QuerySet):
             # Ensure queryset is re-evaluated on each request.
             queryset = queryset.all()
-        country_code = Country.objects.filter(is_main=True).first().code
         queryset = queryset.annotate(is_local=Case(
-            When(code__startswith=country_code, then=True),
+            When(code__startswith=MAIN_COUNTRY_CODE, then=True),
             default=False,
             output_field=BooleanField(),
         ))
@@ -72,5 +75,4 @@ class CurrencyViewSet(mixins.ListModelMixin,
     permission_classes = (IsAuthenticated, )
 
     def get_queryset(self):
-        country_code = Country.objects.filter(is_main=True).first().code
-        return Currency.objects.filter(Q(country__code=country_code) | (Q(is_active=True))).distinct()
+        return Currency.objects.filter(Q(country__code=MAIN_COUNTRY_CODE) | (Q(is_active=True))).distinct()

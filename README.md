@@ -8,3 +8,9 @@
     
 # Run celery:
     celery worker -A config --loglevel=info
+    
+# Apply fixtures:
+    python manage.py loaddata fixtures/*.json
+    
+# System platform settings:
+    Choose country and make it main for platform. Choose main and addtitional currencies. Add exchange rates. 

@@ -1,10 +1,13 @@
 from decimal import Decimal
 
 from django.db.models import Q
+from django.conf import settings
 
 from app.booking.models import Surcharge, Charge
 from app.handling.models import GlobalFee
-from app.location.models import Country
+
+
+MAIN_COUNTRY_CODE = settings.MAIN_COUNTRY_CODE
 
 
 def date_format(date):
@@ -12,9 +15,8 @@ def date_format(date):
 
 
 def rate_surcharges_filter(rate, company):
-    country_code = Country.objects.filter(is_main=True).first().code
     freight_rate = rate.freight_rate
-    direction = 'export' if freight_rate.origin.code.startswith(country_code) else 'import'
+    direction = 'export' if freight_rate.origin.code.startswith(MAIN_COUNTRY_CODE) else 'import'
     location = freight_rate.origin if direction == 'export' else freight_rate.destination
     filter_fields = {
         'carrier': freight_rate.carrier,

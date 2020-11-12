@@ -7,6 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from django.db.models import CharField, Case, When, Value, Q
+from django.conf import settings
 
 from app.booking.filters import SurchargeFilterSet, FreightRateFilterSet, QuoteFilterSet
 from app.booking.mixins import FeeGetQuerysetMixin
@@ -22,7 +23,9 @@ from app.booking.utils import date_format, wm_calculate, calculate_additional_su
 from app.core.mixins import PermissionClassByActionMixin
 from app.core.permissions import IsMasterOrAgent, IsClientCompany
 from app.handling.models import Port, ShippingMode, GlobalFee, ExchangeRate, Currency, ContainerType, PackagingType
-from app.location.models import Country
+
+
+MAIN_COUNTRY_CODE = settings.MAIN_COUNTRY_CODE
 
 
 class SurchargeViesSet(viewsets.ModelViewSet):
@@ -109,9 +112,8 @@ class FreightRateViesSet(PermissionClassByActionMixin,
         user = self.request.user
         queryset = self.queryset.filter(company=user.companies.first())
         if self.action == 'list':
-            country_code = Country.objects.filter(is_main=True).first().code
             return queryset.annotate(direction=Case(
-                When(origin__code__startswith=country_code, then=Value('export')),
+                When(origin__code__startswith=MAIN_COUNTRY_CODE, then=Value('export')),
                 default=Value('import'),
                 output_field=CharField()
             ))
@@ -137,8 +139,7 @@ class FreightRateViesSet(PermissionClassByActionMixin,
         data = serializer.data
         user = self.request.user
         port = Port.objects.get(id=data['origin'])
-        country_code = Country.objects.filter(is_main=True).first().code
-        direction = 'export' if port.code.startswith(country_code) else 'import'
+        direction = 'export' if port.code.startswith(MAIN_COUNTRY_CODE) else 'import'
         location = data['origin'] if direction == 'export' else data['destination']
         start_date = date_format(data['start_date'])
         expiration_date = date_format(data['expiration_date'])

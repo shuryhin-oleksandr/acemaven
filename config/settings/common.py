@@ -13,6 +13,9 @@ import os
 import datetime
 from pathlib import Path
 
+from app.location.models import Country
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
 
@@ -185,3 +188,7 @@ OLD_PASSWORD_FIELD_ENABLED = True
 
 # Tabbed Admin
 TABBED_ADMIN_USE_JQUERY_UI = True
+
+# Platform variables
+main_country = Country.objects.filter(is_main=True).first()
+MAIN_COUNTRY_CODE = main_country.code if main_country else 'BR'

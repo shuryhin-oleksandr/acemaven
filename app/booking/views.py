@@ -254,12 +254,12 @@ class FreightRateViesSet(viewsets.ModelViewSet):
                     surcharge = rate.surcharges.filter(start_date__lte=date_from,
                                                        expiration_date__gte=date_to).first()
                     charges = surcharge.charges.all()
-                    usage_fees = surcharge.usage_fees.all()
+                    usage_fee = surcharge.usage_fees.filter(container_type=cargo_group.get('container_type')).first()
                     calculate_additional_surcharges(totals,
                                                     charges,
-                                                    usage_fees,
+                                                    usage_fee,
                                                     cargo_group,
-                                                    shipping_mode.is_need_volume,
+                                                    shipping_mode,
                                                     new_cargo_group,
                                                     total_weight_per_pack)
                     new_cargo_group['volume'] = cargo_group.get('volume')
@@ -286,12 +286,12 @@ class FreightRateViesSet(viewsets.ModelViewSet):
                     surcharge = rate.surcharges.filter(start_date__lte=date_from,
                                                        expiration_date__gte=date_to).first()
                     charges = surcharge.charges.all()
-                    usage_fees = surcharge.usage_fees.all()
+                    usage_fee = surcharge.usage_fees.filter(container_type=cargo_group.get('container_type')).first()
                     calculate_additional_surcharges(totals,
                                                     charges,
-                                                    usage_fees,
+                                                    usage_fee,
                                                     cargo_group,
-                                                    shipping_mode.is_need_volume,
+                                                    shipping_mode,
                                                     new_cargo_group)
                     new_cargo_group['volume'] = cargo_group.get('volume')
                     container_type = cargo_group.get('container_type')

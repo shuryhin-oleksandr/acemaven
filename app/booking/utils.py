@@ -66,9 +66,9 @@ def add_currency_value(totals, code, subtotal):
 
 def calculate_additional_surcharges(totals,
                                     charges,
-                                    usage_fees,
+                                    usage_fee,
                                     cargo_group,
-                                    is_need_volume,
+                                    shipping_mode,
                                     new_cargo_group,
                                     total_weight_per_pack=0):
     for charge in charges:
@@ -80,7 +80,7 @@ def calculate_additional_surcharges(totals,
                 continue
             fixed_cost = False
             cost_per_pack = charge.charge
-            if is_need_volume:
+            if shipping_mode.is_need_volume:
                 if (condition := charge.conditions) == Charge.WM:
                     cost_per_pack = total_weight_per_pack * charge.charge
                 elif condition == Charge.PER_WEIGHT:
@@ -95,6 +95,18 @@ def calculate_additional_surcharges(totals,
             new_cargo_group[charge.additional_surcharge.title.split()[0].lower()] = data
             add_currency_value(totals, code, subtotal)
             add_currency_value(totals['total_surcharge'], code, subtotal)
+
+    if shipping_mode.has_surcharge_containers:
+        usage_fee_data = dict()
+        code = usage_fee.currency.code
+        usage_fee_data['currency'] = code
+        usage_fee_data['cost'] = usage_fee.charge
+        subtotal = usage_fee.charge * Decimal(cargo_group.get('volume'))
+        usage_fee_data['subtotal'] = subtotal
+        data_key = 'usage_fee' if shipping_mode.is_need_volume else 'handling'
+        new_cargo_group[data_key] = usage_fee_data
+        add_currency_value(totals, code, subtotal)
+        add_currency_value(totals['total_surcharge'], code, subtotal)
 
 
 def calculate_fee(booking_fee, rate, main_currency_code, exchange_rate, subtotal):

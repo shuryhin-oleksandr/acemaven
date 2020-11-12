@@ -469,10 +469,10 @@ class Quote(models.Model):
         on_delete=models.CASCADE,
         related_name='quotes',
     )
-    start_date = models.DateField(
+    date_from = models.DateField(
         _('Quote start date'),
     )
-    expiration_date = models.DateField(
+    date_to = models.DateField(
         _('Quote expiration date'),
     )
     company = models.ForeignKey(

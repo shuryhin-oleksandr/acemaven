@@ -396,8 +396,8 @@ class QuoteSerializer(serializers.ModelSerializer):
             'origin',
             'destination',
             'shipping_mode',
-            'start_date',
-            'expiration_date',
+            'date_from',
+            'date_to',
             'is_active',
             'cargo_groups',
         )

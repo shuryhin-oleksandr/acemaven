@@ -362,6 +362,7 @@ class CargoGroupSerializer(serializers.ModelSerializer):
             'width',
             'weight',
             'dangerous',
+            'description',
             'frozen',
         )
 

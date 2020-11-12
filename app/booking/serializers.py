@@ -9,7 +9,7 @@ from app.core.models import Shipper
 from app.core.serializers import ShipperSerializer
 from app.handling.models import ShippingType
 from app.handling.serializers import ContainerTypesSerializer, CurrencySerializer, CarrierBaseSerializer, \
-    PortSerializer, ShippingModeBaseSerializer
+    PortSerializer, ShippingModeBaseSerializer, PackagingTypeBaseSerializer
 
 
 class UserUpdateMixin:
@@ -368,6 +368,15 @@ class CargoGroupSerializer(serializers.ModelSerializer):
         )
 
 
+class CargoGroupRetrieveSerializer(CargoGroupSerializer):
+    container_type = ContainerTypesSerializer()
+    packaging_type = PackagingTypeBaseSerializer()
+
+    class Meta:
+        model = CargoGroup
+        fields = CargoGroupSerializer.Meta.fields
+
+
 class FreightRateSearchSerializer(serializers.Serializer):
     shipping_mode = serializers.IntegerField()
     origin = serializers.IntegerField()
@@ -417,6 +426,7 @@ class QuoteSerializer(serializers.ModelSerializer):
 
 
 class QuoteListSerializer(QuoteSerializer):
+    cargo_groups = CargoGroupRetrieveSerializer(source='quote_cargo_groups', many=True)
     origin = PortSerializer()
     destination = PortSerializer()
     shipping_mode = ShippingModeBaseSerializer()

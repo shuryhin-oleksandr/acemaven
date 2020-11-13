@@ -1,13 +1,14 @@
 from decimal import Decimal
 
 from django.db.models import Q
-from django.conf import settings
 
 from app.booking.models import Surcharge, Charge
 from app.handling.models import GlobalFee
+from app.location.models import Country
 
 
-MAIN_COUNTRY_CODE = settings.MAIN_COUNTRY_CODE
+main_country = Country.objects.filter(is_main=True).first()
+MAIN_COUNTRY_CODE = main_country.code if main_country else 'BR'
 
 
 def date_format(date):

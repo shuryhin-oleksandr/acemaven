@@ -7,7 +7,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from django.db.models import CharField, Case, When, Value, Q
-from django.conf import settings
 
 from app.booking.filters import SurchargeFilterSet, FreightRateFilterSet, QuoteFilterSet
 from app.booking.mixins import FeeGetQuerysetMixin
@@ -23,9 +22,11 @@ from app.booking.utils import date_format, wm_calculate, calculate_additional_su
 from app.core.mixins import PermissionClassByActionMixin
 from app.core.permissions import IsMasterOrAgent, IsClientCompany
 from app.handling.models import Port, ShippingMode, GlobalFee, ExchangeRate, Currency, ContainerType, PackagingType
+from app.location.models import Country
 
 
-MAIN_COUNTRY_CODE = settings.MAIN_COUNTRY_CODE
+main_country = Country.objects.filter(is_main=True).first()
+MAIN_COUNTRY_CODE = main_country.code if main_country else 'BR'
 
 
 class SurchargeViesSet(viewsets.ModelViewSet):
@@ -371,9 +372,15 @@ class QuoteViesSet(viewsets.ModelViewSet):
     ordering_fields = ('shipping_mode', 'origin', 'destination', 'date_from', 'is_active',)
 
     def get_serializer_class(self):
-        if self.action == 'list':
+        if self.action in ['list', 'get_quotes_list']:
             return QuoteListSerializer
         return self.serializer_class
+
+    @action(methods=['get'], detail=False, url_path='quotes-list')
+    def get_quotes_list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class BookingViesSet(viewsets.ModelViewSet):

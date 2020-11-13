@@ -4,7 +4,6 @@ from django_filters import rest_framework
 from rest_framework.filters import SearchFilter
 
 from django.db.models import BooleanField, Case, QuerySet, When, Q
-from django.conf import settings
 
 from app.handling.filters import CarrierFilterSet, PortFilterSet
 from app.handling.models import Carrier, Port, ShippingMode, ShippingType, Currency, PackagingType
@@ -13,7 +12,8 @@ from app.handling.serializers import CarrierSerializer, CurrencySerializer, Port
 from app.location.models import Country
 
 
-MAIN_COUNTRY_CODE = settings.MAIN_COUNTRY_CODE
+main_country = Country.objects.filter(is_main=True).first()
+MAIN_COUNTRY_CODE = main_country.code if main_country else 'BR'
 
 
 class CarrierViewSet(mixins.ListModelMixin,

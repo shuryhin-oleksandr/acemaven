@@ -1,3 +1,5 @@
+from rest_framework import filters
+
 import django_filters
 from django.db.models import Q
 
@@ -62,3 +64,25 @@ class QuoteFilterSet(django_filters.FilterSet):
 
     def route_filter(self, queryset, _, value):
         return queryset.filter(Q(origin__code__icontains=value) | Q(destination__code__icontains=value))
+
+
+class QuoteOrderingFilterBackend(filters.BaseFilterBackend):
+    valid_ordering_fields = ('shipping_mode', 'origin', 'destination', 'date_from', 'route', 'status', 'shipment_date',)
+
+    def filter_queryset(self, request, queryset, view):
+
+        ordering = request.query_params.get('ordering', 'date_from')
+        if ordering.strip('-') in self.valid_ordering_fields:
+            asc_or_desc = '-' if ordering.startswith('-') else ''
+            if ordering.endswith('shipping_mode'):
+                queryset = queryset.order_by(f'{asc_or_desc}shipping_mode__title', 'date_from')
+            elif ordering.endswith('route'):
+                queryset = queryset.order_by(f'{asc_or_desc}origin__code', 'date_from')
+            elif ordering.endswith('status'):
+                queryset = queryset.order_by(f'{asc_or_desc}is_active', 'date_from')
+            elif ordering.endswith('shipment_date'):
+                queryset = queryset.order_by(f'{asc_or_desc}date_from')
+            else:
+                queryset = queryset.order_by(ordering)
+
+        return queryset

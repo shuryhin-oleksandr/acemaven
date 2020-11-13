@@ -8,7 +8,7 @@ from rest_framework.response import Response
 
 from django.db.models import CharField, Case, When, Value, Q
 
-from app.booking.filters import SurchargeFilterSet, FreightRateFilterSet, QuoteFilterSet
+from app.booking.filters import SurchargeFilterSet, FreightRateFilterSet, QuoteFilterSet, QuoteOrderingFilterBackend
 from app.booking.mixins import FeeGetQuerysetMixin
 from app.booking.models import Surcharge, UsageFee, Charge, FreightRate, Rate, Quote, Booking
 from app.booking.serializers import SurchargeSerializer, SurchargeEditSerializer, SurchargeListSerializer, \
@@ -368,16 +368,22 @@ class QuoteViesSet(viewsets.ModelViewSet):
     serializer_class = QuoteSerializer
     permission_classes = (IsAuthenticated, )
     filter_class = QuoteFilterSet
-    filter_backends = (filters.OrderingFilter, rest_framework.DjangoFilterBackend,)
-    ordering_fields = ('shipping_mode', 'origin', 'destination', 'date_from', 'is_active',)
+    filter_backends = (QuoteOrderingFilterBackend, rest_framework.DjangoFilterBackend,)
+
+    def get_queryset(self):
+        user = self.request.user
+        queryset = self.queryset
+        if self.action == 'list':
+            queryset = self.queryset.filter(company=user.companies.first())
+        return queryset
 
     def get_serializer_class(self):
-        if self.action in ['list', 'get_quotes_list']:
+        if self.action in ['list', 'get_agent_quotes_list']:
             return QuoteListSerializer
         return self.serializer_class
 
-    @action(methods=['get'], detail=False, url_path='quotes-list')
-    def get_quotes_list(self, request, *args, **kwargs):
+    @action(methods=['get'], detail=False, url_path='agent-quotes-list')
+    def get_agent_quotes_list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)

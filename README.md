@@ -14,3 +14,5 @@
     
 # System platform settings:
     Choose country and make it main for platform. Choose main and addtitional currencies. Add exchange rates. 
+    Config the client platfor nad general settings.
+    

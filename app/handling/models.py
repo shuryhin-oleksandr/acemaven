@@ -571,3 +571,59 @@ class ExchangeRate(models.Model):
 
     def __str__(self):
         return f'Exchange rate from {self.currency.code}'
+
+
+class ClientPlatformSetting(models.Model):
+    """
+    Client platform setting model.
+    """
+
+    number_of_results = models.PositiveIntegerField(
+        _('Number of rates results will return'),
+        validators=[MinValueValidator(1)],
+    )
+    show_carrier_name = models.BooleanField(
+        _('Hide/show carrier name in search results'),
+        default=False,
+    )
+    number_of_bids = models.PositiveIntegerField(
+        _('Number of bids client can receive'),
+        validators=[MinValueValidator(1)],
+    )
+    number_of_days = models.PositiveIntegerField(
+        _('Number of days a quote will be shown to ff'),
+        validators=[MinValueValidator(1)],
+    )
+
+
+class GeneralSetting(models.Model):
+    """
+    General settings.
+    """
+
+    AFTER_BOOKING = 'after_booking'
+    ALL = 'all'
+    IN_OPERATION_PAGE = 'in_operation'
+    SHOW_FREIGHT_FORWARDER_NAME_CHOICES = (
+        (AFTER_BOOKING, 'Show after booking is paid'),
+        (ALL, 'Show in search results and after'),
+        (IN_OPERATION_PAGE, 'Show only on operation page'),
+    )
+
+    show_freight_forwarder_name = models.CharField(
+        _('Hide/show freight forwarder'),
+        max_length=50,
+        default=AFTER_BOOKING,
+    )
+    number_of_days_request_can_stay = models.PositiveIntegerField(
+        _('Number of days request can stay in client list until discarded'),
+        validators=[MinValueValidator(1)],
+    )
+    export_deadline_days = models.PositiveIntegerField(
+        _('Number of days that the agent will have to confirm a booking request'),
+        validators=[MinValueValidator(1)],
+    )
+    import_deadline_days = models.PositiveIntegerField(
+        _('Number of days that the agent will have to confirm a booking request'),
+        validators=[MinValueValidator(1)],
+    )

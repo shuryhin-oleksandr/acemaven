@@ -6,22 +6,24 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from django.db.models import CharField, Case, When, Value, Q
+from django.db.models import CharField, Case, When, Value, Q, Count
 
 from app.booking.filters import SurchargeFilterSet, FreightRateFilterSet, QuoteFilterSet, QuoteOrderingFilterBackend
 from app.booking.mixins import FeeGetQuerysetMixin
-from app.booking.models import Surcharge, UsageFee, Charge, FreightRate, Rate, Quote, Booking
+from app.booking.models import Surcharge, UsageFee, Charge, FreightRate, Rate, Quote, Booking, Status
 from app.booking.serializers import SurchargeSerializer, SurchargeEditSerializer, SurchargeListSerializer, \
     SurchargeRetrieveSerializer, UsageFeeSerializer, ChargeSerializer, FreightRateListSerializer, \
     SurchargeCheckDatesSerializer, FreightRateEditSerializer, FreightRateSerializer, FreightRateRetrieveSerializer, \
     RateSerializer, CheckRateDateSerializer, FreightRateCheckDatesSerializer, WMCalculateSerializer, \
     FreightRateSearchSerializer, FreightRateSearchListSerializer, QuoteSerializer, BookingSerializer, \
-    QuoteListSerializer
+    QuoteListSerializer, QuoteAgentListSerializer
 from app.booking.utils import date_format, wm_calculate, calculate_additional_surcharges, calculate_freight_rate, \
     add_currency_value
 from app.core.mixins import PermissionClassByActionMixin
+from app.core.models import Company
 from app.core.permissions import IsMasterOrAgent, IsClientCompany
-from app.handling.models import Port, ShippingMode, GlobalFee, ExchangeRate, Currency, ContainerType, PackagingType
+from app.handling.models import Port, ShippingMode, GlobalFee, ExchangeRate, Currency, ContainerType, PackagingType, \
+    ClientPlatformSetting
 from app.location.models import Country
 
 
@@ -372,19 +374,49 @@ class QuoteViesSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
+        company = user.companies.first()
         queryset = self.queryset
-        if self.action == 'list':
-            queryset = self.queryset.filter(company=user.companies.first())
+        if company.type == Company.CLIENT:
+            queryset = self.queryset.filter(company=company)
         return queryset
 
     def get_serializer_class(self):
-        if self.action in ['list', 'get_agent_quotes_list']:
+        if self.action == 'list':
+            return QuoteListSerializer
+        if self.action == 'get_agent_quotes_list':
+            return QuoteAgentListSerializer
+        if self.action == 'retrieve':
             return QuoteListSerializer
         return self.serializer_class
 
     @action(methods=['get'], detail=False, url_path='agent-quotes-list')
     def get_agent_quotes_list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
+        user = request.user
+        company = user.companies.first()
+
+        queryset = self.get_queryset().exclude(statuses__status=Status.REJECTED,
+                                               freight_rates__company=company)
+        submitted_air = queryset.filter(shipping_mode__shipping_type__title='air',
+                                        statuses__status=Status.SUBMITTED,
+                                        freight_rates__company=company)
+        submitted_sea = queryset.filter(shipping_mode__shipping_type__title='sea',
+                                        statuses__status=Status.SUBMITTED,
+                                        freight_rates__company=company)
+
+        number_of_bids = ClientPlatformSetting.objects.first().number_of_bids
+        queryset = queryset.annotate(bids_count=Count('statuses')).filter(bids_count__lt=number_of_bids)
+
+        not_submitted_air = queryset.filter(shipping_mode__shipping_type__title='air').exclude(
+            statuses__status=Status.SUBMITTED,
+            freight_rates__company=company
+        ).order_by('date_created')[:10]
+        not_submitted_sea = queryset.filter(shipping_mode__shipping_type__title='sea').exclude(
+            statuses__status=Status.SUBMITTED,
+            freight_rates__company=company
+        ).order_by('date_created')[:10]
+
+        queryset = (submitted_air | submitted_sea | not_submitted_air | not_submitted_sea).order_by('date_created')
+        queryset = self.filter_queryset(queryset)
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 

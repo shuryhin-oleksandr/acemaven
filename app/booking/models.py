@@ -495,6 +495,44 @@ class Quote(models.Model):
         on_delete=models.CASCADE,
         related_name='quotes',
     )
+    freight_rates = models.ManyToManyField(
+        'FreightRate',
+        related_name='quotes',
+        through='Status',
+    )
 
     def __str__(self):
         return f'Quote {self.origin.code} - {self.destination.code}'
+
+
+class Status(models.Model):
+    """
+    Through model for quotes and freight rates.
+    """
+
+    REJECTED = 'rejected'
+    SUBMITTED = 'submitted'
+    STATUS_CHOICES = (
+        (REJECTED, 'Rejected'),
+        (SUBMITTED, 'Submitted'),
+    )
+
+    quote = models.ForeignKey(
+        'Quote',
+        on_delete=models.CASCADE,
+        related_name='statuses',
+    )
+    freight_rate = models.ForeignKey(
+        'FreightRate',
+        on_delete=models.CASCADE,
+        related_name='statuses',
+    )
+    status = models.CharField(
+        _('Quote - freight rate status'),
+        max_length=9,
+        choices=STATUS_CHOICES,
+    )
+    is_viewed = models.BooleanField(
+        _('Offer is viewed'),
+        default=False,
+    )

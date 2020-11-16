@@ -449,6 +449,20 @@ class QuoteListSerializer(QuoteSerializer):
         }
 
 
+class QuoteAgentListSerializer(QuoteListSerializer):
+    is_submitted = serializers.SerializerMethodField()
+
+    class Meta(QuoteListSerializer):
+        model = Quote
+        fields = QuoteListSerializer.Meta.fields + (
+            'is_submitted',
+        )
+
+    def get_is_submitted(self, obj):
+        user = self.context['request'].user
+        return True if obj.statuses.filter(freight_rate__company=user.companies.first()).exists() else False
+
+
 class BookingSerializer(serializers.ModelSerializer):
     shipper = ShipperSerializer()
     cargo_groups = CargoGroupSerializer(many=True)

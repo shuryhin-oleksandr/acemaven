@@ -253,6 +253,8 @@ class FreightRateListSerializer(serializers.ModelSerializer):
 
 class FreightRateSearchListSerializer(FreightRateListSerializer):
     carrier = serializers.SerializerMethodField()
+    origin = PortSerializer()
+    destination = PortSerializer()
     company = serializers.CharField(source='company.name')
 
     class Meta(FreightRateListSerializer.Meta):

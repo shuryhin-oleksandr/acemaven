@@ -7,7 +7,7 @@ from app.booking.models import Surcharge, UsageFee, Charge, AdditionalSurcharge,
 from app.booking.utils import rate_surcharges_filter
 from app.core.models import Shipper
 from app.core.serializers import ShipperSerializer
-from app.handling.models import ShippingType
+from app.handling.models import ShippingType, ClientPlatformSetting
 from app.handling.serializers import ContainerTypesSerializer, CurrencySerializer, CarrierBaseSerializer, \
     PortSerializer, ShippingModeBaseSerializer, PackagingTypeBaseSerializer
 
@@ -265,7 +265,8 @@ class FreightRateSearchListSerializer(FreightRateListSerializer):
         )
 
     def get_carrier(self, obj):
-        return obj.carrier.title if not obj.carrier_disclosure else 'disclosed'
+        hide_carrier_name = ClientPlatformSetting.objects.first().hide_carrier_name
+        return 'disclosed' if obj.carrier_disclosure or hide_carrier_name else obj.carrier.title
 
 
 class FreightRateEditSerializer(serializers.ModelSerializer):
@@ -449,7 +450,7 @@ class QuoteListSerializer(QuoteSerializer):
         }
 
 
-class QuoteAgentListSerializer(QuoteListSerializer):
+class QuoteAgentListOrRetrieveSerializer(QuoteListSerializer):
     is_submitted = serializers.SerializerMethodField()
 
     class Meta(QuoteListSerializer):

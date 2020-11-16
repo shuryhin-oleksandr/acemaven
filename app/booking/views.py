@@ -16,7 +16,7 @@ from app.booking.serializers import SurchargeSerializer, SurchargeEditSerializer
     SurchargeCheckDatesSerializer, FreightRateEditSerializer, FreightRateSerializer, FreightRateRetrieveSerializer, \
     RateSerializer, CheckRateDateSerializer, FreightRateCheckDatesSerializer, WMCalculateSerializer, \
     FreightRateSearchSerializer, FreightRateSearchListSerializer, QuoteSerializer, BookingSerializer, \
-    QuoteListSerializer, QuoteAgentListSerializer
+    QuoteListSerializer, QuoteAgentListOrRetrieveSerializer
 from app.booking.utils import date_format, wm_calculate, calculate_additional_surcharges, calculate_freight_rate, \
     add_currency_value
 from app.core.mixins import PermissionClassByActionMixin
@@ -214,7 +214,10 @@ class FreightRateViesSet(PermissionClassByActionMixin,
                 rates__surcharges__charges__additional_surcharge__is_cold=True,
                 rates__surcharges__charges__charge__isnull=False
             )
-        freight_rates = freight_rates.order_by('transit_time').distinct()
+
+        number_of_results = ClientPlatformSetting.objects.first().number_of_results
+        freight_rates = freight_rates.order_by('transit_time').distinct()[:number_of_results]
+
         local_fees = request.user.companies.first().fees.filter(shipping_mode=shipping_mode)
         global_fees = GlobalFee.objects.filter(shipping_mode=shipping_mode)
         local_booking_fee = local_fees.filter(fee_type=GlobalFee.BOOKING, is_active=True).first()
@@ -384,9 +387,9 @@ class QuoteViesSet(viewsets.ModelViewSet):
         if self.action == 'list':
             return QuoteListSerializer
         if self.action == 'get_agent_quotes_list':
-            return QuoteAgentListSerializer
+            return QuoteAgentListOrRetrieveSerializer
         if self.action == 'retrieve':
-            return QuoteListSerializer
+            return QuoteAgentListOrRetrieveSerializer
         return self.serializer_class
 
     @action(methods=['get'], detail=False, url_path='agent-quotes-list')

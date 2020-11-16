@@ -582,7 +582,7 @@ class ClientPlatformSetting(models.Model):
         _('Number of rates results will return'),
         validators=[MinValueValidator(1)],
     )
-    show_carrier_name = models.BooleanField(
+    hide_carrier_name = models.BooleanField(
         _('Hide/show carrier name in search results'),
         default=False,
     )

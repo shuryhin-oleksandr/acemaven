@@ -3,6 +3,11 @@ from rest_framework import serializers
 from app.handling.models import Carrier, Port, ShippingMode, ShippingType, ContainerType, Currency, PackagingType, \
     ReleaseType
 from app.booking.models import AdditionalSurcharge
+from app.location.models import Country
+
+
+main_country = Country.objects.filter(is_main=True).first()
+MAIN_COUNTRY_CODE = main_country.code if main_country else 'BR'
 
 
 class PackagingTypeBaseSerializer(serializers.ModelSerializer):
@@ -53,7 +58,7 @@ class CarrierSerializer(CarrierBaseSerializer):
 
 
 class PortSerializer(serializers.ModelSerializer):
-    is_local = serializers.BooleanField(read_only=True)
+    is_local = serializers.SerializerMethodField()
 
     class Meta:
         model = Port
@@ -64,6 +69,9 @@ class PortSerializer(serializers.ModelSerializer):
             'display_name',
             'is_local',
         )
+
+    def get_is_local(self, obj):
+        return True if obj.code.startswith(MAIN_COUNTRY_CODE) else False
 
 
 class ShippingModeBaseSerializer(serializers.ModelSerializer):

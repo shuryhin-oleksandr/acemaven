@@ -407,7 +407,7 @@ class QuoteViesSet(PermissionClassByActionMixin,
 
         freight_rates, _ = freight_rate_search(data, company=user.companies.first())
         freight_rate = freight_rates.first()
-        data = FreightRateRetrieveSerializer(freight_rate).data
+        data = FreightRateRetrieveSerializer(freight_rate).data if freight_rate else {}
         return Response(data)
 
     @action(methods=['post'], detail=True, url_path='submit')

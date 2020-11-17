@@ -2,6 +2,8 @@ from rest_framework.permissions import BasePermission
 
 from django.db.models import Q
 
+from app.core.models import Company
+
 
 class IsMaster(BasePermission):
     """
@@ -49,10 +51,21 @@ class IsMasterOrAgent(BasePermission):
 
 class IsClientCompany(BasePermission):
     """
-    Allows access only to users with role 'Master' or 'Billing' or 'Client'.
+    Allows access only to users with company type 'Client'.
     """
 
     def has_permission(self, request, view):
         if request.user.role_set.exists():
-            return request.user.get_roles().filter(Q(name='master') | Q(name='billing') | Q(name='client')).exists()
+            return request.user.get_roles().exists() and request.user.companies.first().type == Company.CLIENT
+        return False
+
+
+class IsAgentCompany(BasePermission):
+    """
+    Allows access only to users with company type 'Agent'.
+    """
+
+    def has_permission(self, request, view):
+        if request.user.role_set.exists():
+            return request.user.get_roles().exists() and request.user.companies.first().type == Company.FREIGHT_FORWARDER
         return False

@@ -21,7 +21,7 @@ from app.booking.utils import date_format, wm_calculate, calculate_additional_su
     add_currency_value, freight_rate_search
 from app.core.mixins import PermissionClassByActionMixin
 from app.core.models import Company
-from app.core.permissions import IsMasterOrAgent, IsClientCompany
+from app.core.permissions import IsMasterOrAgent, IsClientCompany, IsAgentCompany
 from app.handling.models import Port, GlobalFee, ExchangeRate, Currency, ContainerType, PackagingType, \
     ClientPlatformSetting
 from app.location.models import Country
@@ -96,7 +96,7 @@ class FreightRateViesSet(PermissionClassByActionMixin,
     serializer_class = FreightRateSerializer
     permission_classes = (IsAuthenticated, IsMasterOrAgent, )
     permission_classes_by_action = {
-        'freight_rate_search_and_calculate': [IsAuthenticated, IsClientCompany, ],
+        'freight_rate_search_and_calculate': (IsAuthenticated, IsClientCompany, ),
     }
     filter_class = FreightRateFilterSet
     filter_backends = (filters.OrderingFilter, rest_framework.DjangoFilterBackend,)
@@ -178,8 +178,8 @@ class FreightRateViesSet(PermissionClassByActionMixin,
 
         cargo_groups = data.get('cargo_groups')
         container_type_ids_list = [group.get('container_type') for group in cargo_groups if 'container_type' in group]
-        date_from = date_format(data.pop('date_from'))
-        date_to = date_format(data.pop('date_to'))
+        date_from = date_format(data.get('date_from'))
+        date_to = date_format(data.get('date_to'))
         freight_rates, shipping_mode = freight_rate_search(data)
 
         number_of_results = ClientPlatformSetting.objects.first().number_of_results
@@ -335,10 +335,16 @@ class WMCalculateView(generics.GenericAPIView):
         return Response(data=results, status=status.HTTP_200_OK)
 
 
-class QuoteViesSet(viewsets.ModelViewSet):
+class QuoteViesSet(PermissionClassByActionMixin,
+                   viewsets.ModelViewSet):
     queryset = Quote.objects.all()
     serializer_class = QuoteSerializer
     permission_classes = (IsAuthenticated, )
+    permission_classes_by_action = {
+        'list': (IsAuthenticated, IsClientCompany,),
+        'get_agent_quotes_list': (IsAuthenticated, IsAgentCompany,),
+        'freight_rate_search': (IsAuthenticated, IsAgentCompany,),
+    }
     filter_class = QuoteFilterSet
     filter_backends = (QuoteOrderingFilterBackend, rest_framework.DjangoFilterBackend,)
 
@@ -391,7 +397,7 @@ class QuoteViesSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     @action(methods=['post'], detail=False, url_path='freight-rate-search')
-    def freight_rate_search_and_calculate(self, request, *args, **kwargs):
+    def freight_rate_search(self, request, *args, **kwargs):
         user = request.user
         serializer = FreightRateSearchSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

@@ -344,6 +344,8 @@ class QuoteViesSet(PermissionClassByActionMixin,
         'list': (IsAuthenticated, IsClientCompany,),
         'get_agent_quotes_list': (IsAuthenticated, IsAgentCompany,),
         'freight_rate_search': (IsAuthenticated, IsAgentCompany,),
+        'submit_quote': (IsAuthenticated, IsAgentCompany,),
+        'reject_quote': (IsAuthenticated, IsAgentCompany,),
     }
     filter_class = QuoteFilterSet
     filter_backends = (QuoteOrderingFilterBackend, rest_framework.DjangoFilterBackend,)
@@ -405,7 +407,7 @@ class QuoteViesSet(PermissionClassByActionMixin,
 
         freight_rates, _ = freight_rate_search(data, company=user.companies.first())
         freight_rate = freight_rates.first()
-        data = FreightRateRetrieveSerializer(freight_rate)
+        data = FreightRateRetrieveSerializer(freight_rate).data
         return Response(data)
 
     @action(methods=['post'], detail=True, url_path='submit')

@@ -3,7 +3,7 @@ from rest_framework import serializers
 from django.db.models import Min
 
 from app.booking.models import Surcharge, UsageFee, Charge, AdditionalSurcharge, FreightRate, Rate, CargoGroup, Quote, \
-    Booking
+    Booking, Status
 from app.booking.utils import rate_surcharges_filter
 from app.core.models import Shipper
 from app.core.serializers import ShipperSerializer
@@ -497,3 +497,15 @@ class BookingSerializer(serializers.ModelSerializer):
         CargoGroup.objects.bulk_create(new_cargo_groups)
         return booking
 
+
+class QuoteStatusBaseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Status
+        fields = (
+            'id',
+            'quote',
+            'freight_rate',
+            'company',
+            'status',
+            'is_viewed',
+        )

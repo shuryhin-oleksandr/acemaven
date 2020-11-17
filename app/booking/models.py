@@ -526,6 +526,7 @@ class Status(models.Model):
         'FreightRate',
         on_delete=models.CASCADE,
         related_name='statuses',
+        null=True
     )
     company = models.ForeignKey(
         'core.Company',

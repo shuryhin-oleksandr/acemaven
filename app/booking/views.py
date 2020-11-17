@@ -16,7 +16,7 @@ from app.booking.serializers import SurchargeSerializer, SurchargeEditSerializer
     SurchargeCheckDatesSerializer, FreightRateEditSerializer, FreightRateSerializer, FreightRateRetrieveSerializer, \
     RateSerializer, CheckRateDateSerializer, FreightRateCheckDatesSerializer, WMCalculateSerializer, \
     FreightRateSearchSerializer, FreightRateSearchListSerializer, QuoteSerializer, BookingSerializer, \
-    QuoteListSerializer, QuoteAgentListOrRetrieveSerializer
+    QuoteListSerializer, QuoteAgentListOrRetrieveSerializer, QuoteStatusBaseSerializer
 from app.booking.utils import date_format, wm_calculate, calculate_additional_surcharges, calculate_freight_rate, \
     add_currency_value, freight_rate_search
 from app.core.mixins import PermissionClassByActionMixin
@@ -407,6 +407,30 @@ class QuoteViesSet(PermissionClassByActionMixin,
         freight_rate = freight_rates.first()
         data = FreightRateRetrieveSerializer(freight_rate)
         return Response(data)
+
+    @action(methods=['post'], detail=True, url_path='submit')
+    def submit_quote(self, request, *args, **kwargs):
+        quote = self.get_object()
+        data = request.data
+        data['quote'] = quote.id
+        serializer = QuoteStatusBaseSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    @action(methods=['post'], detail=True, url_path='reject')
+    def reject_quote(self, request, *args, **kwargs):
+        user = request.user
+        quote = self.get_object()
+        data = request.data
+        data['quote'] = quote.id
+        data['company'] = user.companies.first().id
+        serializer = QuoteStatusBaseSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
 class BookingViesSet(viewsets.ModelViewSet):

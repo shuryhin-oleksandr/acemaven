@@ -18,11 +18,11 @@ from app.booking.serializers import SurchargeSerializer, SurchargeEditSerializer
     FreightRateSearchSerializer, FreightRateSearchListSerializer, QuoteSerializer, BookingSerializer, \
     QuoteListSerializer, QuoteAgentListOrRetrieveSerializer
 from app.booking.utils import date_format, wm_calculate, calculate_additional_surcharges, calculate_freight_rate, \
-    add_currency_value
+    add_currency_value, freight_rate_search
 from app.core.mixins import PermissionClassByActionMixin
 from app.core.models import Company
 from app.core.permissions import IsMasterOrAgent, IsClientCompany
-from app.handling.models import Port, ShippingMode, GlobalFee, ExchangeRate, Currency, ContainerType, PackagingType, \
+from app.handling.models import Port, GlobalFee, ExchangeRate, Currency, ContainerType, PackagingType, \
     ClientPlatformSetting
 from app.location.models import Country
 
@@ -96,7 +96,7 @@ class FreightRateViesSet(PermissionClassByActionMixin,
     serializer_class = FreightRateSerializer
     permission_classes = (IsAuthenticated, IsMasterOrAgent, )
     permission_classes_by_action = {
-        'freight_rate_search': [IsAuthenticated, IsClientCompany, ],
+        'freight_rate_search_and_calculate': [IsAuthenticated, IsClientCompany, ],
     }
     filter_class = FreightRateFilterSet
     filter_backends = (filters.OrderingFilter, rest_framework.DjangoFilterBackend,)
@@ -171,49 +171,16 @@ class FreightRateViesSet(PermissionClassByActionMixin,
         return Response(data=data, status=status.HTTP_201_CREATED)
 
     @action(methods=['post'], detail=False, url_path='search')
-    def freight_rate_search(self, request, *args, **kwargs):
+    def freight_rate_search_and_calculate(self, request, *args, **kwargs):
         serializer = FreightRateSearchSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.data
 
-        cargo_groups = data.pop('cargo_groups')
+        cargo_groups = data.get('cargo_groups')
         container_type_ids_list = [group.get('container_type') for group in cargo_groups if 'container_type' in group]
-        shipping_mode = ShippingMode.objects.filter(id=data.get('shipping_mode')).first()
-        dangerous_list = list(filter(lambda x: x.get('dangerous'), cargo_groups))
-        cold_list = list(filter(lambda x: x.get('frozen') == 'cold', cargo_groups))
-
         date_from = date_format(data.pop('date_from'))
         date_to = date_format(data.pop('date_to'))
-        data['rates__start_date__lte'] = date_from
-        data['rates__expiration_date__gte'] = date_to
-        data['rates__surcharges__start_date__lte'] = date_from
-        data['rates__surcharges__expiration_date__gte'] = date_to
-
-        freight_rates = FreightRate.objects.filter(**data, is_active=True)
-
-        if shipping_mode.has_freight_containers:
-            for container_type_id in container_type_ids_list:
-                freight_rates = freight_rates.filter(
-                    rates__rate__isnull=False,
-                    rates__container_type__id=container_type_id
-                )
-        if shipping_mode.has_surcharge_containers:
-            for container_type_id in container_type_ids_list:
-                freight_rates = freight_rates.filter(
-                    rates__surcharges__usage_fees__charge__isnull=False,
-                    rates__surcharges__usage_fees__container_type__id=container_type_id
-                )
-
-        if dangerous_list:
-            freight_rates = freight_rates.filter(
-                rates__surcharges__charges__additional_surcharge__is_dangerous=True,
-                rates__surcharges__charges__charge__isnull=False
-            )
-        if cold_list:
-            freight_rates = freight_rates.filter(
-                rates__surcharges__charges__additional_surcharge__is_cold=True,
-                rates__surcharges__charges__charge__isnull=False
-            )
+        freight_rates, shipping_mode = freight_rate_search(data)
 
         number_of_results = ClientPlatformSetting.objects.first().number_of_results
         freight_rates = freight_rates.order_by('transit_time').distinct()[:number_of_results]
@@ -398,7 +365,7 @@ class QuoteViesSet(viewsets.ModelViewSet):
         company = user.companies.first()
 
         queryset = self.get_queryset().exclude(statuses__status=Status.REJECTED,
-                                               freight_rates__company=company)
+                                               statuses__company=company)
         submitted_air = queryset.filter(shipping_mode__shipping_type__title='air',
                                         statuses__status=Status.SUBMITTED,
                                         freight_rates__company=company)
@@ -422,6 +389,18 @@ class QuoteViesSet(viewsets.ModelViewSet):
         queryset = self.filter_queryset(queryset)
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+    @action(methods=['post'], detail=False, url_path='freight-rate-search')
+    def freight_rate_search_and_calculate(self, request, *args, **kwargs):
+        user = request.user
+        serializer = FreightRateSearchSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.data
+
+        freight_rates, _ = freight_rate_search(data, company=user.companies.first())
+        freight_rate = freight_rates.first()
+        data = FreightRateRetrieveSerializer(freight_rate)
+        return Response(data)
 
 
 class BookingViesSet(viewsets.ModelViewSet):

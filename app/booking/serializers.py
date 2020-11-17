@@ -386,6 +386,7 @@ class FreightRateSearchSerializer(serializers.Serializer):
     destination = serializers.IntegerField()
     date_from = serializers.DateField()
     date_to = serializers.DateField()
+    carrier = serializers.IntegerField(required=False)
     cargo_groups = CargoGroupSerializer(many=True)
 
 

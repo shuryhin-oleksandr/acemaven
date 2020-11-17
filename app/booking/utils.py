@@ -2,8 +2,8 @@ from decimal import Decimal
 
 from django.db.models import Q
 
-from app.booking.models import Surcharge, Charge
-from app.handling.models import GlobalFee
+from app.booking.models import Surcharge, Charge, FreightRate
+from app.handling.models import GlobalFee, ShippingMode
 from app.location.models import Country
 
 
@@ -156,3 +156,50 @@ def calculate_freight_rate(totals,
     add_currency_value(totals, code, subtotal)
     add_currency_value(totals['total_freight_rate'], code, subtotal)
     return freight
+
+
+def freight_rate_search(data, company=None):
+    cargo_groups = data.pop('cargo_groups')
+    container_type_ids_list = [group.get('container_type') for group in cargo_groups if 'container_type' in group]
+    shipping_mode = ShippingMode.objects.filter(id=data.get('shipping_mode')).first()
+    dangerous_list = list(filter(lambda x: x.get('dangerous'), cargo_groups))
+    cold_list = list(filter(lambda x: x.get('frozen') == 'cold', cargo_groups))
+
+    date_from = date_format(data.pop('date_from'))
+    date_to = date_format(data.pop('date_to'))
+    data['rates__start_date__lte'] = date_from
+    data['rates__expiration_date__gte'] = date_to
+    data['rates__surcharges__start_date__lte'] = date_from
+    data['rates__surcharges__expiration_date__gte'] = date_to
+
+    freight_rates = FreightRate.objects.filter(**data, is_active=True)
+
+    if shipping_mode.has_freight_containers:
+        for container_type_id in container_type_ids_list:
+            freight_rates = freight_rates.filter(
+                rates__rate__isnull=False,
+                rates__container_type__id=container_type_id
+            )
+    if shipping_mode.has_surcharge_containers:
+        for container_type_id in container_type_ids_list:
+            freight_rates = freight_rates.filter(
+                rates__surcharges__usage_fees__charge__isnull=False,
+                rates__surcharges__usage_fees__container_type__id=container_type_id
+            )
+
+    if dangerous_list:
+        freight_rates = freight_rates.filter(
+            rates__surcharges__charges__additional_surcharge__is_dangerous=True,
+            rates__surcharges__charges__charge__isnull=False
+        )
+    if cold_list:
+        freight_rates = freight_rates.filter(
+            rates__surcharges__charges__additional_surcharge__is_cold=True,
+            rates__surcharges__charges__charge__isnull=False
+        )
+    if company:
+        freight_rates = freight_rates.filter(
+            company=company,
+        )
+
+    return freight_rates, shipping_mode

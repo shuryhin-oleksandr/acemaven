@@ -527,6 +527,12 @@ class Status(models.Model):
         on_delete=models.CASCADE,
         related_name='statuses',
     )
+    company = models.ForeignKey(
+        'core.Company',
+        on_delete=models.CASCADE,
+        related_name='statuses',
+        null=True,
+    )
     status = models.CharField(
         _('Quote - freight rate status'),
         max_length=9,

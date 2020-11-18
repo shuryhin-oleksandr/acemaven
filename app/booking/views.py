@@ -114,7 +114,8 @@ class FreightRateViesSet(PermissionClassByActionMixin,
 
     def get_queryset(self):
         user = self.request.user
-        queryset = self.queryset.filter(company=user.companies.first(), temporary=False,)
+        temporary = True if self.action == 'save_freight_rate' else False
+        queryset = self.queryset.filter(company=user.companies.first(), temporary=temporary,)
         if self.action == 'list':
             return queryset.annotate(direction=Case(
                 When(origin__code__startswith=MAIN_COUNTRY_CODE, then=Value('export')),
@@ -146,7 +147,7 @@ class FreightRateViesSet(PermissionClassByActionMixin,
             for freight_rate in freight_rates]
         return Response(data=results, status=status.HTTP_201_CREATED)
 
-    @action(methods=['post'], detail=True, url_path='save-freight-rate')
+    @action(methods=['post'], detail=True, url_path='save')
     def save_freight_rate(self, request, *args, **kwargs):
         freight_rate = self.get_object()
         old_freight_rates = self.get_queryset().filter(shipping_mode=freight_rate.shipping_mode,

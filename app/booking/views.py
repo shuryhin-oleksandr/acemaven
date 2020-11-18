@@ -147,11 +147,14 @@ class FreightRateViesSet(PermissionClassByActionMixin,
 
     @action(methods=['post'], detail=True, url_path='save')
     def save_freight_rate(self, request, *args, **kwargs):
+        user = request.user
         freight_rate = self.get_object()
-        old_freight_rates = self.get_queryset().filter(shipping_mode=freight_rate.shipping_mode,
-                                                       origin=freight_rate.origin,
-                                                       destination=freight_rate.destination,
-                                                       carrier=freight_rate.carrier,)
+        old_freight_rates = self.queryset.filter(company=user.companies.first(),
+                                                 shipping_mode=freight_rate.shipping_mode,
+                                                 origin=freight_rate.origin,
+                                                 destination=freight_rate.destination,
+                                                 carrier=freight_rate.carrier,
+                                                 temporary=False,)
         shipping_mode = freight_rate.shipping_mode
 
         rates = freight_rate.rates.all()

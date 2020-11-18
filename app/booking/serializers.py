@@ -448,6 +448,7 @@ class QuoteListSerializer(QuoteSerializer):
         fields = QuoteSerializer.Meta.fields + (
             'shipping_type',
             'week_range',
+            'charges',
         )
 
     def get_week_range(self, obj):

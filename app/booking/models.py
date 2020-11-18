@@ -1,6 +1,7 @@
 from decimal import Decimal
 
 from django.contrib.auth import get_user_model
+from django.db.models import JSONField
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -502,6 +503,10 @@ class Quote(models.Model):
     is_active = models.BooleanField(
         _('Quote is active or paused'),
         default=True,
+    )
+    charges = JSONField(
+        _('Charges calculations'),
+        null=True,
     )
     company = models.ForeignKey(
         'core.Company',

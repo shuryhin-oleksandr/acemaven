@@ -3,7 +3,7 @@ from decimal import Decimal
 from django.db.models import Q
 
 from app.booking.models import Surcharge, Charge, FreightRate
-from app.handling.models import GlobalFee, ShippingMode
+from app.handling.models import GlobalFee, ShippingMode, ExchangeRate, ContainerType, PackagingType
 from app.location.models import Country
 
 
@@ -157,6 +157,138 @@ def calculate_freight_rate(totals,
     add_currency_value(totals, code, subtotal)
     add_currency_value(totals['total_freight_rate'], code, subtotal)
     return freight
+
+
+def calculate_freight_rate_charges(freight_rate,
+                                   freight_rate_dict,
+                                   cargo_groups,
+                                   shipping_mode,
+                                   booking_fee,
+                                   service_fee,
+                                   main_currency_code,
+                                   date_from,
+                                   date_to,
+                                   container_type_ids_list,):
+    totals = dict()
+    totals['total_freight_rate'] = dict()
+    totals['total_surcharge'] = dict()
+    result = dict()
+    result['freight_rate'] = freight_rate_dict
+    result['cargo_groups'] = []
+    if shipping_mode.is_need_volume:
+        rate = freight_rate.rates.first()
+        exchange_rate = ExchangeRate.objects.filter(currency__code=rate.currency.code).first()
+        for cargo_group in cargo_groups:
+            new_cargo_group = dict()
+            total_weight_per_pack, total_weight = wm_calculate(cargo_group, shipping_mode.shipping_type.title)
+
+            new_cargo_group['freight'] = calculate_freight_rate(totals,
+                                                                rate,
+                                                                booking_fee,
+                                                                main_currency_code,
+                                                                exchange_rate,
+                                                                total_weight_per_pack=total_weight_per_pack,
+                                                                total_weight=total_weight)
+
+            surcharge = rate.surcharges.filter(start_date__lte=date_from,
+                                               expiration_date__gte=date_to).first()
+            charges = surcharge.charges.all()
+            usage_fee = surcharge.usage_fees.filter(container_type=cargo_group.get('container_type')).first()
+            calculate_additional_surcharges(totals,
+                                            charges,
+                                            usage_fee,
+                                            cargo_group,
+                                            shipping_mode,
+                                            new_cargo_group,
+                                            total_weight_per_pack)
+            new_cargo_group['volume'] = cargo_group.get('volume')
+            container_type = cargo_group.get('container_type')
+            packaging_type = cargo_group.get('packaging_type')
+            new_cargo_group['cargo_type'] = ContainerType.objects.filter(id=container_type).first().code \
+                if container_type else PackagingType.objects.filter(id=packaging_type).first().description
+
+            result['cargo_groups'].append(new_cargo_group)
+    else:
+        rates = freight_rate.rates.all()
+        for cargo_group in cargo_groups:
+            new_cargo_group = dict()
+            rate = rates.filter(container_type=cargo_group.get('container_type')).first()
+            exchange_rate = ExchangeRate.objects.filter(currency__code=rate.currency.code).first()
+
+            new_cargo_group['freight'] = calculate_freight_rate(totals,
+                                                                rate,
+                                                                booking_fee,
+                                                                main_currency_code,
+                                                                exchange_rate,
+                                                                volume=cargo_group.get('volume'))
+
+            surcharge = rate.surcharges.filter(start_date__lte=date_from,
+                                               expiration_date__gte=date_to).first()
+            charges = surcharge.charges.all()
+            usage_fee = surcharge.usage_fees.filter(container_type=cargo_group.get('container_type')).first()
+            calculate_additional_surcharges(totals,
+                                            charges,
+                                            usage_fee,
+                                            cargo_group,
+                                            shipping_mode,
+                                            new_cargo_group)
+            new_cargo_group['volume'] = cargo_group.get('volume')
+            container_type = cargo_group.get('container_type')
+            new_cargo_group['cargo_type'] = ContainerType.objects.filter(id=container_type).first().code
+
+            result['cargo_groups'].append(new_cargo_group)
+
+    doc_fee = dict()
+    filter_data = {}
+    if shipping_mode.has_freight_containers:
+        filter_data['container_type__id'] = container_type_ids_list[0]
+    surcharge = freight_rate.rates.filter(**filter_data).first().surcharges.filter(
+        start_date__lte=date_from,
+        expiration_date__gte=date_to,
+    ).first()
+    charge = surcharge.charges.filter(additional_surcharge__is_document=True).first()
+    doc_fee['currency'] = charge.currency.code
+    doc_fee['cost'] = charge.charge
+    doc_fee['subtotal'] = charge.charge
+    result['doc_fee'] = doc_fee
+    add_currency_value(totals, charge.currency.code, charge.charge)
+
+    service_fee_dict = dict()
+    service_fee_dict['currency'] = main_currency_code
+    service_fee_dict['cost'] = service_fee
+    service_fee_dict['subtotal'] = service_fee
+    result['service_fee'] = service_fee_dict
+    add_currency_value(totals, main_currency_code, service_fee)
+
+    total_booking_fee = totals.pop('booking_fee')
+    pay_to_book = service_fee + total_booking_fee
+    total_freight_rate = totals.pop('total_freight_rate')
+    total_surcharge = totals.pop('total_surcharge')
+    result['total_freight_rate'] = total_freight_rate
+    result['total_surcharge'] = total_surcharge
+    result['totals'] = totals
+    result['pay_to_book'] = {
+        'service_fee': service_fee,
+        'booking_fee': total_booking_fee,
+        'pay_to_book': pay_to_book,
+        'currency': main_currency_code,
+    }
+
+    return result
+
+
+def get_fees(company, shipping_mode):
+    local_fees = company.fees.filter(shipping_mode=shipping_mode)
+    global_fees = GlobalFee.objects.filter(shipping_mode=shipping_mode)
+    local_booking_fee = local_fees.filter(fee_type=GlobalFee.BOOKING, is_active=True).first()
+    local_service_fee = local_fees.filter(fee_type=GlobalFee.SERVICE, is_active=True).first()
+    booking_fee = local_booking_fee if local_booking_fee else \
+        global_fees.filter(fee_type=GlobalFee.BOOKING, is_active=True).first()
+    service_fee = local_service_fee if local_service_fee else \
+        global_fees.filter(fee_type=GlobalFee.SERVICE, is_active=True).first()
+    service_fee = service_fee.value if service_fee else 0
+
+    return booking_fee, service_fee
 
 
 def freight_rate_search(data, company=None):

@@ -15,7 +15,7 @@ def date_format(date):
     return '-'.join(date.split('/')[::-1])
 
 
-def rate_surcharges_filter(rate, company):
+def rate_surcharges_filter(rate, company, temporary=False):
     freight_rate = rate.freight_rate
     direction = 'export' if freight_rate.origin.code.startswith(MAIN_COUNTRY_CODE) else 'import'
     location = freight_rate.origin if direction == 'export' else freight_rate.destination
@@ -37,6 +37,7 @@ def rate_surcharges_filter(rate, company):
         Q(**filter_fields),
         Q(Q(**start_date_fields), Q(**end_date_fields), _connector='OR'),
         company=company,
+        temporary=temporary,
     )
     return surcharges
 
@@ -172,7 +173,7 @@ def freight_rate_search(data, company=None):
     data['rates__surcharges__start_date__lte'] = date_from
     data['rates__surcharges__expiration_date__gte'] = date_to
 
-    freight_rates = FreightRate.objects.filter(**data, is_active=True)
+    freight_rates = FreightRate.objects.filter(**data, is_active=True, temporary=False)
 
     if shipping_mode.has_freight_containers:
         for container_type_id in container_type_ids_list:

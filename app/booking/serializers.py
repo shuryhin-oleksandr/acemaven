@@ -300,13 +300,16 @@ class FreightRateSerializer(FreightRateEditSerializer):
         company = user.companies.first()
         validated_data['company'] = company
         rates = validated_data.pop('rates', [])
-        if not validated_data.get('temporary'):
+        temporary = validated_data.get('temporary')
+        temporary = temporary if temporary else False
+        if not temporary:
             errors = {}
             empty_rates = []
             if validated_data['shipping_mode'].has_freight_containers:
                 existing_freight_rates = FreightRate.objects.filter(
                     **{key: value for key, value in validated_data.items()
-                       if key not in ('transit_time', 'carrier_disclosure')}
+                       if key not in ('transit_time', 'carrier_disclosure')},
+                    temporary=False,
                 )
                 new_not_empty_rates = list(filter(lambda x: x.get('start_date'), rates))
                 for existing_freight_rate in existing_freight_rates:
@@ -325,7 +328,7 @@ class FreightRateSerializer(FreightRateEditSerializer):
         for rate in new_rates:
             rate.save()
             if rate.start_date and rate.expiration_date:
-                surcharges = rate_surcharges_filter(rate, company)
+                surcharges = rate_surcharges_filter(rate, company, temporary=temporary)
                 rate.surcharges.set(surcharges)
         return new_freight_rate
 

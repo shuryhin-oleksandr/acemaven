@@ -50,7 +50,7 @@ class SurchargeViesSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        return self.queryset.filter(company=user.companies.first())
+        return self.queryset.filter(company=user.companies.first(), temporary=False)
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -97,6 +97,7 @@ class FreightRateViesSet(PermissionClassByActionMixin,
     permission_classes = (IsAuthenticated, IsMasterOrAgent, )
     permission_classes_by_action = {
         'freight_rate_search_and_calculate': (IsAuthenticated, IsClientCompany, ),
+        'save_freight_rate': (IsAuthenticated, IsAgentCompany, ),
     }
     filter_class = FreightRateFilterSet
     filter_backends = (filters.OrderingFilter, rest_framework.DjangoFilterBackend,)
@@ -113,7 +114,7 @@ class FreightRateViesSet(PermissionClassByActionMixin,
 
     def get_queryset(self):
         user = self.request.user
-        queryset = self.queryset.filter(company=user.companies.first())
+        queryset = self.queryset.filter(company=user.companies.first(), temporary=False,)
         if self.action == 'list':
             return queryset.annotate(direction=Case(
                 When(origin__code__startswith=MAIN_COUNTRY_CODE, then=Value('export')),
@@ -121,6 +122,16 @@ class FreightRateViesSet(PermissionClassByActionMixin,
                 output_field=CharField()
             ))
         return queryset
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        new_freight_rate_id = serializer.data.get('id')
+        freight_rate = FreightRate.objects.get(id=new_freight_rate_id)
+        data = FreightRateRetrieveSerializer(freight_rate).data
+        return Response(data=data, status=status.HTTP_201_CREATED, headers=headers)
 
     @action(methods=['post'], detail=False, url_path='check-date')
     def check_date(self, request, *args, **kwargs):
@@ -134,6 +145,51 @@ class FreightRateViesSet(PermissionClassByActionMixin,
         } for rate in freight_rate.rates.values('container_type', 'start_date', 'expiration_date')]
             for freight_rate in freight_rates]
         return Response(data=results, status=status.HTTP_201_CREATED)
+
+    @action(methods=['post'], detail=True, url_path='save-freight-rate')
+    def save_freight_rate(self, request, *args, **kwargs):
+        freight_rate = self.get_object()
+        old_freight_rates = self.get_queryset().filter(shipping_mode=freight_rate.shipping_mode,
+                                                       origin=freight_rate.origin,
+                                                       destination=freight_rate.destination,
+                                                       carrier=freight_rate.carrier,)
+        shipping_mode = freight_rate.shipping_mode
+
+        rates = freight_rate.rates.all()
+        if shipping_mode.has_freight_containers:
+            new_not_empty_rates = rates.filter(start_date__isnull=False)
+            for old_freight_rate in old_freight_rates:
+                for new_rate in new_not_empty_rates:
+                    if old_freight_rate.rates.filter(
+                        Q(
+                            Q(start_date__gt=new_rate.start_date, start_date__lte=new_rate.expiration_date),
+                            Q(expiration_date__gte=new_rate.start_date, expiration_date__lt=new_rate.expiration_date),
+                            Q(start_date__lte=new_rate.start_date, expiration_date__gte=new_rate.expiration_date),
+                            Q(start_date__isnull=True),
+                            _connector='OR',
+                        ),
+                        container_type=new_rate.container_type,
+                    ).exists():
+                        return Response(status=status.HTTP_400_BAD_REQUEST)
+        else:
+            new_rate = rates.first()
+            for old_freight_rate in old_freight_rates:
+                if old_freight_rate.rates.filter(
+                        Q(
+                            Q(start_date__gt=new_rate.start_date, start_date__lte=new_rate.expiration_date),
+                            Q(expiration_date__gte=new_rate.start_date, expiration_date__lt=new_rate.expiration_date),
+                            Q(start_date__lte=new_rate.start_date, expiration_date__gte=new_rate.expiration_date),
+                            _connector='OR',
+                        )
+                ).exists():
+                    return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        freight_rate.temporary = False
+        freight_rate.save()
+        for rate in rates:
+            rate.surcharges.filter(temporary=True).update(temporary=False)
+
+        return Response(status=status.HTTP_200_OK)
 
     @action(methods=['post'], detail=False, url_path='check-surcharge')
     def check_surcharge(self, request, *args, **kwargs):
@@ -163,7 +219,8 @@ class FreightRateViesSet(PermissionClassByActionMixin,
         surcharge = Surcharge.objects.filter(
             Q(**filter_fields),
             Q(Q(**start_date_fields), Q(**end_date_fields), _connector='OR'),
-            company=user.companies.first()
+            company=user.companies.first(),
+            temporary=False,
         ).order_by('start_date').first()
         data = {}
         if surcharge:

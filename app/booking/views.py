@@ -403,6 +403,7 @@ class QuoteViesSet(PermissionClassByActionMixin,
         'freight_rate_search': (IsAuthenticated, IsAgentCompany,),
         'submit_quote': (IsAuthenticated, IsAgentCompany,),
         'reject_quote': (IsAuthenticated, IsAgentCompany,),
+        'withdraw_quote': (IsAuthenticated, IsAgentCompany,),
     }
     filter_class = QuoteFilterSet
     filter_backends = (QuoteOrderingFilterBackend, rest_framework.DjangoFilterBackend,)
@@ -490,6 +491,14 @@ class QuoteViesSet(PermissionClassByActionMixin,
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    @action(methods=['post'], detail=True, url_path='withdraw')
+    def withdraw_quote(self, request, *args, **kwargs):
+        user = request.user
+        quote = self.get_object()
+        quote_status = quote.statuses.filter(freight_rate__company=user.companies.first()).first()
+        quote_status.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class BookingViesSet(viewsets.ModelViewSet):

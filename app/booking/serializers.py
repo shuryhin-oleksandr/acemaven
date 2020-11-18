@@ -143,6 +143,7 @@ class SurchargeEditSerializer(SurchargeCheckDatesSerializer):
             'id',
             'start_date',
             'expiration_date',
+            'temporary',
         )
 
 
@@ -281,6 +282,7 @@ class FreightRateEditSerializer(serializers.ModelSerializer):
             'transit_time',
             'is_active',
             'shipping_mode',
+            'temporary',
         )
 
 
@@ -298,24 +300,25 @@ class FreightRateSerializer(FreightRateEditSerializer):
         company = user.companies.first()
         validated_data['company'] = company
         rates = validated_data.pop('rates', [])
-        errors = {}
-        empty_rates = []
-        if validated_data['shipping_mode'].has_freight_containers:
-            existing_freight_rates = FreightRate.objects.filter(
-                **{key: value for key, value in validated_data.items()
-                   if key not in ('transit_time', 'carrier_disclosure')}
-            )
-            new_not_empty_rates = list(filter(lambda x: x.get('start_date'), rates))
-            for existing_freight_rate in existing_freight_rates:
-                for new_rate in new_not_empty_rates:
-                    if existing_freight_rate.rates.filter(
-                            container_type=new_rate.get('container_type'),
-                            start_date__isnull=True
-                    ).exists():
-                        empty_rates.append(new_rate.get('container_type').id)
-        if empty_rates:
-            errors['existing_empty_rates'] = list(set(empty_rates))
-            raise serializers.ValidationError(errors)
+        if not validated_data.get('temporary'):
+            errors = {}
+            empty_rates = []
+            if validated_data['shipping_mode'].has_freight_containers:
+                existing_freight_rates = FreightRate.objects.filter(
+                    **{key: value for key, value in validated_data.items()
+                       if key not in ('transit_time', 'carrier_disclosure')}
+                )
+                new_not_empty_rates = list(filter(lambda x: x.get('start_date'), rates))
+                for existing_freight_rate in existing_freight_rates:
+                    for new_rate in new_not_empty_rates:
+                        if existing_freight_rate.rates.filter(
+                                container_type=new_rate.get('container_type'),
+                                start_date__isnull=True
+                        ).exists():
+                            empty_rates.append(new_rate.get('container_type').id)
+            if empty_rates:
+                errors['existing_empty_rates'] = list(set(empty_rates))
+                raise serializers.ValidationError(errors)
         new_freight_rate = super().create(validated_data)
         rates = [{**item, **{'freight_rate': new_freight_rate, 'updated_by': user}} for item in rates]
         new_rates = [Rate(**fields) for fields in rates]

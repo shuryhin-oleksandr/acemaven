@@ -38,6 +38,10 @@ class Surcharge(models.Model):
     expiration_date = models.DateField(
         _('Surcharge expiration date'),
     )
+    temporary = models.BooleanField(
+        _('Temporary surcharge or not'),
+        default=False,
+    )
     shipping_mode = models.ForeignKey(
         'handling.ShippingMode',
         on_delete=models.CASCADE,
@@ -223,10 +227,15 @@ class FreightRate(models.Model):
     )
     transit_time = models.PositiveIntegerField(
         _('Transit time in days'),
+        null=True,
     )
     is_active = models.BooleanField(
         _('Freight rate is active or paused'),
         default=True,
+    )
+    temporary = models.BooleanField(
+        _('Temporary freight rate or not'),
+        default=False,
     )
     shipping_mode = models.ForeignKey(
         'handling.ShippingMode',
@@ -302,6 +311,10 @@ class Booking(models.Model):
     )
     is_paid = models.BooleanField(
         _('Whether booking paid or not'),
+        default=False,
+    )
+    confirmed = models.BooleanField(
+        _('Booking confirmed or not'),
         default=False,
     )
     company = models.ForeignKey(

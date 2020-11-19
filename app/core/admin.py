@@ -94,7 +94,7 @@ class CustomUserAdmin(admin.ModelAdmin):
     )
 
     def company(self, obj):
-        return obj.companies.first()
+        return obj.get_company()
 
 
 @admin.register(Company)

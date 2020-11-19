@@ -160,7 +160,7 @@ class SurchargeSerializer(SurchargeEditSerializer):
 
     def create(self, validated_data):
         user = self.context['request'].user
-        company = user.companies.first()
+        company = user.get_company()
         validated_data['company'] = company
         usage_fees = validated_data.pop('usage_fees', [])
         charges = validated_data.pop('charges', [])
@@ -203,7 +203,7 @@ class RateSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         user = self.context['request'].user
-        company = user.companies.first()
+        company = user.get_company()
         validated_data['updated_by'] = user
         rate = super().update(instance, validated_data)
         surcharges = rate_surcharges_filter(rate, company)
@@ -297,7 +297,7 @@ class FreightRateSerializer(FreightRateEditSerializer):
 
     def create(self, validated_data):
         user = self.context['request'].user
-        company = user.companies.first()
+        company = user.get_company()
         validated_data['company'] = company
         rates = validated_data.pop('rates', [])
         temporary = validated_data.get('temporary')
@@ -425,7 +425,7 @@ class QuoteSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = self.context['request'].user
-        company = user.companies.first()
+        company = user.get_company()
         validated_data['company'] = company
         cargo_groups = validated_data.pop('quote_cargo_groups', [])
         quote = super().create(validated_data)
@@ -468,7 +468,7 @@ class QuoteAgentListSerializer(QuoteListBaseSerializer):
 
     def get_is_submitted(self, obj):
         user = self.context['request'].user
-        return True if obj.statuses.filter(freight_rate__company=user.companies.first()).exists() else False
+        return True if obj.statuses.filter(freight_rate__company=user.get_company()).exists() else False
 
 
 class QuoteAgentRetrieveSerializer(QuoteAgentListSerializer):
@@ -481,7 +481,7 @@ class QuoteAgentRetrieveSerializer(QuoteAgentListSerializer):
         )
 
     def get_status(self, obj):
-        company = self.context['request'].user.companies.first()
+        company = self.context['request'].user.get_company()
         quote_status = obj.statuses.filter(status=Status.SUBMITTED, freight_rate__company=company).first()
         return QuoteStatusRetrieveSerializer(quote_status).data if quote_status else {}
 
@@ -529,7 +529,7 @@ class BookingSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = self.context['request'].user
-        company = user.companies.first()
+        company = user.get_company()
         validated_data['company'] = company
         shipper = validated_data.pop('shipper')
         shipper['company'] = company

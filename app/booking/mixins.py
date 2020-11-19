@@ -6,4 +6,4 @@ class FeeGetQuerysetMixin:
 
     def get_queryset(self):
         user = self.request.user
-        return self.queryset.filter(surcharge__company=user.companies.first())
+        return self.queryset.filter(surcharge__company=user.get_company())

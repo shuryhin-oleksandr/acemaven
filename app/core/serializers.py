@@ -105,7 +105,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         roles = validated_data.pop('roles')
         user = get_user_model().objects.create(**validated_data)
-        company = self.context['request'].user.companies.first()
+        company = self.context['request'].user.get_company()
         Role.objects.create(user=user, company=company)
         user.set_roles(roles)
         process_sign_up_token(user)
@@ -208,7 +208,7 @@ class BankAccountSerializer(serializers.ModelSerializer):
         )
 
     def create(self, validated_data):
-        company = self.context['request'].user.companies.first()
+        company = self.context['request'].user.get_company()
         validated_data['company'] = company
         if not company.bank_accounts.exists():
             validated_data['is_default'] = True

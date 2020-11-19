@@ -51,7 +51,7 @@ class SurchargeViesSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        return self.queryset.filter(company=user.companies.first(), temporary=False)
+        return self.queryset.filter(company=user.get_company(), temporary=False)
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -116,7 +116,7 @@ class FreightRateViesSet(PermissionClassByActionMixin,
     def get_queryset(self):
         user = self.request.user
         temporary = True if self.action == 'save_freight_rate' else False
-        queryset = self.queryset.filter(company=user.companies.first(), temporary=temporary,)
+        queryset = self.queryset.filter(company=user.get_company(), temporary=temporary,)
         if self.action == 'list':
             return queryset.annotate(direction=Case(
                 When(origin__code__startswith=MAIN_COUNTRY_CODE, then=Value('export')),
@@ -152,7 +152,7 @@ class FreightRateViesSet(PermissionClassByActionMixin,
     def save_freight_rate(self, request, *args, **kwargs):
         user = request.user
         freight_rate = self.get_object()
-        old_freight_rates = self.queryset.filter(company=user.companies.first(),
+        old_freight_rates = self.queryset.filter(company=user.get_company(),
                                                  shipping_mode=freight_rate.shipping_mode,
                                                  origin=freight_rate.origin,
                                                  destination=freight_rate.destination,
@@ -224,7 +224,7 @@ class FreightRateViesSet(PermissionClassByActionMixin,
         surcharge = Surcharge.objects.filter(
             Q(**filter_fields),
             Q(Q(**start_date_fields), Q(**end_date_fields), _connector='OR'),
-            company=user.companies.first(),
+            company=user.get_company(),
             temporary=False,
         ).order_by('start_date').first()
         data = {}
@@ -247,7 +247,7 @@ class FreightRateViesSet(PermissionClassByActionMixin,
         number_of_results = ClientPlatformSetting.objects.first().number_of_results
         freight_rates = freight_rates.order_by('transit_time').distinct()[:number_of_results]
 
-        company = request.user.companies.first()
+        company = request.user.get_company()
         booking_fee, service_fee = get_fees(company, shipping_mode)
         service_fee = float(service_fee)
         main_currency_code = Currency.objects.filter(is_main=True).first().code
@@ -280,7 +280,7 @@ class RateViesSet(mixins.CreateModelMixin,
 
     def get_queryset(self):
         user = self.request.user
-        return self.queryset.filter(freight_rate__company=user.companies.first())
+        return self.queryset.filter(freight_rate__company=user.get_company())
 
 
 class WMCalculateView(generics.GenericAPIView):
@@ -317,7 +317,7 @@ class QuoteViesSet(PermissionClassByActionMixin,
 
     def get_queryset(self):
         user = self.request.user
-        company = user.companies.first()
+        company = user.get_company()
         queryset = self.queryset
         if company.type == Company.CLIENT:
             queryset = self.queryset.filter(company=company)
@@ -329,7 +329,7 @@ class QuoteViesSet(PermissionClassByActionMixin,
         if self.action == 'get_agent_quotes_list':
             return QuoteAgentListSerializer
         if self.action == 'retrieve':
-            company = self.request.user.companies.first()
+            company = self.request.user.get_company()
             if company.type == Company.CLIENT:
                 return QuoteClientListOrRetrieveSerializer
             return QuoteAgentRetrieveSerializer
@@ -338,7 +338,7 @@ class QuoteViesSet(PermissionClassByActionMixin,
     @action(methods=['get'], detail=False, url_path='agent-quotes-list')
     def get_agent_quotes_list(self, request, *args, **kwargs):
         user = request.user
-        company = user.companies.first()
+        company = user.get_company()
 
         queryset = self.get_queryset().exclude(statuses__status=Status.REJECTED,
                                                statuses__company=company)
@@ -373,7 +373,7 @@ class QuoteViesSet(PermissionClassByActionMixin,
         serializer.is_valid(raise_exception=True)
         data = serializer.data
 
-        freight_rates, _ = freight_rate_search(data, company=user.companies.first())
+        freight_rates, _ = freight_rate_search(data, company=user.get_company())
         freight_rate = freight_rates.first()
         data = FreightRateRetrieveSerializer(freight_rate).data if freight_rate else {}
         return Response(data)
@@ -397,7 +397,7 @@ class QuoteViesSet(PermissionClassByActionMixin,
                         group.get('container_type') for group in cargo_groups if 'container_type' in group
                     ]
                     main_currency_code = Currency.objects.filter(is_main=True).first().code
-                    company = request.user.companies.first()
+                    company = request.user.get_company()
                     booking_fee, service_fee = get_fees(company, quote.shipping_mode)
                     service_fee = float(service_fee)
 
@@ -432,7 +432,7 @@ class QuoteViesSet(PermissionClassByActionMixin,
         data = request.data
         data['quote'] = quote.id
         data['status'] = Status.REJECTED
-        data['company'] = user.companies.first().id
+        data['company'] = user.get_company().id
         serializer = QuoteStatusBaseSerializer(data=data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
@@ -443,7 +443,7 @@ class QuoteViesSet(PermissionClassByActionMixin,
     def withdraw_quote(self, request, *args, **kwargs):
         user = request.user
         quote = self.get_object()
-        quote_status = quote.statuses.filter(freight_rate__company=user.companies.first()).first()
+        quote_status = quote.statuses.filter(freight_rate__company=user.get_company()).first()
         quote_status.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -451,10 +451,16 @@ class QuoteViesSet(PermissionClassByActionMixin,
 class BookingViesSet(viewsets.ModelViewSet):
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAgentCompany, )
+
+    def get_queryset(self):
+        company = self.request.user.get_company()
+        queryset = self.queryset
+        return queryset.filter(freight_rate__company=company)
 
 
-class StatusViesSet(viewsets.ModelViewSet):
+class StatusViesSet(mixins.UpdateModelMixin,
+                    viewsets.GenericViewSet):
     queryset = Status.objects.all()
     serializer_class = QuoteStatusBaseSerializer
     permission_classes = (IsAuthenticated, )

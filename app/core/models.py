@@ -115,6 +115,9 @@ class CustomUser(AbstractUser):
         verbose_name = _('User')
         verbose_name_plural = _('Users')
 
+    def get_company(self):
+        return self.companies.first()
+
     def get_roles(self):
         return self.role_set.first().groups.all()
 

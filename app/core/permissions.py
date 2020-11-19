@@ -56,7 +56,7 @@ class IsClientCompany(BasePermission):
 
     def has_permission(self, request, view):
         if request.user.role_set.exists():
-            return request.user.get_roles().exists() and request.user.companies.first().type == Company.CLIENT
+            return request.user.get_roles().exists() and request.user.get_company().type == Company.CLIENT
         return False
 
 
@@ -67,5 +67,5 @@ class IsAgentCompany(BasePermission):
 
     def has_permission(self, request, view):
         if request.user.role_set.exists():
-            return request.user.get_roles().exists() and request.user.companies.first().type == Company.FREIGHT_FORWARDER
+            return request.user.get_roles().exists() and request.user.get_company().type == Company.FREIGHT_FORWARDER
         return False

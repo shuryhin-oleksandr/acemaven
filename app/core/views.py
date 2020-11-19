@@ -30,7 +30,7 @@ class BankAccountViewSet(PermissionClassByActionMixin,
 
     def get_queryset(self):
         user = self.request.user
-        return self.queryset.filter(company=user.companies.first())
+        return self.queryset.filter(company=user.get_company())
 
 
 class CompanyEditViewSet(mixins.RetrieveModelMixin,
@@ -87,7 +87,7 @@ class UserViewSet(PermissionClassByActionMixin,
 
     def get_queryset(self):
         user = self.request.user
-        company = user.companies.first()
+        company = user.get_company()
         if self.request.user.get_roles().filter(name='master').exists():
             return self.queryset.filter(companies=company)
         return self.queryset.filter(id=user.id)

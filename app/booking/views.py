@@ -1,4 +1,3 @@
-import json
 from datetime import datetime
 
 from django_filters import rest_framework
@@ -21,7 +20,7 @@ from app.booking.serializers import SurchargeSerializer, SurchargeEditSerializer
     QuoteClientListOrRetrieveSerializer, QuoteAgentListSerializer, QuoteAgentRetrieveSerializer, \
     QuoteStatusBaseSerializer, CargoGroupSerializer
 from app.booking.utils import date_format, wm_calculate, freight_rate_search, calculate_freight_rate_charges, \
-    get_fees, DecimalEncoder
+    get_fees
 from app.core.mixins import PermissionClassByActionMixin
 from app.core.models import Company
 from app.core.permissions import IsMasterOrAgent, IsClientCompany, IsAgentCompany
@@ -250,6 +249,7 @@ class FreightRateViesSet(PermissionClassByActionMixin,
 
         company = request.user.companies.first()
         booking_fee, service_fee = get_fees(company, shipping_mode)
+        service_fee = float(service_fee)
         main_currency_code = Currency.objects.filter(is_main=True).first().code
         results = []
 
@@ -399,6 +399,7 @@ class QuoteViesSet(PermissionClassByActionMixin,
                     main_currency_code = Currency.objects.filter(is_main=True).first().code
                     company = request.user.companies.first()
                     booking_fee, service_fee = get_fees(company, quote.shipping_mode)
+                    service_fee = float(service_fee)
 
                     result = calculate_freight_rate_charges(freight_rate,
                                                             freight_rate_dict,
@@ -410,7 +411,6 @@ class QuoteViesSet(PermissionClassByActionMixin,
                                                             quote.date_from,
                                                             quote.date_to,
                                                             container_type_ids_list,)
-                    result = json.dumps(result, cls=DecimalEncoder)
                     data['charges'] = result
 
                     serializer = QuoteStatusBaseSerializer(data=data)

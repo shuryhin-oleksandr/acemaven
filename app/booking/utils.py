@@ -93,6 +93,8 @@ def calculate_additional_surcharges(totals,
                 elif condition == Charge.FIXED:
                     fixed_cost = True
             subtotal = cost_per_pack * Decimal(cargo_group.get('volume')) if not fixed_cost else cost_per_pack
+            subtotal = float(subtotal)
+            cost_per_pack = float(cost_per_pack)
             code = charge.currency.code
             data['currency'] = code
             data['cost'] = cost_per_pack
@@ -105,8 +107,9 @@ def calculate_additional_surcharges(totals,
         usage_fee_data = dict()
         code = usage_fee.currency.code
         usage_fee_data['currency'] = code
-        usage_fee_data['cost'] = usage_fee.charge
+        usage_fee_data['cost'] = float(usage_fee.charge)
         subtotal = usage_fee.charge * Decimal(cargo_group.get('volume'))
+        subtotal = float(subtotal)
         usage_fee_data['subtotal'] = subtotal
         data_key = 'usage_fee' if shipping_mode.is_need_volume else 'handling'
         new_cargo_group[data_key] = usage_fee_data
@@ -143,7 +146,7 @@ def calculate_freight_rate(totals,
     freight = dict()
     code = rate.currency.code
     freight['currency'] = code
-    freight['cost'] = total_weight_per_pack * rate.rate
+    freight['cost'] = float(total_weight_per_pack * rate.rate)
     subtotal = volume * total_weight * rate.rate
     booking_fee_value_in_local_curr = 0
     if booking_fee:
@@ -152,6 +155,8 @@ def calculate_freight_rate(totals,
                                                                   main_currency_code,
                                                                   exchange_rate,
                                                                   subtotal)
+    subtotal = float(subtotal)
+    booking_fee_value_in_local_curr = float(booking_fee_value_in_local_curr)
     freight['subtotal'] = subtotal
     freight['booking_fee'] = booking_fee_value_in_local_curr
     add_currency_value(totals, 'booking_fee', booking_fee_value_in_local_curr)
@@ -248,11 +253,12 @@ def calculate_freight_rate_charges(freight_rate,
         expiration_date__gte=date_to,
     ).first()
     charge = surcharge.charges.filter(additional_surcharge__is_document=True).first()
+    doc_fee_charge = float(charge.charge)
     doc_fee['currency'] = charge.currency.code
-    doc_fee['cost'] = charge.charge
-    doc_fee['subtotal'] = charge.charge
+    doc_fee['cost'] = doc_fee_charge
+    doc_fee['subtotal'] = doc_fee_charge
     result['doc_fee'] = doc_fee
-    add_currency_value(totals, charge.currency.code, charge.charge)
+    add_currency_value(totals, charge.currency.code, doc_fee_charge)
 
     service_fee_dict = dict()
     service_fee_dict['currency'] = main_currency_code
@@ -337,10 +343,3 @@ def freight_rate_search(data, company=None):
         )
 
     return freight_rates, shipping_mode
-
-
-class DecimalEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, Decimal):
-            return float(obj)
-        return super().default(obj)

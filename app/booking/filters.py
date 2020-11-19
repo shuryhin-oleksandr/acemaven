@@ -89,12 +89,14 @@ class QuoteOrderingFilterBackend(filters.BaseFilterBackend):
 
 
 class BookingFilterSet(django_filters.FilterSet):
+    shipping_type = django_filters.CharFilter(field_name='freight_rate__shipping_mode__shipping_type__title')
     route = django_filters.CharFilter(method='route_filter', label='Route filter')
     client = django_filters.CharFilter(field_name='company__name', lookup_expr='icontains')
 
     class Meta:
         model = Booking
         fields = (
+            'shipping_type',
             'route',
             'client',
         )

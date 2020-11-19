@@ -1,3 +1,4 @@
+import json
 from decimal import Decimal
 
 from django.db.models import Q
@@ -336,3 +337,10 @@ def freight_rate_search(data, company=None):
         )
 
     return freight_rates, shipping_mode
+
+
+class DecimalEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, Decimal):
+            return float(obj)
+        return super().default(obj)

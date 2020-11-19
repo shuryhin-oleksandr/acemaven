@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 
 from django_filters import rest_framework
@@ -17,7 +18,8 @@ from app.booking.serializers import SurchargeSerializer, SurchargeEditSerializer
     RateSerializer, CheckRateDateSerializer, FreightRateCheckDatesSerializer, WMCalculateSerializer, \
     FreightRateSearchSerializer, FreightRateSearchListSerializer, QuoteSerializer, BookingSerializer, \
     QuoteListSerializer, QuoteAgentListOrRetrieveSerializer, QuoteStatusBaseSerializer, CargoGroupSerializer
-from app.booking.utils import date_format, wm_calculate, freight_rate_search, calculate_freight_rate_charges, get_fees
+from app.booking.utils import date_format, wm_calculate, freight_rate_search, calculate_freight_rate_charges, get_fees, \
+    DecimalEncoder
 from app.core.mixins import PermissionClassByActionMixin
 from app.core.models import Company
 from app.core.permissions import IsMasterOrAgent, IsClientCompany, IsAgentCompany
@@ -400,6 +402,7 @@ class QuoteViesSet(PermissionClassByActionMixin,
                                                 quote.date_from,
                                                 quote.date_to,
                                                 container_type_ids_list,)
+        result = json.dumps(result, cls=DecimalEncoder)
         quote.charges = result
         quote.save()
 

@@ -3,7 +3,7 @@ from rest_framework import filters
 import django_filters
 from django.db.models import Q
 
-from app.booking.models import FreightRate, Surcharge, Quote
+from app.booking.models import FreightRate, Surcharge, Quote, Booking
 
 
 class SurchargeFilterSet(django_filters.FilterSet):
@@ -82,6 +82,45 @@ class QuoteOrderingFilterBackend(filters.BaseFilterBackend):
                 queryset = queryset.order_by(f'{asc_or_desc}is_active', 'date_from')
             elif ordering.endswith('shipment_date'):
                 queryset = queryset.order_by(f'{asc_or_desc}date_from')
+            else:
+                queryset = queryset.order_by(ordering)
+
+        return queryset
+
+
+class BookingFilterSet(django_filters.FilterSet):
+    route = django_filters.CharFilter(method='route_filter', label='Route filter')
+    client = django_filters.CharFilter(field_name='company__name', lookup_expr='icontains')
+
+    class Meta:
+        model = Booking
+        fields = (
+            'route',
+            'client',
+        )
+
+    def route_filter(self, queryset, _, value):
+        return queryset.filter(
+            Q(freight_rate__origin__code__icontains=value) | Q(freight_rate__destination__code__icontains=value)
+        ).distinct()
+
+
+class BookingOrderingFilterBackend(filters.BaseFilterBackend):
+    valid_ordering_fields = ('shipping_mode', 'client', 'shipment_date', 'status')
+
+    def filter_queryset(self, request, queryset, view):
+
+        ordering = request.query_params.get('ordering', 'date_from')
+        if ordering.strip('-') in self.valid_ordering_fields:
+            asc_or_desc = '-' if ordering.startswith('-') else ''
+            if ordering.endswith('shipping_mode'):
+                queryset = queryset.order_by(f'{asc_or_desc}freight_rate__shipping_mode__title', 'date_from')
+            elif ordering.endswith('client'):
+                queryset = queryset.order_by(f'{asc_or_desc}company__name', 'date_from')
+            elif ordering.endswith('shipment_date'):
+                queryset = queryset.order_by(f'{asc_or_desc}date_from')
+            elif ordering.endswith('status'):
+                queryset = queryset.order_by(f'{asc_or_desc}is_paid', 'date_from')
             else:
                 queryset = queryset.order_by(ordering)
 

@@ -9,7 +9,8 @@ from rest_framework.response import Response
 from django.db import transaction
 from django.db.models import CharField, Case, When, Value, Q, Count
 
-from app.booking.filters import SurchargeFilterSet, FreightRateFilterSet, QuoteFilterSet, QuoteOrderingFilterBackend
+from app.booking.filters import SurchargeFilterSet, FreightRateFilterSet, QuoteFilterSet, QuoteOrderingFilterBackend, \
+    BookingFilterSet, BookingOrderingFilterBackend
 from app.booking.mixins import FeeGetQuerysetMixin
 from app.booking.models import Surcharge, UsageFee, Charge, FreightRate, Rate, Quote, Booking, Status
 from app.booking.serializers import SurchargeSerializer, SurchargeEditSerializer, SurchargeListSerializer, \
@@ -452,6 +453,8 @@ class BookingViesSet(viewsets.ModelViewSet):
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
     permission_classes = (IsAuthenticated, )
+    filter_class = BookingFilterSet
+    filter_backends = (BookingOrderingFilterBackend, rest_framework.DjangoFilterBackend,)
 
     def get_queryset(self):
         company = self.request.user.get_company()

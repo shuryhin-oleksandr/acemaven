@@ -136,29 +136,28 @@ def calculate_fee(booking_fee, rate, main_currency_code, exchange_rate, subtotal
 
 def calculate_freight_rate(totals,
                            rate,
-                           booking_fee,
                            main_currency_code,
                            exchange_rate,
+                           booking_fee=None,
                            volume=1,
                            total_weight_per_pack=1,
-                           total_weight=1):
+                           total_weight=1,):
     freight = dict()
     code = rate.currency.code
     freight['currency'] = code
     freight['cost'] = float(total_weight_per_pack * rate.rate)
     subtotal = volume * total_weight * rate.rate
-    booking_fee_value_in_local_curr = 0
     if booking_fee:
         subtotal, booking_fee_value_in_local_curr = calculate_fee(booking_fee,
                                                                   rate,
                                                                   main_currency_code,
                                                                   exchange_rate,
                                                                   subtotal)
+        booking_fee_value_in_local_curr = float(booking_fee_value_in_local_curr)
+        freight['booking_fee'] = booking_fee_value_in_local_curr
+        add_currency_value(totals, 'booking_fee', booking_fee_value_in_local_curr)
     subtotal = float(subtotal)
-    booking_fee_value_in_local_curr = float(booking_fee_value_in_local_curr)
     freight['subtotal'] = subtotal
-    freight['booking_fee'] = booking_fee_value_in_local_curr
-    add_currency_value(totals, 'booking_fee', booking_fee_value_in_local_curr)
     add_currency_value(totals, code, subtotal)
     add_currency_value(totals['total_freight_rate'], code, subtotal)
     return freight
@@ -168,12 +167,12 @@ def calculate_freight_rate_charges(freight_rate,
                                    freight_rate_dict,
                                    cargo_groups,
                                    shipping_mode,
-                                   booking_fee,
-                                   service_fee,
                                    main_currency_code,
                                    date_from,
                                    date_to,
-                                   container_type_ids_list,):
+                                   container_type_ids_list,
+                                   booking_fee=None,
+                                   service_fee=0):
     totals = dict()
     totals['total_freight_rate'] = dict()
     totals['total_surcharge'] = dict()
@@ -189,9 +188,9 @@ def calculate_freight_rate_charges(freight_rate,
 
             new_cargo_group['freight'] = calculate_freight_rate(totals,
                                                                 rate,
-                                                                booking_fee,
                                                                 main_currency_code,
                                                                 exchange_rate,
+                                                                booking_fee=booking_fee,
                                                                 total_weight_per_pack=total_weight_per_pack,
                                                                 total_weight=total_weight)
 
@@ -222,9 +221,9 @@ def calculate_freight_rate_charges(freight_rate,
 
             new_cargo_group['freight'] = calculate_freight_rate(totals,
                                                                 rate,
-                                                                booking_fee,
                                                                 main_currency_code,
                                                                 exchange_rate,
+                                                                booking_fee=booking_fee,
                                                                 volume=cargo_group.get('volume'))
 
             surcharge = rate.surcharges.filter(start_date__lte=date_from,
@@ -259,26 +258,29 @@ def calculate_freight_rate_charges(freight_rate,
     result['doc_fee'] = doc_fee
     add_currency_value(totals, charge.currency.code, doc_fee_charge)
 
-    service_fee_dict = dict()
-    service_fee_dict['currency'] = main_currency_code
-    service_fee_dict['cost'] = service_fee
-    service_fee_dict['subtotal'] = service_fee
-    result['service_fee'] = service_fee_dict
-    add_currency_value(totals, main_currency_code, service_fee)
+    if service_fee:
+        service_fee_dict = dict()
+        service_fee_dict['currency'] = main_currency_code
+        service_fee_dict['cost'] = service_fee
+        service_fee_dict['subtotal'] = service_fee
+        result['service_fee'] = service_fee_dict
+        add_currency_value(totals, main_currency_code, service_fee)
 
-    total_booking_fee = totals.pop('booking_fee')
-    pay_to_book = service_fee + total_booking_fee
     total_freight_rate = totals.pop('total_freight_rate')
     total_surcharge = totals.pop('total_surcharge')
     result['total_freight_rate'] = total_freight_rate
     result['total_surcharge'] = total_surcharge
+
+    total_booking_fee = totals.pop('booking_fee', 0)
+    pay_to_book = service_fee + total_booking_fee
     result['totals'] = totals
-    result['pay_to_book'] = {
-        'service_fee': service_fee,
-        'booking_fee': total_booking_fee,
-        'pay_to_book': pay_to_book,
-        'currency': main_currency_code,
-    }
+    if service_fee or booking_fee:
+        result['pay_to_book'] = {
+            'service_fee': service_fee,
+            'booking_fee': total_booking_fee,
+            'pay_to_book': pay_to_book,
+            'currency': main_currency_code,
+        }
 
     return result
 

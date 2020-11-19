@@ -260,12 +260,12 @@ class FreightRateViesSet(PermissionClassByActionMixin,
                                                     freight_rate_dict,
                                                     cargo_groups,
                                                     shipping_mode,
-                                                    booking_fee,
-                                                    service_fee,
                                                     main_currency_code,
                                                     date_from,
                                                     date_to,
-                                                    container_type_ids_list,)
+                                                    container_type_ids_list,
+                                                    booking_fee=booking_fee,
+                                                    service_fee=service_fee)
 
             results.append(result)
 
@@ -398,16 +398,11 @@ class QuoteViesSet(PermissionClassByActionMixin,
                         group.get('container_type') for group in cargo_groups if 'container_type' in group
                     ]
                     main_currency_code = Currency.objects.filter(is_main=True).first().code
-                    company = request.user.get_company()
-                    booking_fee, service_fee = get_fees(company, quote.shipping_mode)
-                    service_fee = float(service_fee)
 
                     result = calculate_freight_rate_charges(freight_rate,
                                                             freight_rate_dict,
                                                             cargo_groups,
                                                             quote.shipping_mode,
-                                                            booking_fee,
-                                                            service_fee,
                                                             main_currency_code,
                                                             quote.date_from,
                                                             quote.date_to,

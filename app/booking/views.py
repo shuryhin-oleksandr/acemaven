@@ -451,7 +451,7 @@ class QuoteViesSet(PermissionClassByActionMixin,
 class BookingViesSet(viewsets.ModelViewSet):
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
-    permission_classes = (IsAgentCompany, )
+    permission_classes = (IsAuthenticated, )
 
     def get_queryset(self):
         company = self.request.user.get_company()

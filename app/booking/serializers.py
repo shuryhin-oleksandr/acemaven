@@ -435,7 +435,7 @@ class QuoteSerializer(serializers.ModelSerializer):
         return quote
 
 
-class QuoteListSerializer(QuoteSerializer):
+class QuoteListBaseSerializer(QuoteSerializer):
     cargo_groups = CargoGroupRetrieveSerializer(source='quote_cargo_groups', many=True)
     origin = PortSerializer()
     destination = PortSerializer()
@@ -448,7 +448,6 @@ class QuoteListSerializer(QuoteSerializer):
         fields = QuoteSerializer.Meta.fields + (
             'shipping_type',
             'week_range',
-            'charges',
         )
 
     def get_week_range(self, obj):
@@ -458,18 +457,57 @@ class QuoteListSerializer(QuoteSerializer):
         }
 
 
-class QuoteAgentListOrRetrieveSerializer(QuoteListSerializer):
+class QuoteAgentListSerializer(QuoteListBaseSerializer):
     is_submitted = serializers.SerializerMethodField()
 
-    class Meta(QuoteListSerializer):
+    class Meta(QuoteListBaseSerializer):
         model = Quote
-        fields = QuoteListSerializer.Meta.fields + (
+        fields = QuoteListBaseSerializer.Meta.fields + (
             'is_submitted',
         )
 
     def get_is_submitted(self, obj):
         user = self.context['request'].user
         return True if obj.statuses.filter(freight_rate__company=user.companies.first()).exists() else False
+
+
+class QuoteAgentRetrieveSerializer(QuoteAgentListSerializer):
+    status = serializers.SerializerMethodField()
+
+    class Meta(QuoteAgentListSerializer):
+        model = Quote
+        fields = QuoteAgentListSerializer.Meta.fields + (
+            'status',
+        )
+
+    def get_status(self, obj):
+        company = self.context['request'].user.companies.first()
+        quote_status = obj.statuses.filter(status=Status.SUBMITTED, freight_rate__company=company).first()
+        return QuoteStatusRetrieveSerializer(quote_status).data if quote_status else {}
+
+
+class QuoteClientListOrRetrieveSerializer(QuoteListBaseSerializer):
+    statuses = serializers.SerializerMethodField()
+    offers = serializers.SerializerMethodField()
+    unchecked_offers = serializers.SerializerMethodField()
+
+    class Meta(QuoteListBaseSerializer):
+        model = Quote
+        fields = QuoteListBaseSerializer.Meta.fields + (
+            'statuses',
+            'offers',
+            'unchecked_offers',
+        )
+
+    def get_statuses(self, obj):
+        queryset = obj.statuses.filter(status=Status.SUBMITTED)
+        return QuoteStatusRetrieveSerializer(queryset, many=True).data if queryset else []
+
+    def get_offers(self, obj):
+        return obj.statuses.filter(status=Status.SUBMITTED).count()
+
+    def get_unchecked_offers(self, obj):
+        return obj.statuses.filter(status=Status.SUBMITTED, is_viewed=False).count()
 
 
 class BookingSerializer(serializers.ModelSerializer):
@@ -515,4 +553,13 @@ class QuoteStatusBaseSerializer(serializers.ModelSerializer):
             'company',
             'status',
             'is_viewed',
+            'charges',
         )
+
+
+class QuoteStatusRetrieveSerializer(QuoteStatusBaseSerializer):
+    freight_rate = FreightRateRetrieveSerializer()
+
+    class Meta(QuoteStatusBaseSerializer.Meta):
+        fields = QuoteStatusBaseSerializer.Meta.fields
+        model = Status

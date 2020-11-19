@@ -7,6 +7,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from django.db import transaction
 from django.db.models import CharField, Case, When, Value, Q, Count
 
 from app.booking.filters import SurchargeFilterSet, FreightRateFilterSet, QuoteFilterSet, QuoteOrderingFilterBackend
@@ -17,9 +18,10 @@ from app.booking.serializers import SurchargeSerializer, SurchargeEditSerializer
     SurchargeCheckDatesSerializer, FreightRateEditSerializer, FreightRateSerializer, FreightRateRetrieveSerializer, \
     RateSerializer, CheckRateDateSerializer, FreightRateCheckDatesSerializer, WMCalculateSerializer, \
     FreightRateSearchSerializer, FreightRateSearchListSerializer, QuoteSerializer, BookingSerializer, \
-    QuoteListSerializer, QuoteAgentListOrRetrieveSerializer, QuoteStatusBaseSerializer, CargoGroupSerializer
-from app.booking.utils import date_format, wm_calculate, freight_rate_search, calculate_freight_rate_charges, get_fees, \
-    DecimalEncoder
+    QuoteClientListOrRetrieveSerializer, QuoteAgentListSerializer, QuoteAgentRetrieveSerializer, \
+    QuoteStatusBaseSerializer, CargoGroupSerializer
+from app.booking.utils import date_format, wm_calculate, freight_rate_search, calculate_freight_rate_charges, \
+    get_fees, DecimalEncoder
 from app.core.mixins import PermissionClassByActionMixin
 from app.core.models import Company
 from app.core.permissions import IsMasterOrAgent, IsClientCompany, IsAgentCompany
@@ -323,11 +325,14 @@ class QuoteViesSet(PermissionClassByActionMixin,
 
     def get_serializer_class(self):
         if self.action == 'list':
-            return QuoteListSerializer
+            return QuoteClientListOrRetrieveSerializer
         if self.action == 'get_agent_quotes_list':
-            return QuoteAgentListOrRetrieveSerializer
+            return QuoteAgentListSerializer
         if self.action == 'retrieve':
-            return QuoteAgentListOrRetrieveSerializer
+            company = self.request.user.companies.first()
+            if company.type == Company.CLIENT:
+                return QuoteClientListOrRetrieveSerializer
+            return QuoteAgentRetrieveSerializer
         return self.serializer_class
 
     @action(methods=['get'], detail=False, url_path='agent-quotes-list')
@@ -373,40 +378,52 @@ class QuoteViesSet(PermissionClassByActionMixin,
         data = FreightRateRetrieveSerializer(freight_rate).data if freight_rate else {}
         return Response(data)
 
+    @transaction.atomic
     @action(methods=['post'], detail=True, url_path='submit')
     def submit_quote(self, request, *args, **kwargs):
         quote = self.get_object()
-        data = request.data
-        data['quote'] = quote.id
-        data['status'] = Status.SUBMITTED
-        serializer = QuoteStatusBaseSerializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
+        number_of_bids = ClientPlatformSetting.objects.first().number_of_bids
+        if quote.statuses.filter(status=Status.SUBMITTED).count() < number_of_bids:
+            try:
+                with transaction.atomic():
+                    data = request.data
+                    data['quote'] = quote.id
+                    data['status'] = Status.SUBMITTED
 
-        freight_rate = Status.objects.get(id=serializer.data.get('id')).freight_rate
-        freight_rate_dict = FreightRateSearchListSerializer(freight_rate).data
-        cargo_groups = CargoGroupSerializer(quote.quote_cargo_groups, many=True).data
-        container_type_ids_list = [group.get('container_type') for group in cargo_groups if 'container_type' in group]
-        main_currency_code = Currency.objects.filter(is_main=True).first().code
-        company = request.user.companies.first()
-        booking_fee, service_fee = get_fees(company, quote.shipping_mode)
+                    freight_rate = FreightRate.objects.filter(id=data.get('freight_rate')).first()
+                    freight_rate_dict = FreightRateSearchListSerializer(freight_rate).data
+                    cargo_groups = CargoGroupSerializer(quote.quote_cargo_groups, many=True).data
+                    container_type_ids_list = [
+                        group.get('container_type') for group in cargo_groups if 'container_type' in group
+                    ]
+                    main_currency_code = Currency.objects.filter(is_main=True).first().code
+                    company = request.user.companies.first()
+                    booking_fee, service_fee = get_fees(company, quote.shipping_mode)
 
-        result = calculate_freight_rate_charges(freight_rate,
-                                                freight_rate_dict,
-                                                cargo_groups,
-                                                quote.shipping_mode,
-                                                booking_fee,
-                                                service_fee,
-                                                main_currency_code,
-                                                quote.date_from,
-                                                quote.date_to,
-                                                container_type_ids_list,)
-        result = json.dumps(result, cls=DecimalEncoder)
-        quote.charges = result
-        quote.save()
+                    result = calculate_freight_rate_charges(freight_rate,
+                                                            freight_rate_dict,
+                                                            cargo_groups,
+                                                            quote.shipping_mode,
+                                                            booking_fee,
+                                                            service_fee,
+                                                            main_currency_code,
+                                                            quote.date_from,
+                                                            quote.date_to,
+                                                            container_type_ids_list,)
+                    result = json.dumps(result, cls=DecimalEncoder)
+                    data['charges'] = result
 
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+                    serializer = QuoteStatusBaseSerializer(data=data)
+                    serializer.is_valid(raise_exception=True)
+                    self.perform_create(serializer)
+                    headers = self.get_success_headers(serializer.data)
+                    return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+            except Exception as error:
+                return Response({'error': str(error)}, status=status.HTTP_400_BAD_REQUEST)
+
+        else:
+            return Response({'error': 'Quote has reached the offers limit.'}, status=status.HTTP_400_BAD_REQUEST)
 
     @action(methods=['post'], detail=True, url_path='reject')
     def reject_quote(self, request, *args, **kwargs):
@@ -434,4 +451,10 @@ class QuoteViesSet(PermissionClassByActionMixin,
 class BookingViesSet(viewsets.ModelViewSet):
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
+    permission_classes = (IsAuthenticated, )
+
+
+class StatusViesSet(viewsets.ModelViewSet):
+    queryset = Status.objects.all()
+    serializer_class = QuoteStatusBaseSerializer
     permission_classes = (IsAuthenticated, )

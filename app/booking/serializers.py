@@ -4,10 +4,10 @@ from django.db.models import Min
 
 from app.booking.models import Surcharge, UsageFee, Charge, AdditionalSurcharge, FreightRate, Rate, CargoGroup, Quote, \
     Booking, Status
-from app.booking.utils import rate_surcharges_filter
+from app.booking.utils import rate_surcharges_filter, calculate_freight_rate_charges
 from app.core.models import Shipper
 from app.core.serializers import ShipperSerializer
-from app.handling.models import ShippingType, ClientPlatformSetting
+from app.handling.models import ShippingType, ClientPlatformSetting, Currency
 from app.handling.serializers import ContainerTypesSerializer, CurrencySerializer, CarrierBaseSerializer, \
     PortSerializer, ShippingModeBaseSerializer, PackagingTypeBaseSerializer, ReleaseTypeSerializer
 
@@ -583,6 +583,7 @@ class BookingRetrieveSerializer(BookingListBaseSerializer):
     shipper = ShipperSerializer()
     cargo_groups = CargoGroupRetrieveSerializer(many=True)
     client_contact_person = serializers.SerializerMethodField()
+    charges = serializers.SerializerMethodField()
 
     class Meta(BookingListBaseSerializer.Meta):
         model = Booking
@@ -590,10 +591,27 @@ class BookingRetrieveSerializer(BookingListBaseSerializer):
             'release_type',
             'shipper',
             'client_contact_person',
+            'charges',
         )
 
     def get_client_contact_person(self, obj):
         return obj.client_contact_person.get_full_name()
+
+    def get_charges(self, obj):
+        main_currency_code = Currency.objects.filter(is_main=True).first().code
+        cargo_groups = CargoGroupSerializer(obj.cargo_groups, many=True).data
+        container_type_ids_list = [
+            group.get('container_type') for group in cargo_groups if 'container_type' in group
+        ]
+        result = calculate_freight_rate_charges(obj.freight_rate,
+                                                {},
+                                                cargo_groups,
+                                                obj.freight_rate.shipping_mode,
+                                                main_currency_code,
+                                                obj.date_from,
+                                                obj.date_to,
+                                                container_type_ids_list, )
+        return result
 
 
 class QuoteStatusBaseSerializer(serializers.ModelSerializer):

@@ -330,7 +330,13 @@ class Booking(models.Model):
     client_contact_person = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
-        related_name='bookings',
+        related_name='client_bookings',
+        null=True,
+    )
+    agent_contact_person = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+        related_name='agent_bookings',
         null=True,
     )
     release_type = models.ForeignKey(

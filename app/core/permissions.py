@@ -69,3 +69,14 @@ class IsAgentCompany(BasePermission):
         if request.user.role_set.exists():
             return request.user.get_roles().exists() and request.user.get_company().type == Company.FREIGHT_FORWARDER
         return False
+
+
+class IsAgentCompanyMaster(BasePermission):
+    """
+    Allows access only to users with company type 'Agent' and role 'Master'.
+    """
+
+    def has_permission(self, request, view):
+        if request.user.role_set.exists():
+            return request.user.get_roles().filter(name='master').exists() and request.user.get_company().type == Company.FREIGHT_FORWARDER
+        return False

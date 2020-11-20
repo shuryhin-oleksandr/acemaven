@@ -1,4 +1,5 @@
 from rest_framework import generics, mixins, viewsets, status
+from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_jwt.settings import api_settings
@@ -7,7 +8,7 @@ from django.contrib.auth import get_user_model, authenticate
 
 from app.core.mixins import PermissionClassByActionMixin, CheckTokenMixin, CreateMixin
 from app.core.models import BankAccount, Company, SignUpRequest
-from app.core.permissions import IsMaster, IsMasterOrBilling
+from app.core.permissions import IsMaster, IsMasterOrBilling, IsAgentCompanyMaster
 from app.core.serializers import CompanySerializer, SignUpRequestSerializer, UserBaseSerializer, UserCreateSerializer, \
     UserSignUpSerializer, BankAccountSerializer, UserMasterSerializer, UserSerializer, SelectChoiceSerializer
 from app.core.utils import choice_to_value_name
@@ -71,9 +72,10 @@ class UserViewSet(PermissionClassByActionMixin,
     serializer_class = UserCreateSerializer
     permission_classes = (IsAuthenticated, )
     permission_classes_by_action = {
-        'create': [IsAuthenticated, IsMaster, ],
-        'destroy': [IsAuthenticated, IsMaster, ],
-        'list': [IsAuthenticated, IsMaster, ],
+        'create': (IsAuthenticated, IsMaster,),
+        'destroy': (IsAuthenticated, IsMaster,),
+        'list': (IsAuthenticated, IsMaster,),
+        'get_users_list_to_assign': (IsAuthenticated, IsAgentCompanyMaster,),
     }
 
     def get_serializer_class(self):
@@ -91,6 +93,12 @@ class UserViewSet(PermissionClassByActionMixin,
         if self.request.user.get_roles().filter(name='master').exists():
             return self.queryset.filter(companies=company)
         return self.queryset.filter(id=user.id)
+
+    @action(methods=['get'], detail=False, url_path='assign-users-list')
+    def get_users_list_to_assign(self, request, *args, **kwargs):
+        queryset = self.get_queryset().filter(role__groups__name='agent')
+        serializer = UserBaseSerializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class UserSignUpView(CheckTokenMixin,

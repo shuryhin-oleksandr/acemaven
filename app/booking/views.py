@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from django.contrib.auth import get_user_model
 from django_filters import rest_framework
 from rest_framework import mixins, viewsets, filters, status, generics
 from rest_framework.decorators import action
@@ -24,7 +25,7 @@ from app.booking.utils import date_format, wm_calculate, freight_rate_search, ca
     get_fees
 from app.core.mixins import PermissionClassByActionMixin
 from app.core.models import Company
-from app.core.permissions import IsMasterOrAgent, IsClientCompany, IsAgentCompany
+from app.core.permissions import IsMasterOrAgent, IsClientCompany, IsAgentCompany, IsAgentCompanyMaster
 from app.handling.models import Port, Currency, ClientPlatformSetting
 from app.location.models import Country
 
@@ -444,10 +445,14 @@ class QuoteViesSet(PermissionClassByActionMixin,
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class BookingViesSet(viewsets.ModelViewSet):
+class BookingViesSet(PermissionClassByActionMixin,
+                     viewsets.ModelViewSet):
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
     permission_classes = (IsAuthenticated, )
+    permission_classes_by_action = {
+        'assign_booking_to_agent': (IsAuthenticated, IsAgentCompanyMaster,),
+    }
     filter_class = BookingFilterSet
     filter_backends = (BookingOrderingFilterBackend, rest_framework.DjangoFilterBackend,)
 
@@ -462,6 +467,15 @@ class BookingViesSet(viewsets.ModelViewSet):
         if self.action == 'retrieve':
             return BookingRetrieveSerializer
         return self.serializer_class
+
+    @action(methods=['post'], detail=True, url_path='assign')
+    def assign_booking_to_agent(self, request, *args, **kwargs):
+        booking = self.get_object()
+        data = request.data
+        user = get_user_model().objects.filter(id=data.get('user')).first()
+        booking.agent_contact_person = user
+        booking.save()
+        return Response(status=status.HTTP_200_OK)
 
 
 class StatusViesSet(mixins.UpdateModelMixin,

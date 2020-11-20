@@ -578,5 +578,17 @@ class Status(models.Model):
     )
 
 
-class ShipmentDetails(models.Model):
-    pass
+# class ShipmentDetails(models.Model):
+#     """
+#     Shipment details model.
+#     """
+#
+#     booking_number = models.CharField(
+#         _('Booking number'),
+#         max_length=20,
+#     )
+#     booking_number_with_carrier = models.CharField(
+#         _('Booking number with carrier'),
+#         max_length=30,
+#         null=True,
+#     )

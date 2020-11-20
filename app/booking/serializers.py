@@ -578,6 +578,7 @@ class BookingListBaseSerializer(BookingSerializer):
 class BookingRetrieveSerializer(BookingListBaseSerializer):
     release_type = ReleaseTypeSerializer()
     shipper = ShipperSerializer()
+    cargo_groups = CargoGroupRetrieveSerializer(many=True)
 
     class Meta(BookingListBaseSerializer.Meta):
         model = Booking

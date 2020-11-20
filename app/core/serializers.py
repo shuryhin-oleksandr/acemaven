@@ -132,6 +132,14 @@ class UserBaseSerializer(serializers.ModelSerializer):
         )
 
 
+class UserBaseSerializerWithPhoto(UserBaseSerializer):
+    class Meta(UserBaseSerializer.Meta):
+        model = get_user_model()
+        fields = UserBaseSerializer.Meta.fields + (
+            'photo',
+        )
+
+
 class UserSerializer(UserBaseSerializer):
     password = serializers.CharField(min_length=8, max_length=25, write_only=True, validators=(PasswordValidator(), ))
 

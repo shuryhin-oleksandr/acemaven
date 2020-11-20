@@ -10,7 +10,8 @@ from app.core.mixins import PermissionClassByActionMixin, CheckTokenMixin, Creat
 from app.core.models import BankAccount, Company, SignUpRequest
 from app.core.permissions import IsMaster, IsMasterOrBilling, IsAgentCompanyMaster
 from app.core.serializers import CompanySerializer, SignUpRequestSerializer, UserBaseSerializer, UserCreateSerializer, \
-    UserSignUpSerializer, BankAccountSerializer, UserMasterSerializer, UserSerializer, SelectChoiceSerializer
+    UserSignUpSerializer, BankAccountSerializer, UserMasterSerializer, UserSerializer, SelectChoiceSerializer, \
+    UserBaseSerializerWithPhoto
 from app.core.utils import choice_to_value_name
 from app.booking.models import CargoGroup
 from app.handling.models import ReleaseType
@@ -97,7 +98,7 @@ class UserViewSet(PermissionClassByActionMixin,
     @action(methods=['get'], detail=False, url_path='assign-users-list')
     def get_users_list_to_assign(self, request, *args, **kwargs):
         queryset = self.get_queryset().filter(role__groups__name='agent')
-        serializer = UserBaseSerializer(queryset, many=True)
+        serializer = UserBaseSerializerWithPhoto(queryset, many=True)
         return Response(serializer.data)
 
 

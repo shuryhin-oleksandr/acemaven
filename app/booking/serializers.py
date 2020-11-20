@@ -9,7 +9,7 @@ from app.core.models import Shipper
 from app.core.serializers import ShipperSerializer
 from app.handling.models import ShippingType, ClientPlatformSetting
 from app.handling.serializers import ContainerTypesSerializer, CurrencySerializer, CarrierBaseSerializer, \
-    PortSerializer, ShippingModeBaseSerializer, PackagingTypeBaseSerializer
+    PortSerializer, ShippingModeBaseSerializer, PackagingTypeBaseSerializer, ReleaseTypeSerializer
 
 
 class UserUpdateMixin:
@@ -576,11 +576,13 @@ class BookingListBaseSerializer(BookingSerializer):
 
 
 class BookingRetrieveSerializer(BookingListBaseSerializer):
+    release_type = ReleaseTypeSerializer()
     shipper = ShipperSerializer()
 
     class Meta(BookingListBaseSerializer.Meta):
         model = Booking
         fields = BookingListBaseSerializer.Meta.fields + (
+            'release_type',
             'shipper',
         )
 

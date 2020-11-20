@@ -474,6 +474,7 @@ class BookingViesSet(PermissionClassByActionMixin,
         data = request.data
         user = get_user_model().objects.filter(id=data.get('user')).first()
         booking.agent_contact_person = user
+        booking.is_assigned = True
         booking.save()
         return Response(status=status.HTTP_200_OK)
 

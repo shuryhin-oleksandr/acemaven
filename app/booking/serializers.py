@@ -592,6 +592,7 @@ class BookingRetrieveSerializer(BookingListBaseSerializer):
             'shipper',
             'client_contact_person',
             'charges',
+            'is_assigned',
         )
 
     def get_client_contact_person(self, obj):

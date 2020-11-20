@@ -321,6 +321,10 @@ class Booking(models.Model):
         _('Whether booking paid or not'),
         default=False,
     )
+    is_assigned = models.BooleanField(
+        _('Is assigned to user'),
+        default=False,
+    )
     status = models.CharField(
         _('Booking confirmed or not'),
         max_length=30,

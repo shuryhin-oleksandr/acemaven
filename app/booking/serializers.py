@@ -593,7 +593,7 @@ class BookingRetrieveSerializer(BookingListBaseSerializer):
         )
 
     def get_client_contact_person(self, obj):
-        return obj.get_full_name()
+        return obj.client_contact_person.get_full_name()
 
 
 class QuoteStatusBaseSerializer(serializers.ModelSerializer):

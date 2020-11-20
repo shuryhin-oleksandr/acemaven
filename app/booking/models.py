@@ -327,8 +327,8 @@ class Booking(models.Model):
         choices=STATUS_CHOICES,
         default=REQUEST_RECEIVED,
     )
-    company = models.ForeignKey(
-        'core.Company',
+    client_contact_person = models.ForeignKey(
+        get_user_model(),
         on_delete=models.CASCADE,
         related_name='bookings',
         null=True,

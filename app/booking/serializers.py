@@ -532,7 +532,7 @@ class BookingSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = self.context['request'].user
         company = user.get_company()
-        validated_data['company'] = company
+        validated_data['client_contact_person'] = user
         shipper = validated_data.pop('shipper')
         shipper['company'] = company
         new_shipper = Shipper.objects.create(**shipper)
@@ -552,7 +552,7 @@ class BookingListBaseSerializer(BookingSerializer):
     week_range = serializers.SerializerMethodField()
     freight_rate = FreightRateRetrieveSerializer()
     shipping_type = serializers.CharField(source='freight_rate.shipping_mode.shipping_type.title')
-    client = serializers.CharField(source='company.name')
+    client = serializers.SerializerMethodField()
     status = serializers.SerializerMethodField()
 
     class Meta(BookingSerializer.Meta):
@@ -571,6 +571,9 @@ class BookingListBaseSerializer(BookingSerializer):
             'week_to': obj.date_to.isocalendar()[1]
         }
 
+    def get_client(self, obj):
+        return obj.client_contact_person.get_company().name
+
     def get_status(self, obj):
         return list(filter(lambda x: x[0] == obj.status, Booking.STATUS_CHOICES))[0][1]
 
@@ -579,13 +582,18 @@ class BookingRetrieveSerializer(BookingListBaseSerializer):
     release_type = ReleaseTypeSerializer()
     shipper = ShipperSerializer()
     cargo_groups = CargoGroupRetrieveSerializer(many=True)
+    client_contact_person = serializers.SerializerMethodField()
 
     class Meta(BookingListBaseSerializer.Meta):
         model = Booking
         fields = BookingListBaseSerializer.Meta.fields + (
             'release_type',
             'shipper',
+            'client_contact_person',
         )
+
+    def get_client_contact_person(self, obj):
+        return obj.get_full_name()
 
 
 class QuoteStatusBaseSerializer(serializers.ModelSerializer):

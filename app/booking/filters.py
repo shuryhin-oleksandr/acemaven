@@ -91,7 +91,7 @@ class QuoteOrderingFilterBackend(filters.BaseFilterBackend):
 class BookingFilterSet(django_filters.FilterSet):
     shipping_type = django_filters.CharFilter(field_name='freight_rate__shipping_mode__shipping_type__title')
     route = django_filters.CharFilter(method='route_filter', label='Route filter')
-    client = django_filters.CharFilter(field_name='company__name', lookup_expr='icontains')
+    client = django_filters.CharFilter(field_name='client_contact_person__companies__name', lookup_expr='icontains')
 
     class Meta:
         model = Booking
@@ -118,7 +118,7 @@ class BookingOrderingFilterBackend(filters.BaseFilterBackend):
             if ordering.endswith('shipping_mode'):
                 queryset = queryset.order_by(f'{asc_or_desc}freight_rate__shipping_mode__title', 'date_from')
             elif ordering.endswith('client'):
-                queryset = queryset.order_by(f'{asc_or_desc}company__name', 'date_from')
+                queryset = queryset.order_by(f'{asc_or_desc}client_contact_person__companies__name', 'date_from')
             elif ordering.endswith('shipment_date'):
                 queryset = queryset.order_by(f'{asc_or_desc}date_from')
             elif ordering.endswith('status'):

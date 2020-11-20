@@ -19,7 +19,7 @@ from app.booking.serializers import SurchargeSerializer, SurchargeEditSerializer
     RateSerializer, CheckRateDateSerializer, FreightRateCheckDatesSerializer, WMCalculateSerializer, \
     FreightRateSearchSerializer, FreightRateSearchListSerializer, QuoteSerializer, BookingSerializer, \
     QuoteClientListOrRetrieveSerializer, QuoteAgentListSerializer, QuoteAgentRetrieveSerializer, \
-    QuoteStatusBaseSerializer, CargoGroupSerializer
+    QuoteStatusBaseSerializer, CargoGroupSerializer, BookingListBaseSerializer, BookingRetrieveSerializer
 from app.booking.utils import date_format, wm_calculate, freight_rate_search, calculate_freight_rate_charges, \
     get_fees
 from app.core.mixins import PermissionClassByActionMixin
@@ -455,6 +455,13 @@ class BookingViesSet(viewsets.ModelViewSet):
         company = self.request.user.get_company()
         queryset = self.queryset
         return queryset.filter(freight_rate__company=company)
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return BookingListBaseSerializer
+        if self.action == 'retrieve':
+            return BookingRetrieveSerializer
+        return self.serializer_class
 
 
 class StatusViesSet(mixins.UpdateModelMixin,

@@ -511,6 +511,7 @@ class QuoteClientListOrRetrieveSerializer(QuoteListBaseSerializer):
 
 
 class BookingSerializer(serializers.ModelSerializer):
+    aceid = serializers.SerializerMethodField()
     shipper = ShipperSerializer()
     cargo_groups = CargoGroupSerializer(many=True)
 
@@ -518,6 +519,7 @@ class BookingSerializer(serializers.ModelSerializer):
         model = Booking
         fields = (
             'id',
+            'aceid',
             'date_from',
             'date_to',
             'release_type',
@@ -541,6 +543,46 @@ class BookingSerializer(serializers.ModelSerializer):
         new_cargo_groups = [CargoGroup(**fields) for fields in cargo_groups]
         CargoGroup.objects.bulk_create(new_cargo_groups)
         return booking
+
+    def get_aceid(self, obj):
+        return f'CO5K5647'
+
+
+class BookingListBaseSerializer(BookingSerializer):
+    week_range = serializers.SerializerMethodField()
+    freight_rate = FreightRateRetrieveSerializer()
+    shipping_type = serializers.CharField(source='freight_rate.shipping_mode.shipping_type.title')
+    client = serializers.CharField(source='company.name')
+    status = serializers.SerializerMethodField()
+
+    class Meta(BookingSerializer.Meta):
+        model = Booking
+        fields = BookingSerializer.Meta.fields + (
+            'week_range',
+            'freight_rate',
+            'shipping_type',
+            'client',
+            'status',
+        )
+
+    def get_week_range(self, obj):
+        return {
+            'week_from': obj.date_from.isocalendar()[1],
+            'week_to': obj.date_to.isocalendar()[1]
+        }
+
+    def get_status(self, obj):
+        return list(filter(lambda x: x[0] == obj.status, Booking.STATUS_CHOICES))[0][1]
+
+
+class BookingRetrieveSerializer(BookingListBaseSerializer):
+    shipper = ShipperSerializer()
+
+    class Meta(BookingListBaseSerializer.Meta):
+        model = Booking
+        fields = BookingListBaseSerializer.Meta.fields + (
+            'shipper',
+        )
 
 
 class QuoteStatusBaseSerializer(serializers.ModelSerializer):

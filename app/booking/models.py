@@ -303,6 +303,14 @@ class Booking(models.Model):
     Model for booking instance.
     """
 
+    CONFIRMED = 'confirmed'
+    WAITING_FOR_CONFIRM = 'pending'
+    REQUEST_RECEIVED = 'received'
+    STATUS_CHOICES = (
+        (CONFIRMED, 'Booking confirmed'),
+        (WAITING_FOR_CONFIRM, 'Waiting for confirmation'),
+        (REQUEST_RECEIVED, 'Booking request received'),
+    )
     date_from = models.DateField(
         _('Booing date from'),
     )
@@ -313,9 +321,11 @@ class Booking(models.Model):
         _('Whether booking paid or not'),
         default=False,
     )
-    confirmed = models.BooleanField(
+    status = models.CharField(
         _('Booking confirmed or not'),
-        default=False,
+        max_length=30,
+        choices=STATUS_CHOICES,
+        default=REQUEST_RECEIVED,
     )
     company = models.ForeignKey(
         'core.Company',
@@ -560,3 +570,7 @@ class Status(models.Model):
         _('Charges calculations'),
         null=True,
     )
+
+
+class ShipmentDetails(models.Model):
+    pass

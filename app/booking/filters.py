@@ -122,7 +122,7 @@ class BookingOrderingFilterBackend(filters.BaseFilterBackend):
             elif ordering.endswith('shipment_date'):
                 queryset = queryset.order_by(f'{asc_or_desc}date_from')
             elif ordering.endswith('status'):
-                queryset = queryset.order_by(f'{asc_or_desc}is_paid', 'date_from')
+                queryset = queryset.order_by(f'{asc_or_desc}status', 'date_from')
             else:
                 queryset = queryset.order_by(ordering)
 

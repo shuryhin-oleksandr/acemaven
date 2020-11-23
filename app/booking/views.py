@@ -13,14 +13,15 @@ from django.db.models import CharField, Case, When, Value, Q, Count
 from app.booking.filters import SurchargeFilterSet, FreightRateFilterSet, QuoteFilterSet, QuoteOrderingFilterBackend, \
     BookingFilterSet, BookingOrderingFilterBackend
 from app.booking.mixins import FeeGetQuerysetMixin
-from app.booking.models import Surcharge, UsageFee, Charge, FreightRate, Rate, Quote, Booking, Status
+from app.booking.models import Surcharge, UsageFee, Charge, FreightRate, Rate, Quote, Booking, Status, ShipmentDetails
 from app.booking.serializers import SurchargeSerializer, SurchargeEditSerializer, SurchargeListSerializer, \
     SurchargeRetrieveSerializer, UsageFeeSerializer, ChargeSerializer, FreightRateListSerializer, \
     SurchargeCheckDatesSerializer, FreightRateEditSerializer, FreightRateSerializer, FreightRateRetrieveSerializer, \
     RateSerializer, CheckRateDateSerializer, FreightRateCheckDatesSerializer, WMCalculateSerializer, \
     FreightRateSearchSerializer, FreightRateSearchListSerializer, QuoteSerializer, BookingSerializer, \
     QuoteClientListOrRetrieveSerializer, QuoteAgentListSerializer, QuoteAgentRetrieveSerializer, \
-    QuoteStatusBaseSerializer, CargoGroupSerializer, BookingListBaseSerializer, BookingRetrieveSerializer
+    QuoteStatusBaseSerializer, CargoGroupSerializer, BookingListBaseSerializer, BookingRetrieveSerializer, \
+    ShipmentDetailsBaseSerializer
 from app.booking.utils import date_format, wm_calculate, freight_rate_search, calculate_freight_rate_charges, \
     get_fees
 from app.core.mixins import PermissionClassByActionMixin
@@ -342,8 +343,8 @@ class QuoteViesSet(PermissionClassByActionMixin,
         user = request.user
         company = user.get_company()
 
-        queryset = self.get_queryset().exclude(statuses__status=Status.REJECTED,
-                                               statuses__company=company)
+        queryset = self.get_queryset().filter(is_active=True).exclude(statuses__status=Status.REJECTED,
+                                                                      statuses__company=company)
         submitted_air = queryset.filter(shipping_mode__shipping_type__title='air',
                                         statuses__status=Status.SUBMITTED,
                                         freight_rates__company=company)
@@ -483,4 +484,10 @@ class StatusViesSet(mixins.UpdateModelMixin,
                     viewsets.GenericViewSet):
     queryset = Status.objects.all()
     serializer_class = QuoteStatusBaseSerializer
+    permission_classes = (IsAuthenticated, )
+
+
+class ShipmentDetailsViesSet(viewsets.ModelViewSet):
+    queryset = ShipmentDetails.objects.all()
+    serializer_class = ShipmentDetailsBaseSerializer
     permission_classes = (IsAuthenticated, )

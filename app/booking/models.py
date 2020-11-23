@@ -304,11 +304,9 @@ class Booking(models.Model):
     """
 
     CONFIRMED = 'confirmed'
-    WAITING_FOR_CONFIRM = 'pending'
     REQUEST_RECEIVED = 'received'
     STATUS_CHOICES = (
         (CONFIRMED, 'Booking confirmed'),
-        (WAITING_FOR_CONFIRM, 'Waiting for confirmation'),
         (REQUEST_RECEIVED, 'Booking request received'),
     )
     date_from = models.DateField(
@@ -582,17 +580,100 @@ class Status(models.Model):
     )
 
 
-# class ShipmentDetails(models.Model):
-#     """
-#     Shipment details model.
-#     """
-#
-#     booking_number = models.CharField(
-#         _('Booking number'),
-#         max_length=20,
-#     )
-#     booking_number_with_carrier = models.CharField(
-#         _('Booking number with carrier'),
-#         max_length=30,
-#         null=True,
-#     )
+class ShipmentDetails(models.Model):
+    """
+    Shipment details model.
+    """
+
+    booking_number = models.CharField(
+        _('Booking number'),
+        max_length=20,
+    )
+    booking_number_with_carrier = models.CharField(
+        _('Booking number with carrier'),
+        max_length=30,
+        null=True,
+    )
+    flight_number = models.CharField(
+        _('Flight number'),
+        max_length=30,
+        null=True,
+    )
+    vessel = models.CharField(
+        _('Vessel number'),
+        max_length=30,
+        null=True,
+    )
+    voyage = models.CharField(
+        _('Voyage number'),
+        max_length=30,
+        null=True,
+    )
+    container_number = models.CharField(
+        _('Container number'),
+        max_length=30,
+        null=True,
+    )
+    mawb = models.CharField(
+        _('MAWB'),
+        max_length=30,
+        null=True,
+    )
+    date_of_departure = models.DateTimeField(
+        _('Estimated time of departure'),
+    )
+    date_of_arrival = models.DateTimeField(
+        _('Estimated time of arrival'),
+    )
+    document_cut_off_date = models.DateTimeField(
+        _('Document cut off date'),
+        null=True,
+    )
+    cargo_cut_off_date = models.DateTimeField(
+        _('Cargo cut off date'),
+        null=True,
+    )
+    cargo_pick_up_location = models.CharField(
+        _('Cargo pick up location'),
+        max_length=100,
+        null=True,
+    )
+    cargo_pick_up_location_address = models.CharField(
+        _('Cargo pick up location address'),
+        max_length=200,
+        null=True,
+    )
+    cargo_drop_off_location = models.CharField(
+        _('Cargo drop off location'),
+        max_length=100,
+        null=True,
+    )
+    cargo_drop_off_location_address = models.CharField(
+        _('Cargo drop off location address'),
+        max_length=200,
+        null=True,
+    )
+    empty_pick_up_location = models.CharField(
+        _('Empty pick up location'),
+        max_length=100,
+        null=True,
+    )
+    empty_pick_up_location_address = models.CharField(
+        _('Empty pick up location address'),
+        max_length=200,
+        null=True,
+    )
+    container_free_time = models.PositiveIntegerField(
+        _('Container free time'),
+        null=True,
+    )
+    booking_notes = models.TextField(
+        _('Booking notes'),
+        null=True,
+    )
+    booking = models.ForeignKey(
+        'Booking',
+        on_delete=models.CASCADE,
+        related_name='shipment_details',
+        null=True,
+    )

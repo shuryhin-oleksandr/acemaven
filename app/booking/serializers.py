@@ -3,7 +3,7 @@ from rest_framework import serializers
 from django.db.models import Min
 
 from app.booking.models import Surcharge, UsageFee, Charge, AdditionalSurcharge, FreightRate, Rate, CargoGroup, Quote, \
-    Booking, Status
+    Booking, Status, ShipmentDetails
 from app.booking.utils import rate_surcharges_filter, calculate_freight_rate_charges
 from app.core.models import Shipper
 from app.core.serializers import ShipperSerializer
@@ -635,3 +635,37 @@ class QuoteStatusRetrieveSerializer(QuoteStatusBaseSerializer):
     class Meta(QuoteStatusBaseSerializer.Meta):
         fields = QuoteStatusBaseSerializer.Meta.fields
         model = Status
+
+
+class ShipmentDetailsBaseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ShipmentDetails
+        fields = (
+            'booking_number',
+            'booking_number_with_carrier',
+            'flight_number',
+            'vessel',
+            'voyage',
+            'container_number',
+            'mawb',
+            'date_of_departure',
+            'date_of_arrival',
+            'document_cut_off_date',
+            'cargo_cut_off_date',
+            'cargo_pick_up_location',
+            'cargo_pick_up_location_address',
+            'cargo_drop_off_location',
+            'cargo_drop_off_location_address',
+            'empty_pick_up_location',
+            'empty_pick_up_location_address',
+            'container_free_time',
+            'booking_notes',
+            'booking',
+        )
+
+    def create(self, validated_data):
+        shipment_detail = super().create(validated_data)
+        booking = validated_data['booking']
+        booking.status = Booking.CONFIRMED
+        booking.save()
+        return shipment_detail

@@ -26,7 +26,7 @@ from app.booking.utils import date_format, wm_calculate, freight_rate_search, ca
     get_fees, surcharge_search
 from app.core.mixins import PermissionClassByActionMixin
 from app.core.models import Company
-from app.core.permissions import IsMasterOrAgent, IsClientCompany, IsAgentCompany, IsAgentCompanyMaster
+from app.core.permissions import IsMasterOrAgent, IsClientCompany, IsAgentCompany, IsAgentCompanyMaster, IsMaster
 from app.handling.models import Port, Currency, ClientPlatformSetting
 from app.location.models import Country
 
@@ -452,7 +452,8 @@ class BookingViesSet(PermissionClassByActionMixin,
     serializer_class = BookingSerializer
     permission_classes = (IsAuthenticated, )
     permission_classes_by_action = {
-        'assign_booking_to_agent': (IsAuthenticated, IsAgentCompanyMaster,),
+        'create': (IsAuthenticated, IsClientCompany,),
+        'assign_booking_to_agent': (IsAuthenticated, IsAgentCompany, IsMaster,),
     }
     filter_class = BookingFilterSet
     filter_backends = (BookingOrderingFilterBackend, rest_framework.DjangoFilterBackend,)
@@ -460,7 +461,10 @@ class BookingViesSet(PermissionClassByActionMixin,
     def get_queryset(self):
         company = self.request.user.get_company()
         queryset = self.queryset
-        return queryset.filter(freight_rate__company=company)
+        return queryset.filter(
+            Q(Q(is_assigned=False), Q(is_assigned=True, agent_contact_person=self.request.user), _connector='OR'),
+            freight_rate__company=company,
+        )
 
     def get_serializer_class(self):
         if self.action == 'list':

@@ -23,7 +23,7 @@ from app.booking.serializers import SurchargeSerializer, SurchargeEditSerializer
     QuoteStatusBaseSerializer, CargoGroupSerializer, BookingListBaseSerializer, BookingRetrieveSerializer, \
     ShipmentDetailsBaseSerializer
 from app.booking.utils import date_format, wm_calculate, freight_rate_search, calculate_freight_rate_charges, \
-    get_fees
+    get_fees, surcharge_search
 from app.core.mixins import PermissionClassByActionMixin
 from app.core.models import Company
 from app.core.permissions import IsMasterOrAgent, IsClientCompany, IsAgentCompany, IsAgentCompanyMaster
@@ -369,16 +369,16 @@ class QuoteViesSet(PermissionClassByActionMixin,
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-    @action(methods=['post'], detail=False, url_path='freight-rate-search')
+    @action(methods=['post'], detail=False, url_path='surcharge-search')
     def freight_rate_search(self, request, *args, **kwargs):
         user = request.user
         serializer = FreightRateSearchSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.data
 
-        freight_rates, _ = freight_rate_search(data, company=user.get_company())
-        freight_rate = freight_rates.first()
-        data = FreightRateRetrieveSerializer(freight_rate).data if freight_rate else {}
+        surcharges = surcharge_search(data, user.get_company())
+        surcharge = surcharges.first()
+        data = SurchargeRetrieveSerializer(surcharge).data if surcharge else {}
         return Response(data)
 
     @transaction.atomic

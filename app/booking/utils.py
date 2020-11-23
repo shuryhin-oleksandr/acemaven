@@ -3,7 +3,7 @@ from decimal import Decimal
 from django.db.models import Q
 
 from app.booking.models import Surcharge, Charge, FreightRate
-from app.handling.models import GlobalFee, ShippingMode, ExchangeRate, ContainerType, PackagingType
+from app.handling.models import GlobalFee, ShippingMode, ExchangeRate, ContainerType, PackagingType, Port
 from app.location.models import Country
 
 
@@ -299,15 +299,59 @@ def get_fees(company, shipping_mode):
     return booking_fee, service_fee
 
 
-def freight_rate_search(data, company=None):
+def get_data_info(data):
     cargo_groups = data.pop('cargo_groups')
     container_type_ids_list = [group.get('container_type') for group in cargo_groups if 'container_type' in group]
-    shipping_mode = ShippingMode.objects.filter(id=data.get('shipping_mode')).first()
     dangerous_list = list(filter(lambda x: x.get('dangerous'), cargo_groups))
     cold_list = list(filter(lambda x: x.get('frozen') == 'cold', cargo_groups))
-
     date_from = date_format(data.pop('date_from'))
     date_to = date_format(data.pop('date_to'))
+    return cargo_groups, container_type_ids_list, dangerous_list, cold_list, date_from, date_to
+
+
+def surcharge_search(data, company):
+    shipping_mode = ShippingMode.objects.filter(id=data.get('shipping_mode')).first()
+    cargo_groups, container_type_ids_list, dangerous_list, cold_list, date_from, date_to = get_data_info(data)
+    port = Port.objects.get(id=data['origin'])
+    direction = 'export' if port.code.startswith(MAIN_COUNTRY_CODE) else 'import'
+    location = data['origin'] if direction == 'export' else data['destination']
+    filter_fields = {
+        'carrier': data['carrier'],
+        'direction': direction,
+        'location': location,
+        'shipping_mode': shipping_mode,
+        'company': company,
+        'temporary': False,
+        'start_date__lte': date_from,
+        'expiration_date__gte': date_to,
+    }
+
+    queryset = Surcharge.objects.filter(**filter_fields)
+
+    if shipping_mode.has_surcharge_containers:
+        for container_type_id in container_type_ids_list:
+            queryset = queryset.filter(
+                usage_fees__charge__isnull=False,
+                usage_fees__container_type__id=container_type_id
+            )
+    if dangerous_list:
+        queryset = queryset.filter(
+            charges__additional_surcharge__is_dangerous=True,
+            charges__charge__isnull=False
+        )
+    if cold_list:
+        queryset = queryset.filter(
+            charges__additional_surcharge__is_cold=True,
+            charges__charge__isnull=False
+        )
+
+    return queryset
+
+
+def freight_rate_search(data, company=None):
+    shipping_mode = ShippingMode.objects.filter(id=data.get('shipping_mode')).first()
+    cargo_groups, container_type_ids_list, dangerous_list, cold_list, date_from, date_to = get_data_info(data)
+
     data['rates__start_date__lte'] = date_from
     data['rates__expiration_date__gte'] = date_to
     data['rates__surcharges__start_date__lte'] = date_from

@@ -37,8 +37,9 @@ def rate_surcharges_filter(rate, company, temporary=False):
         Q(**filter_fields),
         Q(Q(**start_date_fields), Q(**end_date_fields), _connector='OR'),
         company=company,
-        temporary=temporary,
     )
+    if not temporary:
+        surcharges = surcharges.filter(temporary=temporary)
     return surcharges
 
 

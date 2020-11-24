@@ -8,7 +8,7 @@ from django.contrib.auth import get_user_model, authenticate
 
 from app.core.mixins import PermissionClassByActionMixin, CheckTokenMixin, CreateMixin
 from app.core.models import BankAccount, Company, SignUpRequest
-from app.core.permissions import IsMaster, IsMasterOrBilling, IsAgentCompanyMaster
+from app.core.permissions import IsMaster, IsMasterOrBilling, IsAgentCompany
 from app.core.serializers import CompanySerializer, SignUpRequestSerializer, UserBaseSerializer, UserCreateSerializer, \
     UserSignUpSerializer, BankAccountSerializer, UserMasterSerializer, UserSerializer, SelectChoiceSerializer, \
     UserBaseSerializerWithPhoto
@@ -76,7 +76,7 @@ class UserViewSet(PermissionClassByActionMixin,
         'create': (IsAuthenticated, IsMaster,),
         'destroy': (IsAuthenticated, IsMaster,),
         'list': (IsAuthenticated, IsMaster,),
-        'get_users_list_to_assign': (IsAuthenticated, IsAgentCompanyMaster,),
+        'get_users_list_to_assign': (IsAuthenticated, IsAgentCompany, IsMaster,),
     }
 
     def get_serializer_class(self):

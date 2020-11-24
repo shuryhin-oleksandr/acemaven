@@ -26,7 +26,7 @@ from app.booking.utils import date_format, wm_calculate, freight_rate_search, ca
     get_fees, surcharge_search
 from app.core.mixins import PermissionClassByActionMixin
 from app.core.models import Company
-from app.core.permissions import IsMasterOrAgent, IsClientCompany, IsAgentCompany, IsAgentCompanyMaster, IsMaster
+from app.core.permissions import IsMasterOrAgent, IsClientCompany, IsAgentCompany, IsMaster
 from app.handling.models import Port, Currency, ClientPlatformSetting
 from app.location.models import Country
 
@@ -461,10 +461,7 @@ class BookingViesSet(PermissionClassByActionMixin,
     def get_queryset(self):
         company = self.request.user.get_company()
         queryset = self.queryset
-        return queryset.filter(
-            Q(Q(is_assigned=False), Q(is_assigned=True, agent_contact_person=self.request.user), _connector='OR'),
-            freight_rate__company=company,
-        )
+        return queryset.filter(is_assigned=False, freight_rate__company=company,)
 
     def get_serializer_class(self):
         if self.action == 'list':
@@ -480,6 +477,7 @@ class BookingViesSet(PermissionClassByActionMixin,
         user = get_user_model().objects.filter(id=data.get('user')).first()
         booking.agent_contact_person = user
         booking.is_assigned = True
+        booking.status = Booking.ACCEPTED
         booking.save()
         return Response(status=status.HTTP_200_OK)
 

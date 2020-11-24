@@ -583,6 +583,7 @@ class BookingRetrieveSerializer(BookingListBaseSerializer):
     shipper = ShipperSerializer()
     cargo_groups = CargoGroupRetrieveSerializer(many=True)
     client_contact_person = serializers.SerializerMethodField()
+    agent_contact_person = serializers.SerializerMethodField()
     charges = serializers.SerializerMethodField()
 
     class Meta(BookingListBaseSerializer.Meta):
@@ -591,12 +592,16 @@ class BookingRetrieveSerializer(BookingListBaseSerializer):
             'release_type',
             'shipper',
             'client_contact_person',
+            'agent_contact_person',
             'charges',
             'is_assigned',
         )
 
     def get_client_contact_person(self, obj):
         return obj.client_contact_person.get_full_name()
+
+    def get_agent_contact_person(self, obj):
+        return obj.agent_contact_person.get_full_name() if obj.agent_contact_person else None
 
     def get_charges(self, obj):
         main_currency_code = Currency.objects.filter(is_main=True).first().code

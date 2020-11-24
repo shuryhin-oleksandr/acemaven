@@ -127,3 +127,18 @@ class BookingOrderingFilterBackend(filters.BaseFilterBackend):
                 queryset = queryset.order_by(ordering)
 
         return queryset
+
+
+class OperationFilterSet(django_filters.FilterSet):
+    my_operations = django_filters.BooleanFilter(method='my_operations_filter', label='Route filter')
+
+    class Meta:
+        model = Booking
+        fields = (
+            'my_operations',
+        )
+
+    def my_operations_filter(self, queryset, _, value):
+        if value:
+            queryset = queryset.filter(agent_contact_person=self.request.user)
+        return queryset

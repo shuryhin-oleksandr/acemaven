@@ -11,7 +11,7 @@ from django.db import transaction
 from django.db.models import CharField, Case, When, Value, Q, Count
 
 from app.booking.filters import SurchargeFilterSet, FreightRateFilterSet, QuoteFilterSet, QuoteOrderingFilterBackend, \
-    BookingFilterSet, BookingOrderingFilterBackend
+    BookingFilterSet, BookingOrderingFilterBackend, OperationFilterSet
 from app.booking.mixins import FeeGetQuerysetMixin
 from app.booking.models import Surcharge, UsageFee, Charge, FreightRate, Rate, Quote, Booking, Status, ShipmentDetails
 from app.booking.serializers import SurchargeSerializer, SurchargeEditSerializer, SurchargeListSerializer, \
@@ -480,6 +480,27 @@ class BookingViesSet(PermissionClassByActionMixin,
         booking.status = Booking.ACCEPTED
         booking.save()
         return Response(status=status.HTTP_200_OK)
+
+
+class OperationViewSet(PermissionClassByActionMixin,
+                       viewsets.ModelViewSet):
+    queryset = Booking.objects.all()
+    serializer_class = BookingSerializer
+    permission_classes = (IsAuthenticated, )
+    filter_class = OperationFilterSet
+    filter_backends = (rest_framework.DjangoFilterBackend,)
+
+    def get_queryset(self):
+        company = self.request.user.get_company()
+        queryset = self.queryset
+        return queryset.filter(is_assigned=True, freight_rate__company=company,)
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return BookingListBaseSerializer
+        if self.action == 'retrieve':
+            return BookingRetrieveSerializer
+        return self.serializer_class
 
 
 class StatusViesSet(mixins.UpdateModelMixin,

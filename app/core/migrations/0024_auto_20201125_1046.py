@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='bankaccount',
             name='bank_number',
-            field=models.CharField(default=123, max_length=3, validators=[django.core.validators.RegexValidator(message='Invalid format. Must contains only numbers', regex='^\\d{3}$')], verbose_name='Bank Number'),
+            field=models.CharField(default=000, max_length=3, validators=[django.core.validators.RegexValidator(message='Invalid format. Must contains only numbers', regex='^\\d{3}$')], verbose_name='Bank Number'),
             preserve_default=False,
         ),
         migrations.AlterField(

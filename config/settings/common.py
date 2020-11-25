@@ -70,6 +70,7 @@ REST_FRAMEWORK = {
     ),
     'DATE_FORMAT': '%d/%m/%Y',
     'DATE_INPUT_FORMATS': ['%d/%m/%Y'],
+    'DATETIME_INPUT_FORMATS': ['%d/%m/%Y %H:%M', '%d/%m/%Y %H%M'],
     'DATETIME_FORMAT': '%H:%M %d %B %Y',
 }
 

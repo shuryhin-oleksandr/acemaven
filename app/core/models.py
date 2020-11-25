@@ -14,6 +14,11 @@ tax_id_validator = RegexValidator(
     message='Invalid format. Must be: 00.000.000/0000-00'
 )
 
+bank_number_validator = RegexValidator(
+    regex=r'^\d{3}$',
+    message='Invalid format. Must contains only numbers',
+)
+
 branch_validator = RegexValidator(
     regex=r'^\d{4}-\d{1}$',
     message='Invalid format. Must be: 0000-0',
@@ -353,6 +358,11 @@ class BankAccount(models.Model):
         _('Bank Name'),
         max_length=100,
     )
+    bank_number = models.CharField(
+        _('Bank Number'),
+        max_length=3,
+        validators=[bank_number_validator],
+    )
     branch = models.CharField(
         _('Branch Number (0000-0)'),
         max_length=6,
@@ -360,7 +370,7 @@ class BankAccount(models.Model):
     )
     number = models.CharField(
         _('Account Number'),
-        max_length=50,
+        max_length=20,
         validators=[bank_account_number_validator],
         unique=True,
     )

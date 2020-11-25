@@ -307,9 +307,9 @@ class Booking(models.Model):
     ACCEPTED = 'accepted'
     REQUEST_RECEIVED = 'received'
     STATUS_CHOICES = (
-        (CONFIRMED, 'Booking confirmed'),
-        (ACCEPTED, 'Booking accepted'),
-        (REQUEST_RECEIVED, 'Booking request received'),
+        (CONFIRMED, 'Booking Confirmed'),
+        (ACCEPTED, 'Booking Request in Progress'),
+        (REQUEST_RECEIVED, 'Booking Request Received'),
     )
     date_from = models.DateField(
         _('Booing date from'),

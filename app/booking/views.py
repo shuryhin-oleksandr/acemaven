@@ -21,7 +21,7 @@ from app.booking.serializers import SurchargeSerializer, SurchargeEditSerializer
     FreightRateSearchSerializer, FreightRateSearchListSerializer, QuoteSerializer, BookingSerializer, \
     QuoteClientListOrRetrieveSerializer, QuoteAgentListSerializer, QuoteAgentRetrieveSerializer, \
     QuoteStatusBaseSerializer, CargoGroupSerializer, BookingListBaseSerializer, BookingRetrieveSerializer, \
-    ShipmentDetailsBaseSerializer
+    ShipmentDetailsBaseSerializer, OperationSerializer, OperationListBaseSerializer, OperationRetrieveSerializer
 from app.booking.utils import date_format, wm_calculate, freight_rate_search, calculate_freight_rate_charges, \
     get_fees, surcharge_search
 from app.core.mixins import PermissionClassByActionMixin
@@ -485,7 +485,7 @@ class BookingViesSet(PermissionClassByActionMixin,
 class OperationViewSet(PermissionClassByActionMixin,
                        viewsets.ModelViewSet):
     queryset = Booking.objects.all()
-    serializer_class = BookingSerializer
+    serializer_class = OperationSerializer
     permission_classes = (IsAuthenticated, )
     filter_class = OperationFilterSet
     filter_backends = (rest_framework.DjangoFilterBackend,)
@@ -497,9 +497,9 @@ class OperationViewSet(PermissionClassByActionMixin,
 
     def get_serializer_class(self):
         if self.action == 'list':
-            return BookingListBaseSerializer
+            return OperationListBaseSerializer
         if self.action == 'retrieve':
-            return BookingRetrieveSerializer
+            return OperationRetrieveSerializer
         return self.serializer_class
 
 

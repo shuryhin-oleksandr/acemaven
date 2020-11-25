@@ -620,6 +620,77 @@ class BookingRetrieveSerializer(BookingListBaseSerializer):
         return result
 
 
+class OperationSerializer(serializers.ModelSerializer):
+    aceid = serializers.SerializerMethodField()
+    cargo_groups = CargoGroupSerializer(many=True)
+
+    class Meta:
+        model = Booking
+        fields = (
+            'id',
+            'aceid',
+            'release_type',
+            'number_of_documents',
+            'freight_rate',
+            'cargo_groups',
+            'is_assigned',
+        )
+
+    def get_aceid(self, obj):
+        return f'CO5K5647'
+
+
+class OperationListBaseSerializer(OperationSerializer):
+    freight_rate = FreightRateRetrieveSerializer()
+    shipping_type = serializers.CharField(source='freight_rate.shipping_mode.shipping_type.title')
+    status = serializers.SerializerMethodField()
+    agent_contact_person = serializers.SerializerMethodField()
+    cargo_groups = CargoGroupRetrieveSerializer(many=True)
+
+    class Meta(OperationSerializer.Meta):
+        model = Booking
+        fields = OperationSerializer.Meta.fields + (
+            'shipping_type',
+            'status',
+            'agent_contact_person',
+        )
+
+    def get_status(self, obj):
+        return list(filter(lambda x: x[0] == obj.status, Booking.STATUS_CHOICES))[0][1]
+
+    def get_agent_contact_person(self, obj):
+        return obj.agent_contact_person.get_full_name() if obj.agent_contact_person else None
+
+
+class OperationRetrieveSerializer(OperationListBaseSerializer):
+    release_type = ReleaseTypeSerializer()
+    shipper = ShipperSerializer()
+    charges = serializers.SerializerMethodField()
+
+    class Meta(OperationListBaseSerializer.Meta):
+        model = Booking
+        fields = OperationListBaseSerializer.Meta.fields + (
+            'shipper',
+            'charges',
+        )
+
+    def get_charges(self, obj):
+        main_currency_code = Currency.objects.filter(is_main=True).first().code
+        cargo_groups = CargoGroupSerializer(obj.cargo_groups, many=True).data
+        container_type_ids_list = [
+            group.get('container_type') for group in cargo_groups if 'container_type' in group
+        ]
+        result = calculate_freight_rate_charges(obj.freight_rate,
+                                                {},
+                                                cargo_groups,
+                                                obj.freight_rate.shipping_mode,
+                                                main_currency_code,
+                                                obj.date_from,
+                                                obj.date_to,
+                                                container_type_ids_list, )
+        return result
+
+
 class QuoteStatusBaseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Status

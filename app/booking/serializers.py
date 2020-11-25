@@ -670,6 +670,8 @@ class OperationRetrieveSerializer(OperationListBaseSerializer):
     class Meta(OperationListBaseSerializer.Meta):
         model = Booking
         fields = OperationListBaseSerializer.Meta.fields + (
+            'date_from',
+            'date_to',
             'shipper',
             'charges',
         )

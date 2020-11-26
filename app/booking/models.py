@@ -535,6 +535,10 @@ class Quote(models.Model):
         _('Quote is active or paused'),
         default=True,
     )
+    is_archived = models.BooleanField(
+        _('Quote is archived'),
+        default=False,
+    )
     company = models.ForeignKey(
         'core.Company',
         on_delete=models.CASCADE,

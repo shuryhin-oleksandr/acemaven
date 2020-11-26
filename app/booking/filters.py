@@ -130,7 +130,7 @@ class BookingOrderingFilterBackend(filters.BaseFilterBackend):
 
 
 class OperationFilterSet(django_filters.FilterSet):
-    my_operations = django_filters.BooleanFilter(method='my_operations_filter', label='Route filter')
+    my_operations = django_filters.BooleanFilter(method='my_operations_filter', label='My Operations')
     id = django_filters.CharFilter(field_name='aceid', lookup_expr='icontains')
     carrier = django_filters.CharFilter(field_name='freight_rate__carrier__title', lookup_expr='icontains')
 

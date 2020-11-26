@@ -315,6 +315,7 @@ class QuoteViesSet(PermissionClassByActionMixin,
         'submit_quote': (IsAuthenticated, IsAgentCompany,),
         'reject_quote': (IsAuthenticated, IsAgentCompany,),
         'withdraw_quote': (IsAuthenticated, IsAgentCompany,),
+        'archive_quote': (IsAuthenticated, IsClientCompany),
     }
     filter_class = QuoteFilterSet
     filter_backends = (QuoteOrderingFilterBackend, rest_framework.DjangoFilterBackend,)
@@ -322,9 +323,9 @@ class QuoteViesSet(PermissionClassByActionMixin,
     def get_queryset(self):
         user = self.request.user
         company = user.get_company()
-        queryset = self.queryset
+        queryset = self.queryset.filter(is_archived=False)
         if company.type == Company.CLIENT:
-            queryset = self.queryset.filter(company=company)
+            queryset = queryset.filter(company=company)
         return queryset
 
     def get_serializer_class(self):
@@ -445,6 +446,13 @@ class QuoteViesSet(PermissionClassByActionMixin,
         quote_status = quote.statuses.filter(freight_rate__company=user.get_company()).first()
         quote_status.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(methods=['post'], detail=True, url_path='archive')
+    def archive_quote(self, request, *args, **kwargs):
+        quote = self.get_object()
+        quote.is_archived = True
+        quote.save()
+        return Response(status=status.HTTP_200_OK)
 
 
 class BookingViesSet(PermissionClassByActionMixin,

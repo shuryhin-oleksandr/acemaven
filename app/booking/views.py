@@ -11,7 +11,7 @@ from django.db import transaction
 from django.db.models import CharField, Case, When, Value, Q, Count
 
 from app.booking.filters import SurchargeFilterSet, FreightRateFilterSet, QuoteFilterSet, QuoteOrderingFilterBackend, \
-    BookingFilterSet, BookingOrderingFilterBackend, OperationFilterSet
+    BookingFilterSet, BookingOrderingFilterBackend, OperationFilterSet, OperationOrderingFilterBackend
 from app.booking.mixins import FeeGetQuerysetMixin
 from app.booking.models import Surcharge, UsageFee, Charge, FreightRate, Rate, Quote, Booking, Status, ShipmentDetails
 from app.booking.serializers import SurchargeSerializer, SurchargeEditSerializer, SurchargeListSerializer, \
@@ -504,7 +504,7 @@ class OperationViewSet(PermissionClassByActionMixin,
     serializer_class = OperationSerializer
     permission_classes = (IsAuthenticated, )
     filter_class = OperationFilterSet
-    filter_backends = (rest_framework.DjangoFilterBackend,)
+    filter_backends = (OperationOrderingFilterBackend, rest_framework.DjangoFilterBackend,)
 
     def get_queryset(self):
         company = self.request.user.get_company()

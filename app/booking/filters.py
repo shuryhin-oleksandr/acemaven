@@ -131,14 +131,40 @@ class BookingOrderingFilterBackend(filters.BaseFilterBackend):
 
 class OperationFilterSet(django_filters.FilterSet):
     my_operations = django_filters.BooleanFilter(method='my_operations_filter', label='Route filter')
+    id = django_filters.CharFilter(field_name='aceid', lookup_expr='icontains')
+    carrier = django_filters.CharFilter(field_name='freight_rate__carrier__title', lookup_expr='icontains')
 
     class Meta:
         model = Booking
         fields = (
             'my_operations',
+            'id',
+            'carrier',
         )
 
     def my_operations_filter(self, queryset, _, value):
         if value:
             queryset = queryset.filter(agent_contact_person=self.request.user)
+        return queryset
+
+
+class OperationOrderingFilterBackend(filters.BaseFilterBackend):
+    valid_ordering_fields = ('aceid', 'route', 'date', 'carrier', 'status', 'agent')
+
+    def filter_queryset(self, request, queryset, view):
+
+        ordering = request.query_params.get('ordering', 'date_from')
+        if ordering.strip('-') in self.valid_ordering_fields:
+            asc_or_desc = '-' if ordering.startswith('-') else ''
+            if ordering.endswith('route'):
+                queryset = queryset.order_by(f'{asc_or_desc}freight_rate__origin__code', 'date_from')
+            elif ordering.endswith('date'):
+                queryset = queryset.order_by(f'{asc_or_desc}shipment_details__date_of_departure', 'date_from')
+            elif ordering.endswith('carrier'):
+                queryset = queryset.order_by(f'{asc_or_desc}freight_rate__carrier__title', 'date_from')
+            elif ordering.endswith('agent'):
+                queryset = queryset.order_by(f'{asc_or_desc}agent_contact_person__name', 'date_from')
+            else:
+                queryset = queryset.order_by(ordering)
+
         return queryset

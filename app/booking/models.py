@@ -306,10 +306,18 @@ class Booking(models.Model):
     CONFIRMED = 'confirmed'
     ACCEPTED = 'accepted'
     REQUEST_RECEIVED = 'received'
+    PENDING = 'pending'
     STATUS_CHOICES = (
         (CONFIRMED, 'Booking Confirmed'),
         (ACCEPTED, 'Booking Request in Progress'),
         (REQUEST_RECEIVED, 'Booking Request Received'),
+        (PENDING, 'Booking Fee Pending'),
+    )
+
+    aceid = models.CharField(
+        _('Booking ACEID number'),
+        max_length=8,
+        null=True,
     )
     date_from = models.DateField(
         _('Booing date from'),
@@ -329,7 +337,7 @@ class Booking(models.Model):
         _('Booking confirmed or not'),
         max_length=30,
         choices=STATUS_CHOICES,
-        default=REQUEST_RECEIVED,
+        default=PENDING,
     )
     client_contact_person = models.ForeignKey(
         get_user_model(),
@@ -351,6 +359,10 @@ class Booking(models.Model):
     number_of_documents = models.PositiveIntegerField(
         _('Number of documents for chosen release type'),
         validators=[MinValueValidator(1)],
+        null=True,
+    )
+    charges = models.JSONField(
+        _('Charges calculations'),
         null=True,
     )
     freight_rate = models.ForeignKey(
@@ -678,4 +690,42 @@ class ShipmentDetails(models.Model):
         on_delete=models.CASCADE,
         related_name='shipment_details',
         null=True,
+    )
+
+
+class Transaction(models.Model):
+    """
+    Transaction model.
+    """
+
+    OPENED = 'opened'
+    FINISHED = 'finished'
+    CANCELED = 'canceled'
+    EXPIRED = 'expired'
+    STATUS_CHOICES = (
+        (OPENED, 'Transaction opened'),
+        (FINISHED, 'Transaction finished'),
+        (CANCELED, 'Transaction canceled'),
+        (EXPIRED, 'Transaction expired'),
+    )
+
+    transaction_id = models.CharField(
+        _('Transaction identifier'),
+        max_length=35,
+    )
+    status = models.CharField(
+        _('Transaction status'),
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default=OPENED,
+    )
+    charge = models.DecimalField(
+        _('Transaction charge amount'),
+        max_digits=15,
+        decimal_places=2,
+    )
+    booking = models.ForeignKey(
+        'Booking',
+        on_delete=models.CASCADE,
+        related_name='transactions',
     )

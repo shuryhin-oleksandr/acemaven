@@ -1,10 +1,11 @@
+from django.db import transaction
 from rest_framework import serializers
 
 from django.db.models import Min
 
 from app.booking.models import Surcharge, UsageFee, Charge, AdditionalSurcharge, FreightRate, Rate, CargoGroup, Quote, \
     Booking, Status, ShipmentDetails
-from app.booking.utils import rate_surcharges_filter, calculate_freight_rate_charges
+from app.booking.utils import rate_surcharges_filter, calculate_freight_rate_charges, get_fees, generate_aceid
 from app.core.models import Shipper
 from app.core.serializers import ShipperSerializer
 from app.handling.models import ShippingType, ClientPlatformSetting, Currency
@@ -511,7 +512,6 @@ class QuoteClientListOrRetrieveSerializer(QuoteListBaseSerializer):
 
 
 class BookingSerializer(serializers.ModelSerializer):
-    aceid = serializers.SerializerMethodField()
     shipper = ShipperSerializer()
     cargo_groups = CargoGroupSerializer(many=True)
 
@@ -538,14 +538,42 @@ class BookingSerializer(serializers.ModelSerializer):
         new_shipper = Shipper.objects.create(**shipper)
         validated_data['shipper'] = new_shipper
         cargo_groups = validated_data.pop('cargo_groups', [])
-        booking = super().create(validated_data)
-        cargo_groups = [{**item, **{'booking': booking}} for item in cargo_groups]
-        new_cargo_groups = [CargoGroup(**fields) for fields in cargo_groups]
-        CargoGroup.objects.bulk_create(new_cargo_groups)
-        return booking
 
-    def get_aceid(self, obj):
-        return f'CO5K5647'
+        changed_cargo_groups = CargoGroupSerializer(cargo_groups, many=True).data
+        main_currency_code = Currency.objects.filter(is_main=True).first().code
+        container_type_ids_list = [
+            group.get('container_type') for group in changed_cargo_groups if 'container_type' in group
+        ]
+        freight_rate = validated_data.get('freight_rate')
+        booking_fee, service_fee = get_fees(company, freight_rate.shipping_mode)
+        number_of_documents = validated_data.get('number_of_documents')
+        try:
+            with transaction.atomic():
+                result = calculate_freight_rate_charges(freight_rate,
+                                                        {},
+                                                        changed_cargo_groups,
+                                                        freight_rate.shipping_mode,
+                                                        main_currency_code,
+                                                        validated_data.get('date_from'),
+                                                        validated_data.get('date_to'),
+                                                        container_type_ids_list,
+                                                        number_of_documents=number_of_documents,
+                                                        booking_fee=booking_fee,
+                                                        service_fee=service_fee,
+                                                        calculate_fees=True,)
+                validated_data['charges'] = result
+                if result.get('pay_to_book', {}).get('pay_to_book', 0) == 0:
+                    validated_data['is_paid'] = True
+                    validated_data['aceid'] = generate_aceid(freight_rate, company)
+                    validated_data['status'] = Booking.REQUEST_RECEIVED
+                booking = super().create(validated_data)
+
+                cargo_groups = [{**item, **{'booking': booking}} for item in cargo_groups]
+                new_cargo_groups = [CargoGroup(**fields) for fields in cargo_groups]
+                CargoGroup.objects.bulk_create(new_cargo_groups)
+        except Exception as error:
+            raise serializers.ValidationError({'error': error})
+        return booking
 
 
 class BookingListBaseSerializer(BookingSerializer):
@@ -563,6 +591,7 @@ class BookingListBaseSerializer(BookingSerializer):
             'shipping_type',
             'client',
             'status',
+            'aceid',
         )
 
     def get_week_range(self, obj):
@@ -584,7 +613,6 @@ class BookingRetrieveSerializer(BookingListBaseSerializer):
     cargo_groups = CargoGroupRetrieveSerializer(many=True)
     client_contact_person = serializers.SerializerMethodField()
     agent_contact_person = serializers.SerializerMethodField()
-    charges = serializers.SerializerMethodField()
 
     class Meta(BookingListBaseSerializer.Meta):
         model = Booking
@@ -593,8 +621,9 @@ class BookingRetrieveSerializer(BookingListBaseSerializer):
             'shipper',
             'client_contact_person',
             'agent_contact_person',
-            'charges',
             'is_assigned',
+            'is_paid',
+            'charges',
         )
 
     def get_client_contact_person(self, obj):
@@ -603,25 +632,9 @@ class BookingRetrieveSerializer(BookingListBaseSerializer):
     def get_agent_contact_person(self, obj):
         return obj.agent_contact_person.get_full_name() if obj.agent_contact_person else None
 
-    def get_charges(self, obj):
-        main_currency_code = Currency.objects.filter(is_main=True).first().code
-        cargo_groups = CargoGroupSerializer(obj.cargo_groups, many=True).data
-        container_type_ids_list = [
-            group.get('container_type') for group in cargo_groups if 'container_type' in group
-        ]
-        result = calculate_freight_rate_charges(obj.freight_rate,
-                                                {},
-                                                cargo_groups,
-                                                obj.freight_rate.shipping_mode,
-                                                main_currency_code,
-                                                obj.date_from,
-                                                obj.date_to,
-                                                container_type_ids_list, )
-        return result
-
 
 class OperationSerializer(serializers.ModelSerializer):
-    aceid = serializers.SerializerMethodField()
+    aceid = serializers.CharField(read_only=True)
     cargo_groups = CargoGroupSerializer(many=True)
 
     class Meta:
@@ -635,9 +648,6 @@ class OperationSerializer(serializers.ModelSerializer):
             'cargo_groups',
             'is_assigned',
         )
-
-    def get_aceid(self, obj):
-        return f'CO5K5647'
 
 
 class OperationListBaseSerializer(OperationSerializer):
@@ -665,7 +675,6 @@ class OperationListBaseSerializer(OperationSerializer):
 class OperationRetrieveSerializer(OperationListBaseSerializer):
     release_type = ReleaseTypeSerializer()
     shipper = ShipperSerializer()
-    charges = serializers.SerializerMethodField()
 
     class Meta(OperationListBaseSerializer.Meta):
         model = Booking
@@ -675,22 +684,6 @@ class OperationRetrieveSerializer(OperationListBaseSerializer):
             'shipper',
             'charges',
         )
-
-    def get_charges(self, obj):
-        main_currency_code = Currency.objects.filter(is_main=True).first().code
-        cargo_groups = CargoGroupSerializer(obj.cargo_groups, many=True).data
-        container_type_ids_list = [
-            group.get('container_type') for group in cargo_groups if 'container_type' in group
-        ]
-        result = calculate_freight_rate_charges(obj.freight_rate,
-                                                {},
-                                                cargo_groups,
-                                                obj.freight_rate.shipping_mode,
-                                                main_currency_code,
-                                                obj.date_from,
-                                                obj.date_to,
-                                                container_type_ids_list, )
-        return result
 
 
 class QuoteStatusBaseSerializer(serializers.ModelSerializer):

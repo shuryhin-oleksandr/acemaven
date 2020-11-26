@@ -8,7 +8,7 @@ from app.core.tasks import send_registration_email
 
 
 def get_random_string(length):
-    return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
+    return ''.join(random.choices(string.ascii_lowercase + string.digits, k=length))
 
 
 def process_sign_up_token(user):

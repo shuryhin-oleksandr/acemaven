@@ -267,7 +267,8 @@ class FreightRateViesSet(PermissionClassByActionMixin,
                                                     date_to,
                                                     container_type_ids_list,
                                                     booking_fee=booking_fee,
-                                                    service_fee=service_fee)
+                                                    service_fee=service_fee,
+                                                    calculate_fees=True,)
 
             results.append(result)
 
@@ -461,7 +462,12 @@ class BookingViesSet(PermissionClassByActionMixin,
     def get_queryset(self):
         company = self.request.user.get_company()
         queryset = self.queryset
-        return queryset.filter(is_assigned=False, freight_rate__company=company,)
+        return queryset.filter(
+            is_assigned=False,
+            freight_rate__company=company,
+            is_paid=True,
+            status=Booking.REQUEST_RECEIVED
+        )
 
     def get_serializer_class(self):
         if self.action == 'list':
@@ -469,6 +475,16 @@ class BookingViesSet(PermissionClassByActionMixin,
         if self.action == 'retrieve':
             return BookingRetrieveSerializer
         return self.serializer_class
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        new_booking_id = serializer.data.get('id')
+        booking = Booking.objects.get(id=new_booking_id)
+        data = BookingRetrieveSerializer(booking).data
+        return Response(data=data, status=status.HTTP_201_CREATED, headers=headers)
 
     @action(methods=['post'], detail=True, url_path='assign')
     def assign_booking_to_agent(self, request, *args, **kwargs):
@@ -493,7 +509,11 @@ class OperationViewSet(PermissionClassByActionMixin,
     def get_queryset(self):
         company = self.request.user.get_company()
         queryset = self.queryset
-        return queryset.filter(is_assigned=True, freight_rate__company=company,)
+        return queryset.filter(
+            is_assigned=True,
+            freight_rate__company=company,
+            is_paid=True,
+        )
 
     def get_serializer_class(self):
         if self.action == 'list':

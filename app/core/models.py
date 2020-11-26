@@ -388,6 +388,11 @@ class BankAccount(models.Model):
         _('Is default bank account or not'),
         default=False,
     )
+    pix_key = models.CharField(
+        _('Pix payment key'),
+        max_length=77,
+        null=True,
+    )
 
     class Meta:
         verbose_name = _('Bank Account')

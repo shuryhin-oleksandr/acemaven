@@ -8,7 +8,8 @@
     
 # Run celery:
     celery worker -A config --loglevel=info
-    
+    celery beat -A config -l INFO
+
 # Apply fixtures:
     python manage.py loaddata fixtures/*.json
     

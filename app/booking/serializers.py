@@ -681,6 +681,7 @@ class OperationListBaseSerializer(OperationSerializer):
     status = serializers.SerializerMethodField()
     agent_contact_person = serializers.CharField(source='agent_contact_person.get_full_name', default=None)
     cargo_groups = CargoGroupRetrieveSerializer(many=True)
+    shipment_details = ShipmentDetailsBaseSerializer(many=True)
 
     class Meta(OperationSerializer.Meta):
         model = Booking
@@ -688,6 +689,7 @@ class OperationListBaseSerializer(OperationSerializer):
             'shipping_type',
             'status',
             'agent_contact_person',
+            'shipment_details',
         )
 
     def get_status(self, obj):
@@ -700,7 +702,6 @@ class OperationRetrieveSerializer(OperationListBaseSerializer):
     client_contact_person = serializers.CharField(source='client_contact_person.get_full_name')
     client = serializers.CharField(source='client_contact_person.get_company.name')
     shipper = ShipperSerializer()
-    shipment_details = ShipmentDetailsBaseSerializer(many=True)
 
     class Meta(OperationListBaseSerializer.Meta):
         model = Booking
@@ -712,7 +713,6 @@ class OperationRetrieveSerializer(OperationListBaseSerializer):
             'client',
             'shipper',
             'charges',
-            'shipment_details',
         )
 
     def get_week_range(self, obj):

@@ -165,7 +165,7 @@ class OperationOrderingFilterBackend(filters.BaseFilterBackend):
             elif ordering.endswith('carrier'):
                 queryset = queryset.order_by(f'{asc_or_desc}freight_rate__carrier__title', 'date_from')
             elif ordering.endswith('agent'):
-                queryset = queryset.order_by(f'{asc_or_desc}agent_contact_person__name', 'date_from')
+                queryset = queryset.order_by(f'{asc_or_desc}agent_contact_person__first_name', 'date_from')
             else:
                 queryset = queryset.order_by(ordering)
 

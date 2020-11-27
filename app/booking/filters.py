@@ -132,7 +132,7 @@ class BookingOrderingFilterBackend(filters.BaseFilterBackend):
 class OperationFilterSet(django_filters.FilterSet):
     shipping_type = django_filters.CharFilter(field_name='freight_rate__shipping_mode__shipping_type__title')
     my_operations = django_filters.BooleanFilter(method='my_operations_filter', label='My Operations')
-    id = django_filters.CharFilter(field_name='aceid', lookup_expr='icontains')
+    aceid = django_filters.CharFilter(field_name='aceid', lookup_expr='icontains')
     carrier = django_filters.CharFilter(field_name='freight_rate__carrier__title', lookup_expr='icontains')
 
     class Meta:
@@ -140,7 +140,7 @@ class OperationFilterSet(django_filters.FilterSet):
         fields = (
             'shipping_type',
             'my_operations',
-            'id',
+            'aceid',
             'carrier',
         )
 

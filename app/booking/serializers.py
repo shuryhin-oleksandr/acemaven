@@ -708,6 +708,9 @@ class OperationListBaseSerializer(OperationSerializer):
 
 class OperationRetrieveSerializer(OperationListBaseSerializer):
     release_type = ReleaseTypeSerializer()
+    week_range = serializers.SerializerMethodField()
+    client_contact_person = serializers.SerializerMethodField()
+    client = serializers.SerializerMethodField()
     shipper = ShipperSerializer()
     shipment_details = ShipmentDetailsBaseSerializer(many=True)
 
@@ -716,10 +719,25 @@ class OperationRetrieveSerializer(OperationListBaseSerializer):
         fields = OperationListBaseSerializer.Meta.fields + (
             'date_from',
             'date_to',
+            'week_range',
+            'client_contact_person',
+            'client',
             'shipper',
             'charges',
             'shipment_details',
         )
+
+    def get_week_range(self, obj):
+        return {
+            'week_from': obj.date_from.isocalendar()[1],
+            'week_to': obj.date_to.isocalendar()[1]
+        }
+
+    def get_client_contact_person(self, obj):
+        return obj.client_contact_person.get_full_name()
+
+    def get_client(self, obj):
+        return obj.client_contact_person.get_company().name
 
 
 class QuoteStatusBaseSerializer(serializers.ModelSerializer):

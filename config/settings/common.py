@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 import os
 import datetime
 from pathlib import Path
+from celery.schedules import crontab
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
@@ -173,6 +174,12 @@ CELERY_RESULT_BACKEND = 'redis://0.0.0.0:6379'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
+CELERY_BEAT_SCHEDULE = {
+    'archive-expired-quotes': {
+        'task': 'archive_quotes',
+        'schedule': crontab(hour=0),
+    }
+}
 
 # JWT
 JWT_AUTH = {

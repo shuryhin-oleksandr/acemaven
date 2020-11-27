@@ -5,7 +5,7 @@ from django.conf import settings
 
 from app.handling.models import LocalFee, ShippingMode
 
-logger = logging.getLogger("jettpro.task.logging")
+logger = logging.getLogger("acemaven.task.logging")
 
 
 @celery_app.task

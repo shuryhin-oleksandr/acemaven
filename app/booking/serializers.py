@@ -580,7 +580,7 @@ class BookingListBaseSerializer(BookingSerializer):
     week_range = serializers.SerializerMethodField()
     freight_rate = FreightRateRetrieveSerializer()
     shipping_type = serializers.CharField(source='freight_rate.shipping_mode.shipping_type.title')
-    client = serializers.SerializerMethodField()
+    client = serializers.CharField(source='client_contact_person.get_company.name')
     status = serializers.SerializerMethodField()
 
     class Meta(BookingSerializer.Meta):
@@ -600,9 +600,6 @@ class BookingListBaseSerializer(BookingSerializer):
             'week_to': obj.date_to.isocalendar()[1]
         }
 
-    def get_client(self, obj):
-        return obj.client_contact_person.get_company().name
-
     def get_status(self, obj):
         return list(filter(lambda x: x[0] == obj.status, Booking.STATUS_CHOICES))[0][1]
 
@@ -611,8 +608,8 @@ class BookingRetrieveSerializer(BookingListBaseSerializer):
     release_type = ReleaseTypeSerializer()
     shipper = ShipperSerializer()
     cargo_groups = CargoGroupRetrieveSerializer(many=True)
-    client_contact_person = serializers.SerializerMethodField()
-    agent_contact_person = serializers.SerializerMethodField()
+    client_contact_person = serializers.CharField(source='client_contact_person.get_full_name')
+    agent_contact_person = serializers.CharField(source='agent_contact_person.get_full_name', default=None)
 
     class Meta(BookingListBaseSerializer.Meta):
         model = Booking
@@ -625,12 +622,6 @@ class BookingRetrieveSerializer(BookingListBaseSerializer):
             'is_paid',
             'charges',
         )
-
-    def get_client_contact_person(self, obj):
-        return obj.client_contact_person.get_full_name()
-
-    def get_agent_contact_person(self, obj):
-        return obj.agent_contact_person.get_full_name() if obj.agent_contact_person else None
 
 
 class ShipmentDetailsBaseSerializer(serializers.ModelSerializer):
@@ -688,7 +679,7 @@ class OperationListBaseSerializer(OperationSerializer):
     freight_rate = FreightRateRetrieveSerializer()
     shipping_type = serializers.CharField(source='freight_rate.shipping_mode.shipping_type.title')
     status = serializers.SerializerMethodField()
-    agent_contact_person = serializers.SerializerMethodField()
+    agent_contact_person = serializers.CharField(source='agent_contact_person.get_full_name', default=None)
     cargo_groups = CargoGroupRetrieveSerializer(many=True)
 
     class Meta(OperationSerializer.Meta):
@@ -702,15 +693,12 @@ class OperationListBaseSerializer(OperationSerializer):
     def get_status(self, obj):
         return list(filter(lambda x: x[0] == obj.status, Booking.STATUS_CHOICES))[0][1]
 
-    def get_agent_contact_person(self, obj):
-        return obj.agent_contact_person.get_full_name() if obj.agent_contact_person else None
-
 
 class OperationRetrieveSerializer(OperationListBaseSerializer):
     release_type = ReleaseTypeSerializer()
     week_range = serializers.SerializerMethodField()
-    client_contact_person = serializers.SerializerMethodField()
-    client = serializers.SerializerMethodField()
+    client_contact_person = serializers.CharField(source='client_contact_person.get_full_name')
+    client = serializers.CharField(source='client_contact_person.get_company.name')
     shipper = ShipperSerializer()
     shipment_details = ShipmentDetailsBaseSerializer(many=True)
 
@@ -732,12 +720,6 @@ class OperationRetrieveSerializer(OperationListBaseSerializer):
             'week_from': obj.date_from.isocalendar()[1],
             'week_to': obj.date_to.isocalendar()[1]
         }
-
-    def get_client_contact_person(self, obj):
-        return obj.client_contact_person.get_full_name()
-
-    def get_client(self, obj):
-        return obj.client_contact_person.get_company().name
 
 
 class QuoteStatusBaseSerializer(serializers.ModelSerializer):

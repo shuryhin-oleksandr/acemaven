@@ -633,6 +633,40 @@ class BookingRetrieveSerializer(BookingListBaseSerializer):
         return obj.agent_contact_person.get_full_name() if obj.agent_contact_person else None
 
 
+class ShipmentDetailsBaseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ShipmentDetails
+        fields = (
+            'booking_number',
+            'booking_number_with_carrier',
+            'flight_number',
+            'vessel',
+            'voyage',
+            'container_number',
+            'mawb',
+            'date_of_departure',
+            'date_of_arrival',
+            'document_cut_off_date',
+            'cargo_cut_off_date',
+            'cargo_pick_up_location',
+            'cargo_pick_up_location_address',
+            'cargo_drop_off_location',
+            'cargo_drop_off_location_address',
+            'empty_pick_up_location',
+            'empty_pick_up_location_address',
+            'container_free_time',
+            'booking_notes',
+            'booking',
+        )
+
+    def create(self, validated_data):
+        shipment_detail = super().create(validated_data)
+        booking = validated_data['booking']
+        booking.status = Booking.CONFIRMED
+        booking.save()
+        return shipment_detail
+
+
 class OperationSerializer(serializers.ModelSerializer):
     aceid = serializers.CharField(read_only=True)
     cargo_groups = CargoGroupSerializer(many=True)
@@ -675,6 +709,7 @@ class OperationListBaseSerializer(OperationSerializer):
 class OperationRetrieveSerializer(OperationListBaseSerializer):
     release_type = ReleaseTypeSerializer()
     shipper = ShipperSerializer()
+    shipment_details = ShipmentDetailsBaseSerializer(many=True)
 
     class Meta(OperationListBaseSerializer.Meta):
         model = Booking
@@ -683,6 +718,7 @@ class OperationRetrieveSerializer(OperationListBaseSerializer):
             'date_to',
             'shipper',
             'charges',
+            'shipment_details',
         )
 
 
@@ -706,37 +742,3 @@ class QuoteStatusRetrieveSerializer(QuoteStatusBaseSerializer):
     class Meta(QuoteStatusBaseSerializer.Meta):
         fields = QuoteStatusBaseSerializer.Meta.fields
         model = Status
-
-
-class ShipmentDetailsBaseSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ShipmentDetails
-        fields = (
-            'booking_number',
-            'booking_number_with_carrier',
-            'flight_number',
-            'vessel',
-            'voyage',
-            'container_number',
-            'mawb',
-            'date_of_departure',
-            'date_of_arrival',
-            'document_cut_off_date',
-            'cargo_cut_off_date',
-            'cargo_pick_up_location',
-            'cargo_pick_up_location_address',
-            'cargo_drop_off_location',
-            'cargo_drop_off_location_address',
-            'empty_pick_up_location',
-            'empty_pick_up_location_address',
-            'container_free_time',
-            'booking_notes',
-            'booking',
-        )
-
-    def create(self, validated_data):
-        shipment_detail = super().create(validated_data)
-        booking = validated_data['booking']
-        booking.status = Booking.CONFIRMED
-        booking.save()
-        return shipment_detail

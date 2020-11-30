@@ -156,7 +156,7 @@ class OperationFilterSet(django_filters.FilterSet):
 
 
 class OperationOrderingFilterBackend(filters.BaseFilterBackend):
-    valid_ordering_fields = ('aceid', 'route', 'date', 'carrier', 'status', 'agent')
+    valid_ordering_fields = ('aceid', 'route', 'date', 'carrier', 'status', 'agent', 'shipping_mode')
 
     def filter_queryset(self, request, queryset, view):
 
@@ -171,6 +171,8 @@ class OperationOrderingFilterBackend(filters.BaseFilterBackend):
                 queryset = queryset.order_by(f'{asc_or_desc}freight_rate__carrier__title', 'date_from')
             elif ordering.endswith('agent'):
                 queryset = queryset.order_by(f'{asc_or_desc}agent_contact_person__first_name', 'date_from')
+            elif ordering.endswith('shipping_mode'):
+                queryset = queryset.order_by(f'{asc_or_desc}freight_rate__shipping_mode__title', 'date_from')
             else:
                 queryset = queryset.order_by(ordering)
 

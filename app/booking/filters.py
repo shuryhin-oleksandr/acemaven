@@ -4,6 +4,7 @@ import django_filters
 from django.db.models import Q
 
 from app.booking.models import FreightRate, Surcharge, Quote, Booking
+from app.core.models import Company
 
 
 class SurchargeFilterSet(django_filters.FilterSet):
@@ -146,7 +147,11 @@ class OperationFilterSet(django_filters.FilterSet):
 
     def my_operations_filter(self, queryset, _, value):
         if value:
-            queryset = queryset.filter(agent_contact_person=self.request.user)
+            user = self.request.user
+            if user.get_company().type == Company.CLIENT:
+                queryset = queryset.filter(client_contact_person=user)
+            else:
+                queryset = queryset.filter(agent_contact_person=user)
         return queryset
 
 

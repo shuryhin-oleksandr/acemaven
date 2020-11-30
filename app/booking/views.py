@@ -517,11 +517,13 @@ class OperationViewSet(PermissionClassByActionMixin,
     def get_queryset(self):
         company = self.request.user.get_company()
         queryset = self.queryset
-        return queryset.filter(
-            is_assigned=True,
-            freight_rate__company=company,
-            is_paid=True,
-        )
+        if company.type == Company.CLIENT:
+            queryset = queryset.filter(client_contact_person__companies=company)
+        else:
+            queryset = queryset.filter(freight_rate__company=company,
+                                       is_assigned=True,
+                                       is_paid=True,)
+        return queryset
 
     def get_serializer_class(self):
         if self.action == 'list':

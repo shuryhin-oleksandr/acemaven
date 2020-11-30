@@ -628,6 +628,7 @@ class ShipmentDetailsBaseSerializer(serializers.ModelSerializer):
     class Meta:
         model = ShipmentDetails
         fields = (
+            'id',
             'booking_number',
             'booking_number_with_carrier',
             'flight_number',

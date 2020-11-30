@@ -177,7 +177,7 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_BEAT_SCHEDULE = {
     'archive-expired-quotes': {
         'task': 'archive_quotes',
-        'schedule': crontab(hour=0),
+        'schedule': crontab(hour=0, minute=0),
     }
 }
 

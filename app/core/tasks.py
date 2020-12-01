@@ -10,9 +10,10 @@ logger = logging.getLogger("acemaven.task.logging")
 
 @celery_app.task
 def send_registration_email(token, recipient_email):
+    subject = 'Acemaven. Registration process.'
     logger.info(f'New registration email is going to be send to {recipient_email}')
     message_body = f'{settings.DOMAIN_ADDRESS}signup?token={token}'
-    send_mail('Acemaven. Registration process.', message_body, settings.DEFAULT_FROM_EMAIL, [recipient_email])
+    send_mail(subject, message_body, settings.DEFAULT_FROM_EMAIL, [recipient_email])
 
 
 @celery_app.task

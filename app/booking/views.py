@@ -463,6 +463,7 @@ class BookingViesSet(PermissionClassByActionMixin,
     permission_classes_by_action = {
         'create': (IsAuthenticated, IsClientCompany,),
         'assign_booking_to_agent': (IsAuthenticated, IsAgentCompany, IsMaster,),
+        'reject_booking': (IsAuthenticated, IsAgentCompany,),
     }
     filter_class = BookingFilterSet
     filter_backends = (BookingOrderingFilterBackend, rest_framework.DjangoFilterBackend,)
@@ -505,6 +506,13 @@ class BookingViesSet(PermissionClassByActionMixin,
         booking.save()
         return Response(status=status.HTTP_200_OK)
 
+    @action(methods=['post'], detail=True, url_path='reject')
+    def reject_booking(self, request, *args, **kwargs):
+        booking = self.get_object()
+        booking.status = Booking.REJECTED
+        booking.save()
+        return Response(status=status.HTTP_200_OK)
+
 
 class OperationViewSet(PermissionClassByActionMixin,
                        viewsets.ModelViewSet):
@@ -531,6 +539,16 @@ class OperationViewSet(PermissionClassByActionMixin,
         if self.action == 'retrieve':
             return OperationRetrieveSerializer
         return self.serializer_class
+
+    @action(methods=['post'], detail=True, url_path='cancel')
+    def cancel_operation(self, request, *args, **kwargs):
+        operation = self.get_object()
+        if request.user.get_company().type == Company.CLIENT:
+            operation.status = Booking.CANCELED_BY_CLIENT
+        else:
+            operation.status = Booking.CANCELED_BY_AGENT
+        operation.save()
+        return Response(status=status.HTTP_200_OK)
 
 
 class StatusViesSet(mixins.UpdateModelMixin,

@@ -673,6 +673,7 @@ class OperationSerializer(serializers.ModelSerializer):
             'freight_rate',
             'cargo_groups',
             'is_assigned',
+            'payment_due_by',
         )
 
 

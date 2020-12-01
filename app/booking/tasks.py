@@ -7,7 +7,7 @@ from app.handling.models import ClientPlatformSetting
 
 
 @celery_app.task(name='archive_quotes')
-def archive_expired_quotes():
+def daily_archive_expired_quotes():
     settings_days_limit = ClientPlatformSetting.objects.first().number_of_days
     now_date = datetime.datetime.now().date()
     Quote.objects.filter(

@@ -307,11 +307,17 @@ class Booking(models.Model):
     ACCEPTED = 'accepted'
     REQUEST_RECEIVED = 'received'
     PENDING = 'pending'
+    REJECTED = 'rejected'
+    CANCELED_BY_AGENT = 'canceled_by_agent'
+    CANCELED_BY_CLIENT = 'canceled_by_client'
     STATUS_CHOICES = (
         (CONFIRMED, 'Booking Confirmed'),
         (ACCEPTED, 'Booking Request in Progress'),
         (REQUEST_RECEIVED, 'Booking Request Received'),
         (PENDING, 'Booking Fee Pending'),
+        (REJECTED, 'Booking Request Rejected'),
+        (CANCELED_BY_AGENT, 'Operation Canceled by Agent'),
+        (CANCELED_BY_CLIENT, 'Operation Canceled by Client'),
     )
 
     aceid = models.CharField(
@@ -324,6 +330,10 @@ class Booking(models.Model):
     )
     date_to = models.DateField(
         _('Booking date to'),
+    )
+    payment_due_by = models.DateField(
+        _('Payment due by date'),
+        null=True,
     )
     is_paid = models.BooleanField(
         _('Whether booking paid or not'),

@@ -594,6 +594,10 @@ class ClientPlatformSetting(models.Model):
         _('Number of days a quote will be shown to ff'),
         validators=[MinValueValidator(1)],
     )
+    enable_booking_fee_payment = models.BooleanField(
+        _('Enable booking/service fee payment to book freight rate'),
+        default=True,
+    )
 
 
 class GeneralSetting(models.Model):
@@ -613,6 +617,7 @@ class GeneralSetting(models.Model):
     show_freight_forwarder_name = models.CharField(
         _('Hide/show freight forwarder'),
         max_length=50,
+        choices=SHOW_FREIGHT_FORWARDER_NAME_CHOICES,
         default=AFTER_BOOKING,
     )
     number_of_days_request_can_stay = models.PositiveIntegerField(

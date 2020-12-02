@@ -386,6 +386,12 @@ class Booking(models.Model):
         related_name='bookings',
         null=True,
     )
+    original_booking = models.ForeignKey(
+        'self',
+        on_delete=models.SET_NULL,
+        related_name='changed_bookings',
+        null=True,
+    )
 
     def __str__(self):
         return f'Booking of rate [{self.freight_rate}]'

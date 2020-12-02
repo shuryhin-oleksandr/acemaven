@@ -547,6 +547,7 @@ class BookingSerializer(serializers.ModelSerializer):
         freight_rate = validated_data.get('freight_rate')
         booking_fee, service_fee = get_fees(company, freight_rate.shipping_mode)
         number_of_documents = validated_data.get('number_of_documents')
+        calculate_fees = ClientPlatformSetting.objects.first().enable_booking_fee_payment
         try:
             with transaction.atomic():
                 result = calculate_freight_rate_charges(freight_rate,
@@ -560,11 +561,11 @@ class BookingSerializer(serializers.ModelSerializer):
                                                         number_of_documents=number_of_documents,
                                                         booking_fee=booking_fee,
                                                         service_fee=service_fee,
-                                                        calculate_fees=True,)
+                                                        calculate_fees=calculate_fees,)
                 validated_data['charges'] = result
+                validated_data['aceid'] = generate_aceid(freight_rate, company)
                 if result.get('pay_to_book', {}).get('pay_to_book', 0) == 0:
                     validated_data['is_paid'] = True
-                    validated_data['aceid'] = generate_aceid(freight_rate, company)
                     validated_data['status'] = Booking.REQUEST_RECEIVED
                 booking = super().create(validated_data)
 
@@ -660,7 +661,6 @@ class ShipmentDetailsBaseSerializer(serializers.ModelSerializer):
 
 
 class OperationSerializer(serializers.ModelSerializer):
-    aceid = serializers.CharField(read_only=True)
     cargo_groups = CargoGroupSerializer(many=True)
 
     class Meta:
@@ -668,13 +668,52 @@ class OperationSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'aceid',
+            'cargo_groups',
+            'date_from',
+            'date_to',
+            'payment_due_by',
+            'is_assigned',
+            'status',
+            'client_contact_person',
+            'agent_contact_person',
             'release_type',
             'number_of_documents',
             'freight_rate',
-            'cargo_groups',
-            'is_assigned',
-            'payment_due_by',
+            'shipper',
+            'original_booking',
         )
+
+    def create(self, validated_data):
+        cargo_groups = validated_data.pop('cargo_groups', [])
+        changed_cargo_groups = CargoGroupSerializer(cargo_groups, many=True).data
+        number_of_documents = validated_data.get('number_of_documents')
+        main_currency_code = Currency.objects.filter(is_main=True).first().code
+        container_type_ids_list = [
+            group.get('container_type') for group in changed_cargo_groups if 'container_type' in group
+        ]
+        freight_rate = validated_data.get('freight_rate')
+        try:
+            with transaction.atomic():
+                result = calculate_freight_rate_charges(freight_rate,
+                                                        {},
+                                                        changed_cargo_groups,
+                                                        freight_rate.shipping_mode,
+                                                        main_currency_code,
+                                                        validated_data.get('date_from'),
+                                                        validated_data.get('date_to'),
+                                                        container_type_ids_list,
+                                                        number_of_documents=number_of_documents,)
+                validated_data['charges'] = result
+                validated_data['is_paid'] = True
+                validated_data['is_assigned'] = True
+                operation = super().create(validated_data)
+
+                cargo_groups = [{**item, **{'booking': operation}} for item in cargo_groups]
+                new_cargo_groups = [CargoGroup(**fields) for fields in cargo_groups]
+                CargoGroup.objects.bulk_create(new_cargo_groups)
+        except Exception as error:
+            raise serializers.ValidationError({'error': error})
+        return operation
 
 
 class OperationListBaseSerializer(OperationSerializer):
@@ -689,8 +728,6 @@ class OperationListBaseSerializer(OperationSerializer):
         model = Booking
         fields = OperationSerializer.Meta.fields + (
             'shipping_type',
-            'status',
-            'agent_contact_person',
             'shipment_details',
         )
 
@@ -708,12 +745,8 @@ class OperationRetrieveSerializer(OperationListBaseSerializer):
     class Meta(OperationListBaseSerializer.Meta):
         model = Booking
         fields = OperationListBaseSerializer.Meta.fields + (
-            'date_from',
-            'date_to',
             'week_range',
-            'client_contact_person',
             'client',
-            'shipper',
             'charges',
         )
 

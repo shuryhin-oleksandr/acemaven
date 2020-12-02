@@ -32,7 +32,7 @@ class BankAccountViewSet(PermissionClassByActionMixin,
 
     def get_queryset(self):
         user = self.request.user
-        return self.queryset.filter(company=user.get_company())
+        return self.queryset.filter(company=user.get_company(), is_platforms=False)
 
 
 class CompanyEditViewSet(mixins.RetrieveModelMixin,

@@ -378,11 +378,17 @@ class BankAccount(models.Model):
         _('Account Type'),
         max_length=10,
         choices=ACCOUNT_TYPE_CHOICES,
+        default=SAVINGS,
     )
     company = models.ForeignKey(
         'Company',
         on_delete=models.CASCADE,
         related_name='bank_accounts',
+        null=True,
+    )
+    is_platforms = models.BooleanField(
+        _('Is bank account of the platform'),
+        default=False,
     )
     is_default = models.BooleanField(
         _('Is default bank account or not'),
@@ -403,7 +409,7 @@ class BankAccount(models.Model):
 
     def save(self, *args, **kwargs):
         if self.is_default:
-            BankAccount.objects.filter(company=self.company).update(is_default=False)
+            BankAccount.objects.filter(company=self.company, is_platforms=self.is_platforms).update(is_default=False)
         super(BankAccount, self).save(*args, **kwargs)
 
 

@@ -60,10 +60,28 @@ class SignUpTokenAdmin(admin.ModelAdmin):
 class BankAccountAdmin(admin.ModelAdmin):
     list_display = (
         'bank_name',
-        'company',
-        'account_type',
         'is_default',
     )
+    fieldsets = (
+        (None, {
+            'fields': (
+                'bank_name',
+                'bank_number',
+                'branch',
+                'number',
+                'pix_key',
+                'is_default',
+            ),
+        }),
+    )
+
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+        return queryset.filter(company__isnull=True, is_platforms=True)
+
+    def save_model(self, request, obj, form, change):
+        obj.is_platforms = True
+        obj.save()
 
 
 @admin.register(Role)

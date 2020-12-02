@@ -707,7 +707,7 @@ class ShipmentDetails(models.Model):
     )
     booking = models.ForeignKey(
         'Booking',
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         related_name='shipment_details',
         null=True,
     )
@@ -746,6 +746,7 @@ class Transaction(models.Model):
     )
     booking = models.ForeignKey(
         'Booking',
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         related_name='transactions',
+        null=True,
     )

@@ -673,7 +673,6 @@ class OperationSerializer(serializers.ModelSerializer):
             'date_to',
             'payment_due_by',
             'is_assigned',
-            'status',
             'client_contact_person',
             'agent_contact_person',
             'release_type',
@@ -692,6 +691,8 @@ class OperationSerializer(serializers.ModelSerializer):
             group.get('container_type') for group in changed_cargo_groups if 'container_type' in group
         ]
         freight_rate = validated_data.get('freight_rate')
+        original_booking = validated_data.get('original_booking')
+        validated_data['status'] = original_booking.status
         try:
             with transaction.atomic():
                 result = calculate_freight_rate_charges(freight_rate,
@@ -728,6 +729,7 @@ class OperationListBaseSerializer(OperationSerializer):
         model = Booking
         fields = OperationSerializer.Meta.fields + (
             'shipping_type',
+            'status',
             'shipment_details',
         )
 

@@ -472,6 +472,7 @@ class BookingViesSet(PermissionClassByActionMixin,
         company = self.request.user.get_company()
         queryset = self.queryset
         return queryset.filter(
+            original_booking__isnull=True,
             is_assigned=False,
             freight_rate__company=company,
             is_paid=True,

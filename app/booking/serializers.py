@@ -752,7 +752,13 @@ class OperationRetrieveSerializer(OperationListBaseSerializer):
             'client_contact_person',
             'client',
             'charges',
+            'change_requests',
         )
+
+    def get_fields(self):
+        fields = super(OperationRetrieveSerializer, self).get_fields()
+        fields['change_requests'] = OperationRetrieveSerializer(many=True)
+        return fields
 
     def get_week_range(self, obj):
         return {

@@ -389,7 +389,7 @@ class Booking(models.Model):
     original_booking = models.ForeignKey(
         'self',
         on_delete=models.SET_NULL,
-        related_name='changed_bookings',
+        related_name='change_requests',
         null=True,
     )
 

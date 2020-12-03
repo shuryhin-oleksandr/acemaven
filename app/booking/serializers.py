@@ -7,7 +7,7 @@ from app.booking.models import Surcharge, UsageFee, Charge, AdditionalSurcharge,
     Booking, Status, ShipmentDetails
 from app.booking.utils import rate_surcharges_filter, calculate_freight_rate_charges, get_fees, generate_aceid
 from app.core.models import Shipper
-from app.core.serializers import ShipperSerializer
+from app.core.serializers import ShipperSerializer, BankAccountBaseSerializer
 from app.handling.models import ShippingType, ClientPlatformSetting, Currency
 from app.handling.serializers import ContainerTypesSerializer, CurrencySerializer, CarrierBaseSerializer, \
     PortSerializer, ShippingModeBaseSerializer, PackagingTypeBaseSerializer, ReleaseTypeSerializer
@@ -765,6 +765,23 @@ class OperationRetrieveSerializer(OperationListBaseSerializer):
             'week_from': obj.date_from.isocalendar()[1],
             'week_to': obj.date_to.isocalendar()[1]
         }
+
+
+class OperationRetrieveClientSerializer(OperationRetrieveSerializer):
+    agent_bank_account = serializers.SerializerMethodField()
+
+    class Meta(OperationRetrieveSerializer.Meta):
+        model = Booking
+        fields = OperationRetrieveSerializer.Meta.fields + (
+            'agent_bank_account',
+        )
+
+    def get_agent_bank_account(self, obj):
+        if obj.agent_contact_person:
+            bank_account = obj.agent_contact_person.get_company().bank_accounts.filter(is_default=True).first()
+            if bank_account:
+                return BankAccountBaseSerializer(bank_account).data
+        return {}
 
 
 class QuoteStatusBaseSerializer(serializers.ModelSerializer):

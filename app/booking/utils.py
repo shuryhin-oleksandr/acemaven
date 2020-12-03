@@ -258,7 +258,9 @@ def calculate_freight_rate_charges(freight_rate,
     doc_fee_charge = float(charge.charge) if charge.charge else 0
     doc_fee['currency'] = charge.currency.code
     doc_fee['cost'] = doc_fee_charge
-    subtotal_doc_fee_charge = doc_fee_charge * number_of_documents if number_of_documents else doc_fee_charge
+    number_of_documents = number_of_documents if number_of_documents else 1
+    subtotal_doc_fee_charge = doc_fee_charge * number_of_documents
+    doc_fee['volume'] = number_of_documents
     doc_fee['subtotal'] = subtotal_doc_fee_charge
     result['doc_fee'] = doc_fee
     add_currency_value(totals, charge.currency.code, subtotal_doc_fee_charge)

@@ -200,16 +200,24 @@ class UserSignUpSerializer(serializers.Serializer):
         return instance
 
 
-class BankAccountSerializer(serializers.ModelSerializer):
-    company = serializers.IntegerField(source='company.id', read_only=True)
-
+class BankAccountBaseSerializer(serializers.ModelSerializer):
     class Meta:
         model = BankAccount
         fields = (
             'id',
             'bank_name',
+            'bank_number',
             'branch',
             'number',
+        )
+
+
+class BankAccountSerializer(BankAccountBaseSerializer):
+    company = serializers.IntegerField(source='company.id', read_only=True)
+
+    class Meta(BankAccountBaseSerializer.Meta):
+        model = BankAccount
+        fields = BankAccountBaseSerializer.Meta.fields + (
             'account_type',
             'company',
             'is_default',

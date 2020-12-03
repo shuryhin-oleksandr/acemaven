@@ -21,7 +21,8 @@ from app.booking.serializers import SurchargeSerializer, SurchargeEditSerializer
     FreightRateSearchSerializer, FreightRateSearchListSerializer, QuoteSerializer, BookingSerializer, \
     QuoteClientListOrRetrieveSerializer, QuoteAgentListSerializer, QuoteAgentRetrieveSerializer, \
     QuoteStatusBaseSerializer, CargoGroupSerializer, BookingListBaseSerializer, BookingRetrieveSerializer, \
-    ShipmentDetailsBaseSerializer, OperationSerializer, OperationListBaseSerializer, OperationRetrieveSerializer
+    ShipmentDetailsBaseSerializer, OperationSerializer, OperationListBaseSerializer, OperationRetrieveSerializer, \
+    OperationRetrieveClientSerializer
 from app.booking.utils import date_format, wm_calculate, freight_rate_search, calculate_freight_rate_charges, \
     get_fees, surcharge_search
 from app.core.mixins import PermissionClassByActionMixin
@@ -538,7 +539,10 @@ class OperationViewSet(PermissionClassByActionMixin,
         if self.action == 'list':
             return OperationListBaseSerializer
         if self.action == 'retrieve':
-            return OperationRetrieveSerializer
+            if self.request.user.get_company().type == Company.CLIENT:
+                return OperationRetrieveClientSerializer
+            else:
+                return OperationRetrieveSerializer
         return self.serializer_class
 
     @action(methods=['post'], detail=True, url_path='cancel')

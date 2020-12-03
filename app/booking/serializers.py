@@ -673,8 +673,6 @@ class OperationSerializer(serializers.ModelSerializer):
             'date_to',
             'payment_due_by',
             'is_assigned',
-            'client_contact_person',
-            'agent_contact_person',
             'release_type',
             'number_of_documents',
             'freight_rate',
@@ -693,6 +691,8 @@ class OperationSerializer(serializers.ModelSerializer):
         freight_rate = validated_data.get('freight_rate')
         original_booking = validated_data.get('original_booking')
         validated_data['status'] = original_booking.status
+        validated_data['agent_contact_person'] = original_booking.agent_contact_person
+        validated_data['client_contact_person'] = original_booking.client_contact_person
         try:
             with transaction.atomic():
                 result = calculate_freight_rate_charges(freight_rate,
@@ -700,8 +700,8 @@ class OperationSerializer(serializers.ModelSerializer):
                                                         changed_cargo_groups,
                                                         freight_rate.shipping_mode,
                                                         main_currency_code,
-                                                        validated_data.get('date_from'),
-                                                        validated_data.get('date_to'),
+                                                        original_booking.date_from,
+                                                        original_booking.date_to,
                                                         container_type_ids_list,
                                                         number_of_documents=number_of_documents,)
                 validated_data['charges'] = result
@@ -730,6 +730,7 @@ class OperationListBaseSerializer(OperationSerializer):
         fields = OperationSerializer.Meta.fields + (
             'shipping_type',
             'status',
+            'agent_contact_person',
             'shipment_details',
         )
 
@@ -748,6 +749,7 @@ class OperationRetrieveSerializer(OperationListBaseSerializer):
         model = Booking
         fields = OperationListBaseSerializer.Meta.fields + (
             'week_range',
+            'client_contact_person',
             'client',
             'charges',
         )

@@ -182,7 +182,7 @@ class UserSignUpSerializer(serializers.Serializer):
 
     def validate(self, attrs):
         errors = {}
-        users = get_user_model().objects.filter(email=attrs.get('email'))
+        users = get_user_model().objects.exclude(id=self.instance.id).filter(email=attrs.get('email'))
         if users.exists():
             errors['email'] = f'Email [{attrs.get("email")}] already exists.'
         if attrs.get('password') != attrs.get('confirm_password'):

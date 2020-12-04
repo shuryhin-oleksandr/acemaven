@@ -122,7 +122,8 @@ def calculate_additional_surcharges(totals,
 def calculate_fee(booking_fee, rate, main_currency_code, exchange_rate, subtotal):
     if booking_fee.value_type == GlobalFee.FIXED:
         if rate.currency.code != main_currency_code:
-            booking_fee_value_in_foreign_curr = booking_fee.value / (exchange_rate.rate * (1 + exchange_rate.spread))
+            booking_fee_value_in_foreign_curr = booking_fee.value / (exchange_rate.rate * (
+                    1 + exchange_rate.spread / 100))
         else:
             booking_fee_value_in_foreign_curr = booking_fee.value
         booking_fee_value_in_local_curr = booking_fee.value
@@ -130,7 +131,7 @@ def calculate_fee(booking_fee, rate, main_currency_code, exchange_rate, subtotal
         booking_fee_value_in_foreign_curr = subtotal * booking_fee.value / 100
         if rate.currency.code != main_currency_code:
             booking_fee_value_in_local_curr = booking_fee_value_in_foreign_curr * (
-                    exchange_rate.rate * (1 + exchange_rate.spread))
+                    exchange_rate.rate * (1 + exchange_rate.spread / 100))
         else:
             booking_fee_value_in_local_curr = booking_fee_value_in_foreign_curr
     return float(booking_fee_value_in_foreign_curr), float(booking_fee_value_in_local_curr)
@@ -175,7 +176,7 @@ def calculate_freight_rate_charges(freight_rate,
                                    container_type_ids_list,
                                    number_of_documents=None,
                                    booking_fee=None,
-                                   service_fee=0,
+                                   service_fee=None,
                                    calculate_fees=False):
     totals = dict()
     totals['total_freight_rate'] = dict()
@@ -271,18 +272,35 @@ def calculate_freight_rate_charges(freight_rate,
     result['total_surcharge'] = total_surcharge
 
     if calculate_fees:
-        service_fee = float(service_fee)
+        total_booking_fee = totals.pop('booking_fee', 0)
+
+        if service_fee:
+            float_service_fee_value = float(service_fee.value)
+            if service_fee.value_type == GlobalFee.FIXED:
+                service_fee_value = float_service_fee_value
+            else:
+                service_fee_value = 0
+                for currency, value in totals.items():
+                    current_value = value * float_service_fee_value / 100
+                    if currency != main_currency_code:
+                        exchange_rate = ExchangeRate.objects.filter(currency__code=currency).first()
+                        current_value = current_value * (float(exchange_rate.rate) *
+                                                         (1 + float(exchange_rate.spread) / 100))
+                    service_fee_value += current_value
+                service_fee_value = round(service_fee_value, 2)
+        else:
+            service_fee_value = 0
+
         service_fee_dict = dict()
         service_fee_dict['currency'] = main_currency_code
-        service_fee_dict['cost'] = service_fee
-        service_fee_dict['subtotal'] = service_fee
+        service_fee_dict['cost'] = service_fee_value
+        service_fee_dict['subtotal'] = service_fee_value
         result['service_fee'] = service_fee_dict
-        add_currency_value(totals, main_currency_code, service_fee)
+        add_currency_value(totals, main_currency_code, service_fee_value)
 
-        total_booking_fee = totals.pop('booking_fee', 0)
-        pay_to_book = service_fee + total_booking_fee
+        pay_to_book = service_fee_value + total_booking_fee
         result['pay_to_book'] = {
-            'service_fee': service_fee,
+            'service_fee': service_fee_value,
             'booking_fee': total_booking_fee,
             'pay_to_book': pay_to_book,
             'currency': main_currency_code,
@@ -302,7 +320,6 @@ def get_fees(company, shipping_mode):
         global_fees.filter(fee_type=GlobalFee.BOOKING, is_active=True).first()
     service_fee = local_service_fee if local_service_fee else \
         global_fees.filter(fee_type=GlobalFee.SERVICE, is_active=True).first()
-    service_fee = service_fee.value if service_fee else 0
 
     return booking_fee, service_fee
 

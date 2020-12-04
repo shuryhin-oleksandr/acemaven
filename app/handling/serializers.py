@@ -29,12 +29,19 @@ class AdditionalSurchargeSerializer(serializers.ModelSerializer):
         )
 
 
-class ContainerTypesSerializer(serializers.ModelSerializer):
+class ContainerTypesBaseSerializer(serializers.ModelSerializer):
     class Meta:
         model = ContainerType
         fields = (
             'id',
             'code',
+        )
+
+
+class ContainerTypesSerializer(ContainerTypesBaseSerializer):
+    class Meta(ContainerTypesBaseSerializer.Meta):
+        model = ContainerType
+        fields = ContainerTypesBaseSerializer.Meta.fields + (
             'shipping_mode',
             'is_frozen',
             'can_be_dangerous',

@@ -6,7 +6,13 @@ from app.handling.models import GlobalFee, LocalFee, ShippingType, ShippingMode,
 
 @admin.register(ClientPlatformSetting)
 class ClientPlatformSettingAdmin(admin.ModelAdmin):
-    pass
+    list_display = (
+        'number_of_results',
+        'hide_carrier_name',
+        'number_of_bids',
+        'number_of_days',
+        'enable_booking_fee_payment',
+    )
 
 
 @admin.register(GeneralSetting)

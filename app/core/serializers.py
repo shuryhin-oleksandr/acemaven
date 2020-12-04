@@ -7,7 +7,7 @@ from django.contrib.auth import get_user_model
 from app.core.models import BankAccount, Company, SignUpRequest, Role, Shipper
 from app.core.utils import process_sign_up_token
 from app.core.validators import PasswordValidator
-from app.handling.serializers import ReleaseTypeSerializer
+from app.handling.serializers import ReleaseTypeSerializer, PackagingTypeBaseSerializer, ContainerTypesBaseSerializer
 
 
 class CompanyBaseSerializer(serializers.ModelSerializer):
@@ -235,6 +235,9 @@ class BankAccountSerializer(BankAccountBaseSerializer):
 class SelectChoiceSerializer(serializers.Serializer):
     frozen_choices = serializers.ListField(required=False)
     release_type = ReleaseTypeSerializer(many=True, required=False)
+    packaging_type = PackagingTypeBaseSerializer(many=True, required=False)
+    container_type_sea = ContainerTypesBaseSerializer(many=True, required=False)
+    container_type_air = ContainerTypesBaseSerializer(many=True, required=False)
 
 
 class ShipperSerializer(serializers.ModelSerializer):

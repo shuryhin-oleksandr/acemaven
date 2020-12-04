@@ -248,12 +248,13 @@ class FreightRateViesSet(PermissionClassByActionMixin,
         date_to = date_format(data.get('date_to'))
         freight_rates, shipping_mode = freight_rate_search(data)
 
-        number_of_results = ClientPlatformSetting.objects.first().number_of_results
+        client_platform_settings = ClientPlatformSetting.objects.first()
+        number_of_results = client_platform_settings.number_of_results
+        calculate_fees = client_platform_settings.enable_booking_fee_payment
         freight_rates = freight_rates.order_by('transit_time').distinct()[:number_of_results]
 
         company = request.user.get_company()
         booking_fee, service_fee = get_fees(company, shipping_mode)
-        service_fee = float(service_fee)
         main_currency_code = Currency.objects.filter(is_main=True).first().code
         results = []
 
@@ -269,7 +270,7 @@ class FreightRateViesSet(PermissionClassByActionMixin,
                                                     container_type_ids_list,
                                                     booking_fee=booking_fee,
                                                     service_fee=service_fee,
-                                                    calculate_fees=True,)
+                                                    calculate_fees=calculate_fees,)
 
             results.append(result)
 

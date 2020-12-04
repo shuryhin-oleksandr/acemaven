@@ -14,7 +14,7 @@ from app.core.serializers import CompanySerializer, SignUpRequestSerializer, Use
     UserBaseSerializerWithPhoto
 from app.core.utils import choice_to_value_name
 from app.booking.models import CargoGroup
-from app.handling.models import ReleaseType
+from app.handling.models import ReleaseType, PackagingType, ContainerType
 
 
 class BankAccountViewSet(PermissionClassByActionMixin,
@@ -158,6 +158,18 @@ class SelectChoiceView(generics.GenericAPIView):
                     'choice_type': 'model',
                     'data': ReleaseType,
                 },
+                'packaging_type': {
+                    'choice_type': 'model',
+                    'data': PackagingType,
+                },
+                'container_type_sea': {
+                    'choice_type': 'model',
+                    'data': ContainerType,
+                },
+                'container_type_air': {
+                    'choice_type': 'model',
+                    'data': ContainerType,
+                }
             }
             for model in models:
                 if model in allowed_models:
@@ -165,7 +177,12 @@ class SelectChoiceView(generics.GenericAPIView):
                     if (choice_type := value.get('choice_type')) == 'choice':
                         data[model] = choice_to_value_name(value.get('data'))
                     elif choice_type == 'model':
-                        data[model] = value.get('data').objects.all()
+                        queryset = value.get('data').objects.all()
+                        if model == 'container_type_sea':
+                            queryset = queryset.filter(shipping_mode__shipping_type__title='sea')
+                        elif model == 'container_type_air':
+                            queryset = queryset.filter(shipping_mode__shipping_type__title='air')
+                        data[model] = queryset
             serializer = self.get_serializer(data)
             return Response(data=serializer.data, status=status.HTTP_200_OK)
         return Response(status=status.HTTP_400_BAD_REQUEST)

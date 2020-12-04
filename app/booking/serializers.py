@@ -724,6 +724,7 @@ class OperationListBaseSerializer(OperationSerializer):
     agent_contact_person = serializers.CharField(source='agent_contact_person.get_full_name', default=None)
     cargo_groups = CargoGroupRetrieveSerializer(many=True)
     shipment_details = ShipmentDetailsBaseSerializer(many=True)
+    has_change_request = serializers.SerializerMethodField()
 
     class Meta(OperationSerializer.Meta):
         model = Booking
@@ -732,10 +733,14 @@ class OperationListBaseSerializer(OperationSerializer):
             'status',
             'agent_contact_person',
             'shipment_details',
+            'has_change_request',
         )
 
     def get_status(self, obj):
         return list(filter(lambda x: x[0] == obj.status, Booking.STATUS_CHOICES))[0][1]
+
+    def get_has_change_request(self, obj):
+        return True if obj.change_requests.exists() else False
 
 
 class OperationRetrieveSerializer(OperationListBaseSerializer):

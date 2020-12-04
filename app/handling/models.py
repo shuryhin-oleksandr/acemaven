@@ -583,7 +583,7 @@ class ClientPlatformSetting(models.Model):
         validators=[MinValueValidator(1)],
     )
     hide_carrier_name = models.BooleanField(
-        _('Hide/show carrier name in search results'),
+        _('Hide carrier name in search results'),
         default=False,
     )
     number_of_bids = models.PositiveIntegerField(

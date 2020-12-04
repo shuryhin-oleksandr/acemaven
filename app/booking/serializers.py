@@ -749,6 +749,7 @@ class OperationRetrieveSerializer(OperationListBaseSerializer):
     client_contact_person = serializers.CharField(source='client_contact_person.get_full_name')
     client = serializers.CharField(source='client_contact_person.get_company.name')
     shipper = ShipperSerializer()
+    change_requests = serializers.SerializerMethodField()
 
     class Meta(OperationListBaseSerializer.Meta):
         model = Booking
@@ -760,10 +761,9 @@ class OperationRetrieveSerializer(OperationListBaseSerializer):
             'change_requests',
         )
 
-    def get_fields(self):
-        fields = super(OperationRetrieveSerializer, self).get_fields()
-        fields['change_requests'] = OperationRetrieveSerializer(many=True)
-        return fields
+    def get_change_requests(self, obj):
+        serializer = OperationRetrieveSerializer(obj.change_requests.all(), many=True)
+        return serializer.data
 
     def get_week_range(self, obj):
         return {

@@ -565,6 +565,22 @@ class OperationViewSet(PermissionClassByActionMixin,
         operation.save()
         return Response(status=status.HTTP_200_OK)
 
+    @action(methods=['post'], detail=True, url_path='confirm_change_request')
+    def confirm_change_request(self, request, *args, **kwargs):
+        operation = self.get_object()
+        change_request = operation.change_requests.first()
+        operation.shipment_details.update(booking=change_request)
+        operation.delete()
+        return Response(status=status.HTTP_200_OK)
+
+    @action(methods=['post'], detail=True, url_path='cancel_change_request')
+    def cancel_change_request(self, request, *args, **kwargs):
+        operation = self.get_object()
+        change_request = operation.change_requests.first()
+        change_request.cargo_groups.delete()
+        operation.change_requests.first().delete()
+        return Response(status=status.HTTP_200_OK)
+
 
 class StatusViesSet(mixins.UpdateModelMixin,
                     viewsets.GenericViewSet):

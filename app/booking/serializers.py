@@ -573,11 +573,12 @@ class BookingSerializer(serializers.ModelSerializer):
                                                         booking_fee=booking_fee,
                                                         service_fee=service_fee,
                                                         calculate_fees=calculate_fees,)
-                validated_data['charges'] = result
-                validated_data['aceid'] = generate_aceid(freight_rate, company)
                 if result.get('pay_to_book', {}).get('pay_to_book', 0) == 0:
                     validated_data['is_paid'] = True
                     validated_data['status'] = Booking.REQUEST_RECEIVED
+                    del result['pay_to_book']
+                validated_data['charges'] = result
+                validated_data['aceid'] = generate_aceid(freight_rate, company)
                 booking = super().create(validated_data)
 
                 cargo_groups = [{**item, **{'booking': booking}} for item in cargo_groups]

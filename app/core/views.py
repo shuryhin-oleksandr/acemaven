@@ -13,7 +13,7 @@ from app.core.serializers import CompanySerializer, SignUpRequestSerializer, Use
     UserSignUpSerializer, BankAccountSerializer, UserMasterSerializer, UserSerializer, SelectChoiceSerializer, \
     UserBaseSerializerWithPhoto
 from app.core.utils import choice_to_value_name
-from app.booking.models import CargoGroup
+from app.booking.models import CargoGroup, CancellationReason
 from app.handling.models import ReleaseType, PackagingType, ContainerType
 
 
@@ -169,7 +169,11 @@ class SelectChoiceView(generics.GenericAPIView):
                 'container_type_air': {
                     'choice_type': 'model',
                     'data': ContainerType,
-                }
+                },
+                'cancellation_reason': {
+                    'choice_type': 'choice',
+                    'data': CancellationReason.REASON_CHOICES,
+                },
             }
             for model in models:
                 if model in allowed_models:

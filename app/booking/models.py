@@ -397,6 +397,41 @@ class Booking(models.Model):
         return f'Booking of rate [{self.freight_rate}]'
 
 
+class CancellationReason(models.Model):
+    """
+    Model to save cancellation reason and comments.
+    """
+    CONTRACT_EXPIRED = 'expired'
+    RATE_INCREASED = 'increased'
+    CANNOT_MEET_DATES = 'dates'
+    CLIENT_REQUESTED = 'client_requested'
+    OTHER = 'other'
+    REASON_CHOICES = (
+        (CONTRACT_EXPIRED, 'Freight contract has expired.'),
+        (RATE_INCREASED, 'Rate has been increased by Carrier.'),
+        (CANNOT_MEET_DATES, 'We cannot meet the dates requested by the client or there was no space availability for '
+                            'this shipment.'),
+        (CLIENT_REQUESTED, 'Client requested the cancellation.'),
+        (OTHER, 'Other'),
+    )
+
+    reason = models.CharField(
+        _('Cancellation reason'),
+        max_length=20,
+        choices=REASON_CHOICES,
+        null=True,
+    )
+    comment = models.TextField(
+        _('Comment to cancellation reason'),
+        null=True,
+    )
+    booking = models.ForeignKey(
+        'Booking',
+        related_name='reasons',
+        on_delete=models.CASCADE,
+    )
+
+
 class CargoGroup(models.Model):
     """
     Model for cargo group.

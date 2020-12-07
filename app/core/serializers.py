@@ -238,6 +238,7 @@ class SelectChoiceSerializer(serializers.Serializer):
     packaging_type = PackagingTypeBaseSerializer(many=True, required=False)
     container_type_sea = ContainerTypesBaseSerializer(many=True, required=False)
     container_type_air = ContainerTypesBaseSerializer(many=True, required=False)
+    cancellation_reason = serializers.ListField(required=False)
 
 
 class ShipperSerializer(serializers.ModelSerializer):

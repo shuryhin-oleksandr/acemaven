@@ -581,7 +581,7 @@ class BookingSerializer(serializers.ModelSerializer):
                 if result.get('pay_to_book', {}).get('pay_to_book', 0) == 0:
                     validated_data['is_paid'] = True
                     validated_data['status'] = Booking.REQUEST_RECEIVED
-                    del result['pay_to_book']
+                    result.pop('pay_to_book', None)
                 validated_data['charges'] = result
                 validated_data['aceid'] = generate_aceid(freight_rate, company)
                 booking = super().create(validated_data)

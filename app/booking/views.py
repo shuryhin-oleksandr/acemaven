@@ -13,7 +13,8 @@ from django.db.models import CharField, Case, When, Value, Q, Count
 from app.booking.filters import SurchargeFilterSet, FreightRateFilterSet, QuoteFilterSet, QuoteOrderingFilterBackend, \
     BookingFilterSet, BookingOrderingFilterBackend, OperationFilterSet, OperationOrderingFilterBackend
 from app.booking.mixins import FeeGetQuerysetMixin
-from app.booking.models import Surcharge, UsageFee, Charge, FreightRate, Rate, Quote, Booking, Status, ShipmentDetails
+from app.booking.models import Surcharge, UsageFee, Charge, FreightRate, Rate, Quote, Booking, Status, \
+    ShipmentDetails, CancellationReason
 from app.booking.serializers import SurchargeSerializer, SurchargeEditSerializer, SurchargeListSerializer, \
     SurchargeRetrieveSerializer, UsageFeeSerializer, ChargeSerializer, FreightRateListSerializer, \
     SurchargeCheckDatesSerializer, FreightRateEditSerializer, FreightRateSerializer, FreightRateRetrieveSerializer, \
@@ -512,6 +513,10 @@ class BookingViesSet(PermissionClassByActionMixin,
     @action(methods=['post'], detail=True, url_path='reject')
     def reject_booking(self, request, *args, **kwargs):
         booking = self.get_object()
+        data = request.data
+        data['agent_contact_person'] = request.user
+        data['booking'] = booking
+        CancellationReason.objects.create(**data)
         booking.status = Booking.REJECTED
         booking.save()
         return Response(status=status.HTTP_200_OK)
@@ -552,6 +557,10 @@ class OperationViewSet(PermissionClassByActionMixin,
         if request.user.get_company().type == Company.CLIENT:
             operation.status = Booking.CANCELED_BY_CLIENT
         else:
+            data = request.data
+            data['agent_contact_person'] = request.user
+            data['booking'] = operation
+            CancellationReason.objects.create(**data)
             operation.status = Booking.CANCELED_BY_AGENT
         operation.save()
         return Response(status=status.HTTP_200_OK)

@@ -4,7 +4,7 @@ from rest_framework import serializers
 from django.db.models import Min
 
 from app.booking.models import Surcharge, UsageFee, Charge, AdditionalSurcharge, FreightRate, Rate, CargoGroup, Quote, \
-    Booking, Status, ShipmentDetails
+    Booking, Status, ShipmentDetails, CancellationReason
 from app.booking.utils import rate_surcharges_filter, calculate_freight_rate_charges, get_fees, generate_aceid
 from app.core.models import Shipper
 from app.core.serializers import ShipperSerializer, BankAccountBaseSerializer
@@ -509,6 +509,17 @@ class QuoteClientListOrRetrieveSerializer(QuoteListBaseSerializer):
 
     def get_unchecked_offers(self, obj):
         return obj.statuses.filter(status=Status.SUBMITTED, is_viewed=False).count()
+
+
+class CancellationReasonSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CancellationReason
+        fields = (
+            'id',
+            'reason',
+            'comment',
+            'agent_contact_person',
+        )
 
 
 class BookingSerializer(serializers.ModelSerializer):

@@ -425,6 +425,15 @@ class CancellationReason(models.Model):
         _('Comment to cancellation reason'),
         null=True,
     )
+    date = models.DateField(
+        _('Date reason created'),
+        auto_now_add=True,
+    )
+    agent_contact_person = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.SET_NULL,
+        null=True,
+    )
     booking = models.ForeignKey(
         'Booking',
         related_name='reasons',

@@ -23,7 +23,7 @@ from app.booking.serializers import SurchargeSerializer, SurchargeEditSerializer
     QuoteClientListOrRetrieveSerializer, QuoteAgentListSerializer, QuoteAgentRetrieveSerializer, \
     QuoteStatusBaseSerializer, CargoGroupSerializer, BookingListBaseSerializer, BookingRetrieveSerializer, \
     ShipmentDetailsBaseSerializer, OperationSerializer, OperationListBaseSerializer, OperationRetrieveSerializer, \
-    OperationRetrieveClientSerializer
+    OperationRetrieveClientSerializer, OperationRecalculateSerializer
 from app.booking.utils import date_format, wm_calculate, freight_rate_search, calculate_freight_rate_charges, \
     get_fees, surcharge_search
 from app.core.mixins import PermissionClassByActionMixin
@@ -580,6 +580,29 @@ class OperationViewSet(PermissionClassByActionMixin,
         change_request.cargo_groups.delete()
         operation.change_requests.first().delete()
         return Response(status=status.HTTP_200_OK)
+
+    @action(methods=['post'], detail=True, url_path='recalculate')
+    def recalculate_charges(self, request, *args, **kwargs):
+        operation = self.get_object()
+        serializer = OperationRecalculateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.data
+
+        cargo_groups = data.get('cargo_groups')
+        container_type_ids_list = [group.get('container_type') for group in cargo_groups if 'container_type' in group]
+        main_currency_code = Currency.objects.filter(is_main=True).first().code
+        number_of_documents = data.get('number_of_documents')
+        result = calculate_freight_rate_charges(operation.freight_rate,
+                                                {},
+                                                cargo_groups,
+                                                operation.freight_rate.shipping_mode,
+                                                main_currency_code,
+                                                operation.date_from,
+                                                operation.date_to,
+                                                container_type_ids_list,
+                                                number_of_documents=number_of_documents)
+
+        return Response(data=result, status=status.HTTP_200_OK)
 
 
 class StatusViesSet(mixins.UpdateModelMixin,

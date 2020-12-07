@@ -397,6 +397,11 @@ class FreightRateSearchSerializer(serializers.Serializer):
     cargo_groups = CargoGroupSerializer(many=True)
 
 
+class OperationRecalculateSerializer(serializers.Serializer):
+    number_of_documents = serializers.IntegerField(min_value=1, required=False)
+    cargo_groups = CargoGroupSerializer(many=True)
+
+
 class WMCalculateSerializer(serializers.Serializer):
     shipping_type = serializers.ChoiceField(choices=ShippingType.objects.values_list('title', flat=True))
     weight_measurement = serializers.ChoiceField(choices=CargoGroup.WEIGHT_MEASUREMENT_CHOICES)

@@ -362,6 +362,7 @@ class CargoGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = CargoGroup
         fields = (
+            'id',
             'container_type',
             'packaging_type',
             'weight_measurement',
@@ -376,6 +377,14 @@ class CargoGroupSerializer(serializers.ModelSerializer):
             'description',
             'frozen',
         )
+
+
+class CargoGroupWithIdSerializer(CargoGroupSerializer):
+    id = serializers.IntegerField()
+
+    class Meta(CargoGroupSerializer.Meta):
+        model = CargoGroup
+        fields = CargoGroupSerializer.Meta.fields
 
 
 class CargoGroupRetrieveSerializer(CargoGroupSerializer):
@@ -399,7 +408,7 @@ class FreightRateSearchSerializer(serializers.Serializer):
 
 class OperationRecalculateSerializer(serializers.Serializer):
     number_of_documents = serializers.IntegerField(min_value=1, required=False)
-    cargo_groups = CargoGroupSerializer(many=True)
+    cargo_groups = CargoGroupWithIdSerializer(many=True)
 
 
 class WMCalculateSerializer(serializers.Serializer):

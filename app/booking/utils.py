@@ -195,6 +195,8 @@ def calculate_freight_rate_charges(freight_rate,
         exchange_rate = ExchangeRate.objects.filter(currency__code=rate.currency.code).first()
         for cargo_group in cargo_groups:
             new_cargo_group = dict()
+            if 'id' in cargo_group:
+                new_cargo_group['id'] = cargo_group['id']
             total_weight_per_pack, total_weight = wm_calculate(cargo_group, shipping_mode.shipping_type.title)
 
             new_cargo_group['freight'] = calculate_freight_rate(totals,
@@ -229,6 +231,8 @@ def calculate_freight_rate_charges(freight_rate,
         rates = freight_rate.rates.all()
         for cargo_group in cargo_groups:
             new_cargo_group = dict()
+            if 'id' in cargo_group:
+                new_cargo_group['id'] = cargo_group['id']
             rate = rates.filter(container_type=cargo_group.get('container_type')).first()
             exchange_rate = ExchangeRate.objects.filter(currency__code=rate.currency.code).first()
 

@@ -571,7 +571,7 @@ class OperationViewSet(PermissionClassByActionMixin,
         change_request = operation.change_requests.first()
         operation.shipment_details.update(booking=change_request)
         operation.delete()
-        return Response(status=status.HTTP_200_OK)
+        return Response(data={'id': change_request.id}, status=status.HTTP_200_OK)
 
     @action(methods=['post'], detail=True, url_path='cancel_change_request')
     def cancel_change_request(self, request, *args, **kwargs):

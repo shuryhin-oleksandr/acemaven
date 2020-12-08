@@ -380,7 +380,7 @@ class CargoGroupSerializer(serializers.ModelSerializer):
 
 
 class CargoGroupWithIdSerializer(CargoGroupSerializer):
-    id = serializers.IntegerField()
+    id = serializers.IntegerField(required=False)
 
     class Meta(CargoGroupSerializer.Meta):
         model = CargoGroup

@@ -222,6 +222,7 @@ def calculate_freight_rate_charges(freight_rate,
             packaging_type = cargo_group.get('packaging_type')
             new_cargo_group['cargo_type'] = ContainerType.objects.filter(id=container_type).first().code \
                 if container_type else PackagingType.objects.filter(id=packaging_type).first().description
+            new_cargo_group['total_wm'] = float(total_weight)
 
             result['cargo_groups'].append(new_cargo_group)
     else:

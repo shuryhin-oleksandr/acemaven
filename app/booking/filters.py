@@ -159,7 +159,12 @@ class OperationFilterSet(django_filters.FilterSet):
         if value == 'active':
             user = self.request.user
             if user.get_company().type == Company.CLIENT:
-                queryset = queryset.filter(status__in=(Booking.REQUEST_RECEIVED, Booking.PENDING))
+                queryset = queryset.filter(status__in=(
+                    Booking.PENDING,
+                    Booking.REQUEST_RECEIVED,
+                    Booking.ACCEPTED,
+                    Booking.CONFIRMED,
+                ))
             else:
                 queryset = queryset.filter(status__in=(Booking.ACCEPTED, Booking.CONFIRMED))
         elif value == 'completed':

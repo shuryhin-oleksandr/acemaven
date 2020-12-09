@@ -536,9 +536,13 @@ class OperationViewSet(PermissionClassByActionMixin,
         if company.type == Company.CLIENT:
             queryset = queryset.filter(client_contact_person__companies=company)
         else:
-            queryset = queryset.filter(freight_rate__company=company,
-                                       is_assigned=True,
-                                       is_paid=True,)
+            queryset = queryset.exclude(
+                status__in=(Booking.REQUEST_RECEIVED, Booking.PENDING, Booking.REJECTED)
+            ).filter(
+                freight_rate__company=company,
+                is_assigned=True,
+                is_paid=True,
+            )
         return queryset
 
     def get_serializer_class(self):
@@ -577,8 +581,7 @@ class OperationViewSet(PermissionClassByActionMixin,
     def cancel_change_request(self, request, *args, **kwargs):
         operation = self.get_object()
         change_request = operation.change_requests.first()
-        change_request.cargo_groups.delete()
-        operation.change_requests.first().delete()
+        change_request.delete()
         return Response(status=status.HTTP_200_OK)
 
     @action(methods=['post'], detail=True, url_path='recalculate')

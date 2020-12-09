@@ -135,6 +135,7 @@ class OperationFilterSet(django_filters.FilterSet):
     my_operations = django_filters.BooleanFilter(method='my_operations_filter', label='My Operations')
     aceid = django_filters.CharFilter(field_name='aceid', lookup_expr='icontains')
     carrier = django_filters.CharFilter(field_name='freight_rate__carrier__title', lookup_expr='icontains')
+    status = django_filters.CharFilter(method='status_filter', label='Operation statuses')
 
     class Meta:
         model = Booking
@@ -152,6 +153,23 @@ class OperationFilterSet(django_filters.FilterSet):
                 queryset = queryset.filter(client_contact_person=user)
             else:
                 queryset = queryset.filter(agent_contact_person=user)
+        return queryset
+
+    def status_filter(self, queryset, _, value):
+        if value == 'active':
+            user = self.request.user
+            if user.get_company().type == Company.CLIENT:
+                queryset = queryset.filter(status__in=(Booking.REQUEST_RECEIVED, Booking.PENDING))
+            else:
+                queryset = queryset.filter(status__in=(Booking.ACCEPTED, Booking.CONFIRMED))
+        elif value == 'completed':
+            queryset = queryset.filter(status__in=(Booking.COMPLETED,))
+        elif value == 'canceled':
+            queryset = queryset.filter(status__in=(
+                Booking.CANCELED_BY_AGENT,
+                Booking.CANCELED_BY_CLIENT,
+                Booking.REJECTED,
+            ))
         return queryset
 
 

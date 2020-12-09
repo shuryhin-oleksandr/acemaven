@@ -310,6 +310,7 @@ class Booking(models.Model):
     REJECTED = 'rejected'
     CANCELED_BY_AGENT = 'canceled_by_agent'
     CANCELED_BY_CLIENT = 'canceled_by_client'
+    COMPLETED = 'completed'
     STATUS_CHOICES = (
         (CONFIRMED, 'Booking Confirmed'),
         (ACCEPTED, 'Booking Request in Progress'),
@@ -318,6 +319,7 @@ class Booking(models.Model):
         (REJECTED, 'Booking Request Rejected'),
         (CANCELED_BY_AGENT, 'Operation Canceled by Agent'),
         (CANCELED_BY_CLIENT, 'Operation Canceled by Client'),
+        (COMPLETED, 'Operation Complete'),
     )
 
     aceid = models.CharField(

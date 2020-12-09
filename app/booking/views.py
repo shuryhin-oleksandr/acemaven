@@ -474,12 +474,15 @@ class BookingViesSet(PermissionClassByActionMixin,
     def get_queryset(self):
         company = self.request.user.get_company()
         queryset = self.queryset
+        if self.action != 'assign_booking_to_agent':
+            queryset = queryset.filter(
+                is_assigned=False,
+                status=Booking.REQUEST_RECEIVED
+            )
         return queryset.filter(
             original_booking__isnull=True,
-            is_assigned=False,
             freight_rate__company=company,
-            is_paid=True,
-            status=Booking.REQUEST_RECEIVED
+            is_paid=True
         )
 
     def get_serializer_class(self):

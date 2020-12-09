@@ -583,8 +583,8 @@ class OperationViewSet(PermissionClassByActionMixin,
     @action(methods=['post'], detail=True, url_path='cancel_change_request')
     def cancel_change_request(self, request, *args, **kwargs):
         operation = self.get_object()
-        change_request = operation.change_requests.first()
-        change_request.delete()
+        change_requests = operation.change_requests.all()
+        change_requests.delete()
         return Response(status=status.HTTP_200_OK)
 
     @action(methods=['post'], detail=True, url_path='recalculate')

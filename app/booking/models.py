@@ -42,6 +42,10 @@ class Surcharge(models.Model):
         _('Temporary surcharge or not'),
         default=False,
     )
+    is_archived = models.BooleanField(
+        _('Surcharge is archived'),
+        default=False,
+    )
     shipping_mode = models.ForeignKey(
         'handling.ShippingMode',
         on_delete=models.CASCADE,
@@ -235,6 +239,10 @@ class FreightRate(models.Model):
     )
     temporary = models.BooleanField(
         _('Temporary freight rate or not'),
+        default=False,
+    )
+    is_archived = models.BooleanField(
+        _('Freight rate is archived'),
         default=False,
     )
     shipping_mode = models.ForeignKey(

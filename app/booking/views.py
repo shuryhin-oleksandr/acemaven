@@ -56,7 +56,11 @@ class SurchargeViesSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        return self.queryset.filter(company=user.get_company(), temporary=False)
+        return self.queryset.filter(
+            company=user.get_company(),
+            temporary=False,
+            is_archived=False,
+        )
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -121,7 +125,11 @@ class FreightRateViesSet(PermissionClassByActionMixin,
     def get_queryset(self):
         user = self.request.user
         temporary = True if self.action == 'save_freight_rate' else False
-        queryset = self.queryset.filter(company=user.get_company(), temporary=temporary,)
+        queryset = self.queryset.filter(
+            company=user.get_company(),
+            temporary=temporary,
+            is_archived=False,
+        )
         if self.action == 'list':
             return queryset.annotate(direction=Case(
                 When(origin__code__startswith=MAIN_COUNTRY_CODE, then=Value('export')),
@@ -162,7 +170,8 @@ class FreightRateViesSet(PermissionClassByActionMixin,
                                                  origin=freight_rate.origin,
                                                  destination=freight_rate.destination,
                                                  carrier=freight_rate.carrier,
-                                                 temporary=False,)
+                                                 temporary=False,
+                                                 is_archived=False,)
         shipping_mode = freight_rate.shipping_mode
 
         rates = freight_rate.rates.all()
@@ -231,6 +240,7 @@ class FreightRateViesSet(PermissionClassByActionMixin,
             Q(Q(**start_date_fields), Q(**end_date_fields), _connector='OR'),
             company=user.get_company(),
             temporary=False,
+            is_archived=False,
         ).order_by('start_date').first()
         data = {}
         if surcharge:
@@ -314,7 +324,7 @@ class QuoteViesSet(PermissionClassByActionMixin,
     permission_classes_by_action = {
         'list': (IsAuthenticated, IsClientCompany,),
         'get_agent_quotes_list': (IsAuthenticated, IsAgentCompany,),
-        'freight_rate_search': (IsAuthenticated, IsAgentCompany,),
+        'surcharge_search': (IsAuthenticated, IsAgentCompany,),
         'submit_quote': (IsAuthenticated, IsAgentCompany,),
         'reject_quote': (IsAuthenticated, IsAgentCompany,),
         'withdraw_quote': (IsAuthenticated, IsAgentCompany,),
@@ -375,7 +385,7 @@ class QuoteViesSet(PermissionClassByActionMixin,
         return Response(serializer.data)
 
     @action(methods=['post'], detail=False, url_path='surcharge-search')
-    def freight_rate_search(self, request, *args, **kwargs):
+    def surcharge_search(self, request, *args, **kwargs):
         user = request.user
         serializer = FreightRateSearchSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

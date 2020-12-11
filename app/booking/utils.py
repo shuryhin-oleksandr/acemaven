@@ -38,6 +38,7 @@ def rate_surcharges_filter(rate, company, temporary=False):
         Q(**filter_fields),
         Q(Q(**start_date_fields), Q(**end_date_fields), _connector='OR'),
         company=company,
+        is_archived=False,
     )
     if not temporary:
         surcharges = surcharges.filter(temporary=temporary)
@@ -363,6 +364,7 @@ def surcharge_search(data, company):
         'shipping_mode': shipping_mode,
         'company': company,
         'temporary': False,
+        'is_archived': False,
         'start_date__lte': date_from,
         'expiration_date__gte': date_to,
     }
@@ -398,7 +400,12 @@ def freight_rate_search(data, company=None):
     data['rates__surcharges__start_date__lte'] = date_from
     data['rates__surcharges__expiration_date__gte'] = date_to
 
-    freight_rates = FreightRate.objects.filter(**data, is_active=True, temporary=False)
+    freight_rates = FreightRate.objects.filter(
+        **data,
+        is_active=True,
+        temporary=False,
+        is_archived=False,
+    )
 
     if shipping_mode.has_freight_containers:
         for container_type_id in container_type_ids_list:
@@ -441,3 +448,59 @@ def generate_aceid(freight_rate, company):
             f'{random.choices(vowels_or_consonants)[0]}' \
             f'{"".join(random.choices(string.digits, k=4))}'
     return aceid
+
+
+def make_copy_of_surcharge(surcharge, usage_fee_id=None, charge_id=None):
+    original_surcharge_id = surcharge.id
+    original_surcharge = Surcharge.objects.get(id=original_surcharge_id)
+
+    item = None
+
+    surcharge.pk = None
+    surcharge.save()
+
+    for usage_fee in original_surcharge.usage_fees.all():
+        old_usage_fee_id = usage_fee.id
+        usage_fee.pk = None
+        usage_fee.surcharge = surcharge
+        usage_fee.save()
+        if usage_fee_id and old_usage_fee_id == usage_fee_id:
+            item = usage_fee
+
+    for charge in original_surcharge.charges.all():
+        old_charge_id = charge.id
+        charge.pk = None
+        charge.surcharge = surcharge
+        charge.save()
+        if charge_id and old_charge_id == charge_id:
+            item = charge
+
+    original_surcharge.is_archived = True
+    original_surcharge.save()
+
+    return surcharge, item
+
+
+def make_copy_of_freight_rate(freight_rate, rate_id=None):
+    original_freight_rate_id = freight_rate.id
+    original_freight_rate = FreightRate.objects.get(id=original_freight_rate_id)
+
+    item = None
+
+    freight_rate.pk = None
+    freight_rate.save()
+
+    for rate in original_freight_rate.rates.all():
+        old_rate_id = rate.id
+        surcharges = rate.surcharges.all()
+        rate.pk = None
+        rate.freight_rate = freight_rate
+        rate.save()
+        rate.surcharges.set(surcharges)
+        if rate_id and old_rate_id == rate_id:
+            item = rate
+
+    original_freight_rate.is_archived = True
+    original_freight_rate.save()
+
+    return freight_rate, item

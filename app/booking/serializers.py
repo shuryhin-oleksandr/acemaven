@@ -5,7 +5,8 @@ from django.db.models import Min
 
 from app.booking.models import Surcharge, UsageFee, Charge, AdditionalSurcharge, FreightRate, Rate, CargoGroup, Quote, \
     Booking, Status, ShipmentDetails, CancellationReason
-from app.booking.utils import rate_surcharges_filter, calculate_freight_rate_charges, get_fees, generate_aceid
+from app.booking.utils import rate_surcharges_filter, calculate_freight_rate_charges, get_fees, generate_aceid, \
+    make_copy_of_surcharge, make_copy_of_freight_rate
 from app.core.models import Shipper
 from app.core.serializers import ShipperSerializer, BankAccountBaseSerializer
 from app.handling.models import ShippingType, ClientPlatformSetting, Currency
@@ -43,7 +44,7 @@ class AdditionalSurchargesSerializer(serializers.ModelSerializer):
         )
 
 
-class UsageFeeSerializer(UserUpdateMixin, serializers.ModelSerializer):
+class UsageFeeSerializer(serializers.ModelSerializer):
     class Meta:
         model = UsageFee
         fields = (
@@ -51,7 +52,15 @@ class UsageFeeSerializer(UserUpdateMixin, serializers.ModelSerializer):
             'container_type',
             'currency',
             'charge',
+            'surcharge',
         )
+
+    def update(self, instance, validated_data):
+        surcharge = instance.surcharge
+        _, instance = make_copy_of_surcharge(surcharge, usage_fee_id=instance.id)
+        validated_data['updated_by'] = self.context['request'].user
+        super().update(instance, validated_data)
+        return instance
 
 
 class UsageFeeEditSerializer(UserFullNameGetMixin, UsageFeeSerializer):
@@ -67,7 +76,7 @@ class UsageFeeEditSerializer(UserFullNameGetMixin, UsageFeeSerializer):
         )
 
 
-class ChargeSerializer(UserUpdateMixin, serializers.ModelSerializer):
+class ChargeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Charge
         fields = (
@@ -76,7 +85,15 @@ class ChargeSerializer(UserUpdateMixin, serializers.ModelSerializer):
             'currency',
             'charge',
             'conditions',
+            'surcharge',
         )
+
+    def update(self, instance, validated_data):
+        surcharge = instance.surcharge
+        _, instance = make_copy_of_surcharge(surcharge, charge_id=instance.id)
+        validated_data['updated_by'] = self.context['request'].user
+        super().update(instance, validated_data)
+        return instance
 
 
 class ChargeEditSerializer(UserFullNameGetMixin, ChargeSerializer):
@@ -174,6 +191,11 @@ class SurchargeSerializer(SurchargeEditSerializer):
         Charge.objects.bulk_create(new_charges)
         return surcharge
 
+    def update(self, instance, validated_data):
+        instance, _ = make_copy_of_surcharge(instance)
+        super().update(instance, validated_data)
+        return instance
+
 
 class SurchargeRetrieveSerializer(SurchargeSerializer):
     carrier = CarrierBaseSerializer()
@@ -200,15 +222,18 @@ class RateSerializer(serializers.ModelSerializer):
             'rate',
             'start_date',
             'expiration_date',
+            'freight_rate',
         )
 
     def update(self, instance, validated_data):
+        freight_rate = instance.freight_rate
+        _, instance = make_copy_of_freight_rate(freight_rate, rate_id=instance.id)
         user = self.context['request'].user
         company = user.get_company()
         validated_data['updated_by'] = user
-        rate = super().update(instance, validated_data)
-        surcharges = rate_surcharges_filter(rate, company)
-        rate.surcharges.set(surcharges)
+        super().update(instance, validated_data)
+        surcharges = rate_surcharges_filter(instance, company)
+        instance.surcharges.set(surcharges)
         return instance
 
 
@@ -311,6 +336,7 @@ class FreightRateSerializer(FreightRateEditSerializer):
                     **{key: value for key, value in validated_data.items()
                        if key not in ('transit_time', 'carrier_disclosure')},
                     temporary=False,
+                    is_archived=False,
                 )
                 new_not_empty_rates = list(filter(lambda x: x.get('start_date'), rates))
                 for existing_freight_rate in existing_freight_rates:
@@ -332,6 +358,11 @@ class FreightRateSerializer(FreightRateEditSerializer):
                 surcharges = rate_surcharges_filter(rate, company, temporary=temporary)
                 rate.surcharges.set(surcharges)
         return new_freight_rate
+
+    def update(self, instance, validated_data):
+        instance, _ = make_copy_of_freight_rate(instance)
+        super().update(instance, validated_data)
+        return instance
 
 
 class FreightRateRetrieveSerializer(FreightRateSerializer):

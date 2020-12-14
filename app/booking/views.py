@@ -25,7 +25,7 @@ from app.booking.serializers import SurchargeSerializer, SurchargeEditSerializer
     ShipmentDetailsBaseSerializer, OperationSerializer, OperationListBaseSerializer, OperationRetrieveSerializer, \
     OperationRetrieveClientSerializer, OperationRecalculateSerializer
 from app.booking.utils import date_format, wm_calculate, freight_rate_search, calculate_freight_rate_charges, \
-    get_fees, surcharge_search
+    get_fees, surcharge_search, make_copy_of_surcharge, make_copy_of_freight_rate
 from app.core.mixins import PermissionClassByActionMixin
 from app.core.models import Company
 from app.core.permissions import IsMasterOrAgent, IsClientCompany, IsAgentCompany, IsMaster
@@ -90,6 +90,21 @@ class UsageFeeViesSet(FeeGetQuerysetMixin,
     serializer_class = UsageFeeSerializer
     permission_classes = (IsAuthenticated, IsMasterOrAgent, )
 
+    @transaction.atomic
+    @action(methods=['post'], detail=False, url_path='patch')
+    def usage_fee_patch(self, request, *args, **kwargs):
+        data = request.data
+        surcharge = Surcharge.objects.filter(id=data.get('surcharge')).first()
+        if surcharge:
+            surcharge, fees_map = make_copy_of_surcharge(surcharge, get_usage_fees_map=True)
+            for usage_fee in data.get('usage_fees'):
+                old_usage_fee_id = usage_fee.pop('id')
+                serializer = self.get_serializer(fees_map[old_usage_fee_id], data=usage_fee, partial=True)
+                serializer.is_valid(raise_exception=True)
+                self.perform_update(serializer)
+            return Response(data={'surcharge': surcharge.id}, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
 
 class ChargeViesSet(FeeGetQuerysetMixin,
                     mixins.CreateModelMixin,
@@ -98,6 +113,21 @@ class ChargeViesSet(FeeGetQuerysetMixin,
     queryset = Charge.objects.all()
     serializer_class = ChargeSerializer
     permission_classes = (IsAuthenticated, IsMasterOrAgent, )
+
+    @transaction.atomic
+    @action(methods=['post'], detail=False, url_path='patch')
+    def charge_patch(self, request, *args, **kwargs):
+        data = request.data
+        surcharge = Surcharge.objects.filter(id=data.get('surcharge')).first()
+        if surcharge:
+            surcharge, fees_map = make_copy_of_surcharge(surcharge, get_charges_map=True)
+            for charge in data.get('charges'):
+                old_charge_id = charge.pop('id')
+                serializer = self.get_serializer(fees_map[old_charge_id], data=charge, partial=True)
+                serializer.is_valid(raise_exception=True)
+                self.perform_update(serializer)
+            return Response(data={'surcharge': surcharge.id}, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class FreightRateViesSet(PermissionClassByActionMixin,
@@ -298,6 +328,21 @@ class RateViesSet(mixins.CreateModelMixin,
     def get_queryset(self):
         user = self.request.user
         return self.queryset.filter(freight_rate__company=user.get_company())
+
+    @transaction.atomic
+    @action(methods=['post'], detail=False, url_path='patch')
+    def rate_patch(self, request, *args, **kwargs):
+        data = request.data
+        freight_rate = FreightRate.objects.filter(id=data.get('freight_rate')).first()
+        if freight_rate:
+            freight_rate, fees_map = make_copy_of_freight_rate(freight_rate, get_rates_map=True)
+            for rate in data.get('rates'):
+                old_rate_id = rate.pop('id')
+                serializer = self.get_serializer(fees_map[old_rate_id], data=rate, partial=True)
+                serializer.is_valid(raise_exception=True)
+                self.perform_update(serializer)
+            return Response(data={'freight_rate': freight_rate.id}, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class WMCalculateView(generics.GenericAPIView):

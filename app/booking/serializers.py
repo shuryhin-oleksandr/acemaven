@@ -44,7 +44,7 @@ class AdditionalSurchargesSerializer(serializers.ModelSerializer):
         )
 
 
-class UsageFeeSerializer(serializers.ModelSerializer):
+class UsageFeeSerializer(UserUpdateMixin, serializers.ModelSerializer):
     class Meta:
         model = UsageFee
         fields = (
@@ -54,13 +54,6 @@ class UsageFeeSerializer(serializers.ModelSerializer):
             'charge',
             'surcharge',
         )
-
-    def update(self, instance, validated_data):
-        surcharge = instance.surcharge
-        _, instance = make_copy_of_surcharge(surcharge, usage_fee_id=instance.id)
-        validated_data['updated_by'] = self.context['request'].user
-        super().update(instance, validated_data)
-        return instance
 
 
 class UsageFeeEditSerializer(UserFullNameGetMixin, UsageFeeSerializer):
@@ -76,7 +69,7 @@ class UsageFeeEditSerializer(UserFullNameGetMixin, UsageFeeSerializer):
         )
 
 
-class ChargeSerializer(serializers.ModelSerializer):
+class ChargeSerializer(UserUpdateMixin, serializers.ModelSerializer):
     class Meta:
         model = Charge
         fields = (
@@ -87,13 +80,6 @@ class ChargeSerializer(serializers.ModelSerializer):
             'conditions',
             'surcharge',
         )
-
-    def update(self, instance, validated_data):
-        surcharge = instance.surcharge
-        _, instance = make_copy_of_surcharge(surcharge, charge_id=instance.id)
-        validated_data['updated_by'] = self.context['request'].user
-        super().update(instance, validated_data)
-        return instance
 
 
 class ChargeEditSerializer(UserFullNameGetMixin, ChargeSerializer):
@@ -226,8 +212,6 @@ class RateSerializer(serializers.ModelSerializer):
         )
 
     def update(self, instance, validated_data):
-        freight_rate = instance.freight_rate
-        _, instance = make_copy_of_freight_rate(freight_rate, rate_id=instance.id)
         user = self.context['request'].user
         company = user.get_company()
         validated_data['updated_by'] = user

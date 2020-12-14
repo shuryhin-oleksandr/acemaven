@@ -450,11 +450,11 @@ def generate_aceid(freight_rate, company):
     return aceid
 
 
-def make_copy_of_surcharge(surcharge, usage_fee_id=None, charge_id=None):
+def make_copy_of_surcharge(surcharge, get_usage_fees_map=False, get_charges_map=False):
     original_surcharge_id = surcharge.id
     original_surcharge = Surcharge.objects.get(id=original_surcharge_id)
 
-    item = None
+    fees_map = dict()
 
     surcharge.pk = None
     surcharge.save()
@@ -464,28 +464,28 @@ def make_copy_of_surcharge(surcharge, usage_fee_id=None, charge_id=None):
         usage_fee.pk = None
         usage_fee.surcharge = surcharge
         usage_fee.save()
-        if usage_fee_id and old_usage_fee_id == usage_fee_id:
-            item = usage_fee
+        if get_usage_fees_map:
+            fees_map[old_usage_fee_id] = usage_fee
 
     for charge in original_surcharge.charges.all():
         old_charge_id = charge.id
         charge.pk = None
         charge.surcharge = surcharge
         charge.save()
-        if charge_id and old_charge_id == charge_id:
-            item = charge
+        if get_charges_map:
+            fees_map[old_charge_id] = charge
 
     original_surcharge.is_archived = True
     original_surcharge.save()
 
-    return surcharge, item
+    return surcharge, fees_map
 
 
-def make_copy_of_freight_rate(freight_rate, rate_id=None):
+def make_copy_of_freight_rate(freight_rate, get_rates_map=False):
     original_freight_rate_id = freight_rate.id
     original_freight_rate = FreightRate.objects.get(id=original_freight_rate_id)
 
-    item = None
+    fees_map = dict()
 
     freight_rate.pk = None
     freight_rate.save()
@@ -497,10 +497,10 @@ def make_copy_of_freight_rate(freight_rate, rate_id=None):
         rate.freight_rate = freight_rate
         rate.save()
         rate.surcharges.set(surcharges)
-        if rate_id and old_rate_id == rate_id:
-            item = rate
+        if get_rates_map:
+            fees_map[old_rate_id] = rate
 
     original_freight_rate.is_archived = True
     original_freight_rate.save()
 
-    return freight_rate, item
+    return freight_rate, fees_map

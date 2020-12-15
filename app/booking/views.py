@@ -529,6 +529,11 @@ class BookingViesSet(PermissionClassByActionMixin,
     def get_queryset(self):
         company = self.request.user.get_company()
         queryset = self.queryset
+        if self.action in ('update', 'partial_update'):
+            return queryset.filter(
+                is_assigned=False,
+                status__in=(Booking.PENDING, Booking.REQUEST_RECEIVED),
+            )
         if self.action != 'assign_booking_to_agent':
             queryset = queryset.filter(
                 is_assigned=False,

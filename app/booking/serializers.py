@@ -764,6 +764,7 @@ class OperationListBaseSerializer(OperationSerializer):
     cargo_groups = CargoGroupRetrieveSerializer(many=True)
     shipment_details = ShipmentDetailsBaseSerializer(many=True)
     has_change_request = serializers.SerializerMethodField()
+    can_be_patched = serializers.SerializerMethodField()
 
     class Meta(OperationSerializer.Meta):
         model = Booking
@@ -773,6 +774,7 @@ class OperationListBaseSerializer(OperationSerializer):
             'agent_contact_person',
             'shipment_details',
             'has_change_request',
+            'can_be_patched',
         )
 
     def get_status(self, obj):
@@ -780,6 +782,9 @@ class OperationListBaseSerializer(OperationSerializer):
 
     def get_has_change_request(self, obj):
         return True if obj.change_requests.exists() else False
+
+    def get_can_be_patched(self, obj):
+        return True if obj.status in (Booking.PENDING, Booking.REQUEST_RECEIVED) else False
 
 
 class OperationRetrieveSerializer(OperationListBaseSerializer):
@@ -813,13 +818,11 @@ class OperationRetrieveSerializer(OperationListBaseSerializer):
 
 class OperationRetrieveClientSerializer(OperationRetrieveSerializer):
     agent_bank_account = serializers.SerializerMethodField()
-    can_be_patched = serializers.SerializerMethodField()
 
     class Meta(OperationRetrieveSerializer.Meta):
         model = Booking
         fields = OperationRetrieveSerializer.Meta.fields + (
             'agent_bank_account',
-            'can_be_patched',
         )
 
     def get_agent_bank_account(self, obj):
@@ -828,9 +831,6 @@ class OperationRetrieveClientSerializer(OperationRetrieveSerializer):
             if bank_account:
                 return BankAccountBaseSerializer(bank_account).data
         return {}
-
-    def get_can_be_patched(self, obj):
-        return True if obj.status in (Booking.PENDING, Booking.REQUEST_RECEIVED) else False
 
 
 class QuoteStatusBaseSerializer(serializers.ModelSerializer):

@@ -518,34 +518,34 @@ class BookingViesSet(PermissionClassByActionMixin,
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
     permission_classes = (IsAuthenticated, )
-    # permission_classes_by_action = {
-    #     'create': (IsAuthenticated, IsClientCompany,),
-    #     'update': (IsAuthenticated, IsClientCompany,),
-    #     'partial_update': (IsAuthenticated, IsClientCompany,),
-    #     'assign_booking_to_agent': (IsAuthenticated, IsAgentCompany, IsMaster,),
-    #     'reject_booking': (IsAuthenticated, IsAgentCompany,),
-    # }
+    permission_classes_by_action = {
+        'create': (IsAuthenticated, IsClientCompany,),
+        'update': (IsAuthenticated, IsClientCompany,),
+        'partial_update': (IsAuthenticated, IsClientCompany,),
+        'assign_booking_to_agent': (IsAuthenticated, IsAgentCompany, IsMaster,),
+        'reject_booking': (IsAuthenticated, IsAgentCompany,),
+    }
     filter_class = BookingFilterSet
     filter_backends = (BookingOrderingFilterBackend, rest_framework.DjangoFilterBackend,)
 
-    # def get_queryset(self):
-    #     company = self.request.user.get_company()
-    #     queryset = self.queryset
-    #     if self.action in ('update', 'partial_update'):
-    #         return queryset.filter(
-    #             is_assigned=False,
-    #             status__in=(Booking.PENDING, Booking.REQUEST_RECEIVED),
-    #         )
-    #     if self.action != 'assign_booking_to_agent':
-    #         queryset = queryset.filter(
-    #             is_assigned=False,
-    #             status=Booking.REQUEST_RECEIVED
-    #         )
-    #     return queryset.filter(
-    #         original_booking__isnull=True,
-    #         freight_rate__company=company,
-    #         is_paid=True
-    #     )
+    def get_queryset(self):
+        company = self.request.user.get_company()
+        queryset = self.queryset
+        if self.action in ('update', 'partial_update'):
+            return queryset.filter(
+                is_assigned=False,
+                status__in=(Booking.PENDING, Booking.REQUEST_RECEIVED),
+            )
+        if self.action != 'assign_booking_to_agent':
+            queryset = queryset.filter(
+                is_assigned=False,
+                status=Booking.REQUEST_RECEIVED
+            )
+        return queryset.filter(
+            original_booking__isnull=True,
+            freight_rate__company=company,
+            is_paid=True
+        )
 
     def get_serializer_class(self):
         if self.action == 'list':

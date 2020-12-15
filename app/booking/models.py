@@ -804,3 +804,17 @@ class Transaction(models.Model):
         related_name='transactions',
         null=True,
     )
+
+
+class Track(models.Model):
+    """
+    Temporary model for tracking json.
+    """
+
+    date_created = models.DateTimeField(
+        _('Date the track object created'),
+        auto_now_add=True,
+    )
+    data = models.JSONField(
+        _('Json data from tracking api'),
+    )

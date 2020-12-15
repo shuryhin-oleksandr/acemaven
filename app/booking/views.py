@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 from django_filters import rest_framework
 from rest_framework import mixins, viewsets, filters, status, generics
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
 from django.db import transaction
@@ -14,7 +14,7 @@ from app.booking.filters import SurchargeFilterSet, FreightRateFilterSet, QuoteF
     BookingFilterSet, BookingOrderingFilterBackend, OperationFilterSet, OperationOrderingFilterBackend
 from app.booking.mixins import FeeGetQuerysetMixin
 from app.booking.models import Surcharge, UsageFee, Charge, FreightRate, Rate, Quote, Booking, Status, \
-    ShipmentDetails, CancellationReason, CargoGroup
+    ShipmentDetails, CancellationReason, CargoGroup, Track
 from app.booking.serializers import SurchargeSerializer, SurchargeEditSerializer, SurchargeListSerializer, \
     SurchargeRetrieveSerializer, UsageFeeSerializer, ChargeSerializer, FreightRateListSerializer, \
     SurchargeCheckDatesSerializer, FreightRateEditSerializer, FreightRateSerializer, FreightRateRetrieveSerializer, \
@@ -23,7 +23,7 @@ from app.booking.serializers import SurchargeSerializer, SurchargeEditSerializer
     QuoteClientListOrRetrieveSerializer, QuoteAgentListSerializer, QuoteAgentRetrieveSerializer, \
     QuoteStatusBaseSerializer, CargoGroupSerializer, BookingListBaseSerializer, BookingRetrieveSerializer, \
     ShipmentDetailsBaseSerializer, OperationSerializer, OperationListBaseSerializer, OperationRetrieveSerializer, \
-    OperationRetrieveClientSerializer, OperationRecalculateSerializer
+    OperationRetrieveClientSerializer, OperationRecalculateSerializer, TrackSerializer
 from app.booking.utils import date_format, wm_calculate, freight_rate_search, calculate_freight_rate_charges, \
     get_fees, surcharge_search, make_copy_of_surcharge, make_copy_of_freight_rate
 from app.core.mixins import PermissionClassByActionMixin
@@ -738,3 +738,10 @@ class ShipmentDetailsViesSet(viewsets.ModelViewSet):
     queryset = ShipmentDetails.objects.all()
     serializer_class = ShipmentDetailsBaseSerializer
     permission_classes = (IsAuthenticated, )
+
+
+class TrackView(mixins.CreateModelMixin,
+                viewsets.GenericViewSet):
+    queryset = Track.objects.all()
+    serializer_class = TrackSerializer
+    permission_classes = (AllowAny,)

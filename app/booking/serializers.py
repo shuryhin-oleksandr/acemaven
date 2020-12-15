@@ -4,7 +4,7 @@ from rest_framework import serializers
 from django.db.models import Min
 
 from app.booking.models import Surcharge, UsageFee, Charge, AdditionalSurcharge, FreightRate, Rate, CargoGroup, Quote, \
-    Booking, Status, ShipmentDetails, CancellationReason
+    Booking, Status, ShipmentDetails, CancellationReason, Track
 from app.booking.utils import rate_surcharges_filter, calculate_freight_rate_charges, get_fees, generate_aceid, \
     make_copy_of_surcharge, make_copy_of_freight_rate
 from app.core.models import Shipper
@@ -853,3 +853,12 @@ class QuoteStatusRetrieveSerializer(QuoteStatusBaseSerializer):
     class Meta(QuoteStatusBaseSerializer.Meta):
         fields = QuoteStatusBaseSerializer.Meta.fields
         model = Status
+
+
+class TrackSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Track
+        fields = (
+            'id',
+            'data',
+        )

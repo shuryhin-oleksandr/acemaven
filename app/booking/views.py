@@ -14,7 +14,7 @@ from app.booking.filters import SurchargeFilterSet, FreightRateFilterSet, QuoteF
     BookingFilterSet, BookingOrderingFilterBackend, OperationFilterSet, OperationOrderingFilterBackend
 from app.booking.mixins import FeeGetQuerysetMixin
 from app.booking.models import Surcharge, UsageFee, Charge, FreightRate, Rate, Quote, Booking, Status, \
-    ShipmentDetails, CancellationReason
+    ShipmentDetails, CancellationReason, CargoGroup
 from app.booking.serializers import SurchargeSerializer, SurchargeEditSerializer, SurchargeListSerializer, \
     SurchargeRetrieveSerializer, UsageFeeSerializer, ChargeSerializer, FreightRateListSerializer, \
     SurchargeCheckDatesSerializer, FreightRateEditSerializer, FreightRateSerializer, FreightRateRetrieveSerializer, \
@@ -518,34 +518,34 @@ class BookingViesSet(PermissionClassByActionMixin,
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
     permission_classes = (IsAuthenticated, )
-    permission_classes_by_action = {
-        'create': (IsAuthenticated, IsClientCompany,),
-        'update': (IsAuthenticated, IsClientCompany,),
-        'partial_update': (IsAuthenticated, IsClientCompany,),
-        'assign_booking_to_agent': (IsAuthenticated, IsAgentCompany, IsMaster,),
-        'reject_booking': (IsAuthenticated, IsAgentCompany,),
-    }
+    # permission_classes_by_action = {
+    #     'create': (IsAuthenticated, IsClientCompany,),
+    #     'update': (IsAuthenticated, IsClientCompany,),
+    #     'partial_update': (IsAuthenticated, IsClientCompany,),
+    #     'assign_booking_to_agent': (IsAuthenticated, IsAgentCompany, IsMaster,),
+    #     'reject_booking': (IsAuthenticated, IsAgentCompany,),
+    # }
     filter_class = BookingFilterSet
     filter_backends = (BookingOrderingFilterBackend, rest_framework.DjangoFilterBackend,)
 
-    def get_queryset(self):
-        company = self.request.user.get_company()
-        queryset = self.queryset
-        if self.action in ('update', 'partial_update'):
-            return queryset.filter(
-                is_assigned=False,
-                status__in=(Booking.PENDING, Booking.REQUEST_RECEIVED),
-            )
-        if self.action != 'assign_booking_to_agent':
-            queryset = queryset.filter(
-                is_assigned=False,
-                status=Booking.REQUEST_RECEIVED
-            )
-        return queryset.filter(
-            original_booking__isnull=True,
-            freight_rate__company=company,
-            is_paid=True
-        )
+    # def get_queryset(self):
+    #     company = self.request.user.get_company()
+    #     queryset = self.queryset
+    #     if self.action in ('update', 'partial_update'):
+    #         return queryset.filter(
+    #             is_assigned=False,
+    #             status__in=(Booking.PENDING, Booking.REQUEST_RECEIVED),
+    #         )
+    #     if self.action != 'assign_booking_to_agent':
+    #         queryset = queryset.filter(
+    #             is_assigned=False,
+    #             status=Booking.REQUEST_RECEIVED
+    #         )
+    #     return queryset.filter(
+    #         original_booking__isnull=True,
+    #         freight_rate__company=company,
+    #         is_paid=True
+    #     )
 
     def get_serializer_class(self):
         if self.action == 'list':
@@ -563,6 +563,32 @@ class BookingViesSet(PermissionClassByActionMixin,
         booking = Booking.objects.get(id=new_booking_id)
         data = BookingRetrieveSerializer(booking).data
         return Response(data=data, status=status.HTTP_201_CREATED, headers=headers)
+
+    @transaction.atomic
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        data = request.data
+        cargo_groups = data.pop('cargo_groups', {})
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        for cargo_group in cargo_groups:
+            cargo_group_serializer = CargoGroupSerializer(
+                CargoGroup.objects.filter(id=cargo_group.get('id')).first(),
+                data=cargo_group,
+                partial=True,
+            )
+            cargo_group_serializer.is_valid(raise_exception=True)
+            self.perform_update(cargo_group_serializer)
+
+        if getattr(instance, '_prefetched_objects_cache', None):
+            # If 'prefetch_related' has been applied to a queryset, we need to
+            # forcibly invalidate the prefetch cache on the instance.
+            instance._prefetched_objects_cache = {}
+
+        return Response(serializer.data)
 
     @action(methods=['post'], detail=True, url_path='assign')
     def assign_booking_to_agent(self, request, *args, **kwargs):

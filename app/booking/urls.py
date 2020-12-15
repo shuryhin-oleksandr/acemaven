@@ -20,10 +20,10 @@ router.register(r'booking', BookingViesSet, basename='booking')
 router.register(r'status', StatusViesSet, basename='status')
 router.register(r'shipment-details', ShipmentDetailsViesSet, basename='shipment_details')
 router.register(r'operation', OperationViewSet, basename='operation')
-router.register(r'champ-tracking', TrackView, basename='track')
 
 urlpatterns = router.urls
 
 urlpatterns += [
     path('calculate/', WMCalculateView.as_view()),
+    path('champ-tracking/', TrackView.as_view()),
 ]

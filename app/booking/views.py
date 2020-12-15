@@ -2,7 +2,7 @@ from datetime import datetime
 
 from django.contrib.auth import get_user_model
 from django_filters import rest_framework
-from rest_framework import mixins, viewsets, filters, status, generics
+from rest_framework import mixins, viewsets, filters, status, generics, views
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
@@ -740,8 +740,12 @@ class ShipmentDetailsViesSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated, )
 
 
-class TrackView(mixins.CreateModelMixin,
-                viewsets.GenericViewSet):
-    queryset = Track.objects.all()
-    serializer_class = TrackSerializer
+class TrackView(views.APIView):
     permission_classes = (AllowAny,)
+
+    def post(self, request, *args, **kwargs):
+        try:
+            Track.objects.create(data=request.data)
+        except Exception:
+            Track.objects.create(data=str(request.data))
+        return Response(status=status.HTTP_200_OK)

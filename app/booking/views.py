@@ -520,6 +520,8 @@ class BookingViesSet(PermissionClassByActionMixin,
     permission_classes = (IsAuthenticated, )
     permission_classes_by_action = {
         'create': (IsAuthenticated, IsClientCompany,),
+        'update': (IsAuthenticated, IsClientCompany,),
+        'partial_update': (IsAuthenticated, IsClientCompany,),
         'assign_booking_to_agent': (IsAuthenticated, IsAgentCompany, IsMaster,),
         'reject_booking': (IsAuthenticated, IsAgentCompany,),
     }

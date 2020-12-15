@@ -388,6 +388,7 @@ class CargoGroupSerializer(serializers.ModelSerializer):
             'dangerous',
             'description',
             'frozen',
+            'booking',
         )
 
 

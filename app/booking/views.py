@@ -575,13 +575,41 @@ class BookingViesSet(PermissionClassByActionMixin,
         self.perform_update(serializer)
 
         for cargo_group in cargo_groups:
-            cargo_group_serializer = CargoGroupSerializer(
-                CargoGroup.objects.filter(id=cargo_group.get('id')).first(),
-                data=cargo_group,
-                partial=True,
+            if 'id' in cargo_group:
+                cargo_group_serializer = CargoGroupSerializer(
+                    CargoGroup.objects.filter(id=cargo_group.get('id')).first(),
+                    data=cargo_group,
+                    partial=True,
+                )
+                cargo_group_serializer.is_valid(raise_exception=True)
+                self.perform_update(cargo_group_serializer)
+            else:
+                cargo_group['booking'] = instance.id
+                cargo_group_serializer = CargoGroupSerializer(data=cargo_group)
+                cargo_group_serializer.is_valid(raise_exception=True)
+                self.perform_create(cargo_group_serializer)
+
+        main_currency_code = Currency.objects.filter(is_main=True).first().code
+        container_type_ids_list = [
+            group.get('container_type') for group in cargo_groups if 'container_type' in group
+        ]
+        try:
+            new_charges = calculate_freight_rate_charges(instance.freight_rate,
+                                                         {},
+                                                         cargo_groups,
+                                                         instance.freight_rate.shipping_mode,
+                                                         main_currency_code,
+                                                         instance.date_from,
+                                                         instance.date_to,
+                                                         container_type_ids_list,
+                                                         number_of_documents=instance.number_of_documents,)
+            instance.charges = new_charges
+            instance.save()
+        except AttributeError:
+            return Response(
+                data={'error': 'date_from or date_to mismatch with surcharges or freight rate dates.'},
+                status=status.HTTP_400_BAD_REQUEST
             )
-            cargo_group_serializer.is_valid(raise_exception=True)
-            self.perform_update(cargo_group_serializer)
 
         if getattr(instance, '_prefetched_objects_cache', None):
             # If 'prefetch_related' has been applied to a queryset, we need to

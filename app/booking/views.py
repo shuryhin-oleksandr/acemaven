@@ -748,4 +748,4 @@ class TrackView(views.APIView):
             Track.objects.create(data=request.data)
         except Exception:
             Track.objects.create(data=str(request.data))
-        return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_201_CREATED)

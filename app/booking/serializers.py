@@ -52,7 +52,6 @@ class UsageFeeSerializer(UserUpdateMixin, serializers.ModelSerializer):
             'container_type',
             'currency',
             'charge',
-            'surcharge',
         )
 
 
@@ -78,7 +77,6 @@ class ChargeSerializer(UserUpdateMixin, serializers.ModelSerializer):
             'currency',
             'charge',
             'conditions',
-            'surcharge',
         )
 
 
@@ -208,7 +206,6 @@ class RateSerializer(serializers.ModelSerializer):
             'rate',
             'start_date',
             'expiration_date',
-            'freight_rate',
         )
 
     def update(self, instance, validated_data):

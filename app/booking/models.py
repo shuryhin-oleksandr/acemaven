@@ -501,7 +501,6 @@ class CargoGroup(models.Model):
     )
     volume = models.PositiveIntegerField(
         _('Number of items'),
-        validators=[MinValueValidator(1)],
         null=True,
     )
     height = models.DecimalField(

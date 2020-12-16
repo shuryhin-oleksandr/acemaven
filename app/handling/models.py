@@ -6,6 +6,37 @@ from django.core.validators import MinValueValidator
 from django.utils.translation import gettext_lazy as _
 
 
+class SingletonModel(models.Model):
+    """Singleton Django Model"""
+
+    class Meta:
+        abstract = True
+
+    def save(self, *args, **kwargs):
+        """
+        Save object to the database.  When you save an instance of the model,
+        it always has the same primary key, so there is only one record for
+        this model in the database.
+        """
+
+        self.pk = 1
+        self.__class__.objects.exclude(id=self.id).delete()
+        super(SingletonModel, self).save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        pass
+
+    @classmethod
+    def load(cls):
+        """
+        Load object from the database. if the object does not exist in a database,
+        it will be created.
+        """
+
+        obj, created = cls.objects.get_or_create(pk=1)
+        return obj
+
+
 class ShippingType(models.Model):
     """
     Shipping type model.
@@ -573,7 +604,7 @@ class ExchangeRate(models.Model):
         return f'Exchange rate from {self.currency.code}'
 
 
-class ClientPlatformSetting(models.Model):
+class ClientPlatformSetting(SingletonModel):
     """
     Client platform setting model.
     """
@@ -600,7 +631,7 @@ class ClientPlatformSetting(models.Model):
     )
 
 
-class GeneralSetting(models.Model):
+class GeneralSetting(SingletonModel):
     """
     General settings.
     """

@@ -860,5 +860,6 @@ class TrackSerializer(serializers.ModelSerializer):
         model = Track
         fields = (
             'id',
+            'date_created',
             'data',
         )

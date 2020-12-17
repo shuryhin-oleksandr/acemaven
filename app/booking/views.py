@@ -749,3 +749,10 @@ class TrackView(views.APIView):
         except Exception:
             Track.objects.create(data=str(request.data))
         return Response(status=status.HTTP_201_CREATED)
+
+
+class TrackViewSet(mixins.ListModelMixin,
+                   viewsets.GenericViewSet):
+    queryset = Track.objects.all()
+    serializer_class = TrackSerializer
+    permission_classes = (IsAuthenticated, )

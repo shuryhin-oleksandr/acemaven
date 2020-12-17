@@ -656,10 +656,10 @@ class GeneralSetting(SingletonModel):
         validators=[MinValueValidator(1)],
     )
     export_deadline_days = models.PositiveIntegerField(
-        _('Number of days that the agent will have to confirm a booking request'),
+        _('Number of days that the agent will have to confirm a booking request(export)'),
         validators=[MinValueValidator(1)],
     )
     import_deadline_days = models.PositiveIntegerField(
-        _('Number of days that the agent will have to confirm a booking request'),
+        _('Number of days that the agent will have to confirm a booking request(import)'),
         validators=[MinValueValidator(1)],
     )

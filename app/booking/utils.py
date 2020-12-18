@@ -146,7 +146,7 @@ def calculate_freight_rate(totals,
                            volume=1,
                            total_weight_per_pack=1,
                            total_weight=1,
-                           calculate_fees=False,):
+                           calculate_fees=False, ):
     freight = dict()
     code = rate.currency.code
     freight['currency'] = code
@@ -205,7 +205,7 @@ def calculate_freight_rate_charges(freight_rate,
                                                                 booking_fee=booking_fee,
                                                                 total_weight_per_pack=total_weight_per_pack,
                                                                 total_weight=total_weight,
-                                                                calculate_fees=calculate_fees,)
+                                                                calculate_fees=calculate_fees, )
 
             surcharge = rate.surcharges.filter(start_date__lte=date_from,
                                                expiration_date__gte=date_to).first()
@@ -240,7 +240,7 @@ def calculate_freight_rate_charges(freight_rate,
                                                                 exchange_rate,
                                                                 booking_fee=booking_fee,
                                                                 volume=cargo_group.get('volume'),
-                                                                calculate_fees=calculate_fees,)
+                                                                calculate_fees=calculate_fees, )
 
             surcharge = rate.surcharges.filter(start_date__lte=date_from,
                                                expiration_date__gte=date_to).first()
@@ -444,7 +444,7 @@ def generate_aceid(freight_rate, company):
     odd_or_even = 1 if freight_rate.origin.code.startswith(MAIN_COUNTRY_CODE) else 2
     vowels_or_consonants = vowels if freight_rate.shipping_mode.shipping_type.title == 'air' else consonants
     aceid = f'{company.name[:2].upper()}' \
-            f'{random.choices(range(odd_or_even,10,2))[0]}' \
+            f'{random.choices(range(odd_or_even, 10, 2))[0]}' \
             f'{random.choices(vowels_or_consonants)[0]}' \
             f'{"".join(random.choices(string.digits, k=4))}'
     return aceid
@@ -506,3 +506,108 @@ def make_copy_of_freight_rate(freight_rate, get_rates_map=False):
     original_freight_rate.save()
 
     return freight_rate, fees_map
+
+
+test_track_data_1 = {
+    "type": "flight status",
+    "id": "1f7cb56b-7aa4-4077-b38d-9371a24fa45c",
+    "messageHeader": {
+        "addressing": {
+            "routeVia": {
+                "type": "PIMA",
+                "address": "REUAIR08AAL",
+            },
+            "routeAnswerVia": {
+                "type": "PIMA",
+                "address": "REUAIR08AAL",
+            },
+            "senderAddresses": [
+                {
+                    "type": "PIMA",
+                    "address": "REUAIR08AAL",
+                },
+            ],
+            "finalRecipientAddresses": [
+                {
+                    "type": "PIMA",
+                    "address": "REUAIR08AAL",
+                },
+            ],
+            "replyAnswerTo": [
+                {
+                    "type": "PIMA",
+                    "address": "REUAIR08AAL",
+                },
+            ],
+        },
+        "creationDate": "2017-09-05T11:46:13.000",
+        "edifactData": {
+            "commonAccessReference": "10381",
+            "messageReference": "ORDERS:D:94B:UN",
+            "password": "test1234",
+            "interchangeControlReference": "abcde1234567",
+        },
+    },
+    "airWaybillNumber": "020-97162321",
+    "originAndDestination": {
+        "origin": "FRA",
+        "destination": "FRA",
+    },
+    "quantity": {
+        "shipmentDescriptionCode": "DIVIDED_CONSIGNMENT",
+        "numberOfPieces": "8",
+        "weight": {
+            "amount": "100",
+            "unit": "KILOGRAM",
+        }
+    },
+    "totalNumberOfPieces": "20",
+    "events": [
+        {
+            "type": "in flight",
+            "numberOfPieces": 1,
+            "weight": {
+                "amount": 128,
+                "unit": "KILOGRAM"
+            },
+            "timeOfEvent": "2020-12-17T14:51:30",
+            "timeOfEventTimePartQuality": "SUPPLIED",
+            "flight": "MS527",
+            "origin": "OST",
+            "destination": "CAI",
+            "scheduledTimeOfDeparture": "2020-12-17T15:27:58",
+            "scheduledTimeOfArrival": "2020-12-17T21:35:58",
+            "actualTimeOfDeparture": "2020-12-17T15:26:16",
+            "estimatedTimeOfArrival": "2020-12-17T21:35:00",
+            "plannedflightTime": 308,
+            "estimatedDiffToSchedule": 0,
+            "ecefLongitude": 7.46506,
+            "ecefLatitude": 51.65355,
+        },
+    ],
+    "otherCustomsSecurityAndRegulatoryInformation": {
+        "oci": [
+            {
+                "isoCountryCode": "US",
+                "informationIdentifier": "ACC",
+                "controlInformation": "ACCOUNT_CONSIGNOR",
+                "additionalControlInformation": "D",
+                "supplementaryControlInformation": "BCBP123",
+            }
+        ],
+        "uld": [
+            {
+                "type": "ASE",
+                "serialNumber": "1234",
+                "ownerCode": "TW",
+                "loadingIndicator": "MAIN_DECK_LOADING_ONLY",
+                "remarks": "Do not load via nose door.",
+                "weightOfULDContents": {
+                    "amount": "100",
+                    "unit": "KILOGRAM",
+                }
+            },
+        ],
+    },
+    "otherServiceInformation": "Extra charge due to special handling requirements.",
+}

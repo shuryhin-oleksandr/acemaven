@@ -6,7 +6,8 @@ from django.db.models import Min
 from app.booking.models import Surcharge, UsageFee, Charge, AdditionalSurcharge, FreightRate, Rate, CargoGroup, Quote, \
     Booking, Status, ShipmentDetails, CancellationReason, Track
 from app.booking.tasks import send_awb_number_to_air_tracking_api
-from app.booking.utils import rate_surcharges_filter, calculate_freight_rate_charges, get_fees, generate_aceid
+from app.booking.utils import rate_surcharges_filter, calculate_freight_rate_charges, get_fees, generate_aceid, \
+    test_track_data_1
 from app.core.models import Shipper
 from app.core.serializers import ShipperSerializer, BankAccountBaseSerializer
 from app.handling.models import ShippingType, ClientPlatformSetting, Currency
@@ -785,6 +786,7 @@ class OperationRetrieveSerializer(OperationListBaseSerializer):
     client = serializers.CharField(source='client_contact_person.get_company.name')
     shipper = ShipperSerializer()
     change_requests = serializers.SerializerMethodField()
+    tracking_events = serializers.SerializerMethodField()
 
     class Meta(OperationListBaseSerializer.Meta):
         model = Booking
@@ -794,6 +796,7 @@ class OperationRetrieveSerializer(OperationListBaseSerializer):
             'client',
             'charges',
             'change_requests',
+            'tracking_events',
         )
 
     def get_change_requests(self, obj):
@@ -805,6 +808,16 @@ class OperationRetrieveSerializer(OperationListBaseSerializer):
             'week_from': obj.date_from.isocalendar()[1],
             'week_to': obj.date_to.isocalendar()[1]
         }
+
+    def get_tracking_events(self, obj):
+        events = list()
+        if obj.freight_rate.shipping_mode.shipping_type == 'air':
+            events.append(test_track_data_1)
+            for i in range(1, 10, 4):
+                test_track_data_1['events'][0]['ecefLongitude'] += i
+                test_track_data_1['events'][0]['ecefLatitude'] += i
+                events.append(test_track_data_1)
+        return events
 
 
 class OperationRetrieveClientSerializer(OperationRetrieveSerializer):

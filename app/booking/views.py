@@ -75,8 +75,8 @@ class SurchargeViesSet(viewsets.ModelViewSet):
     @transaction.atomic
     def update(self, request, *args, **kwargs):
         data = request.data
-        usage_fees = data.pop('usage_fees', {})
-        charges = data.pop('charges', {})
+        usage_fees = data.pop('usage_fees', [])
+        charges = data.pop('charges', [])
         partial = kwargs.pop('partial', False)
         surcharge = self.get_object()
         surcharge, fees_map = make_copy_of_surcharge(
@@ -88,15 +88,27 @@ class SurchargeViesSet(viewsets.ModelViewSet):
         surcharge_serializer.is_valid(raise_exception=True)
         self.perform_update(surcharge_serializer)
 
+        context = self.get_serializer_context()
+
         for usage_fee in usage_fees:
             old_usage_fee_id = usage_fee.pop('id')
-            serializer = UsageFeeSerializer(fees_map['usage_fees'][old_usage_fee_id], data=usage_fee, partial=True)
+            serializer = UsageFeeSerializer(
+                fees_map['usage_fees'][old_usage_fee_id],
+                data=usage_fee,
+                partial=True,
+                context=context,
+            )
             serializer.is_valid(raise_exception=True)
             self.perform_update(serializer)
 
         for charge in charges:
             old_charge_id = charge.pop('id')
-            serializer = ChargeSerializer(fees_map['charges'][old_charge_id], data=charge, partial=True)
+            serializer = ChargeSerializer(
+                fees_map['charges'][old_charge_id],
+                data=charge,
+                partial=True,
+                context=context,
+            )
             serializer.is_valid(raise_exception=True)
             self.perform_update(serializer)
 
@@ -186,7 +198,7 @@ class FreightRateViesSet(PermissionClassByActionMixin,
     @transaction.atomic
     def update(self, request, *args, **kwargs):
         data = request.data
-        rates = data.pop('rates', {})
+        rates = data.pop('rates', [])
         partial = kwargs.pop('partial', False)
         freight_rate = self.get_object()
         freight_rate, fees_map = make_copy_of_freight_rate(
@@ -197,9 +209,16 @@ class FreightRateViesSet(PermissionClassByActionMixin,
         freight_rate_serializer.is_valid(raise_exception=True)
         self.perform_update(freight_rate_serializer)
 
+        context = self.get_serializer_context()
+
         for rate in rates:
             old_rate_id = rate.pop('id')
-            serializer = RateSerializer(fees_map[old_rate_id], data=rate, partial=True)
+            serializer = RateSerializer(
+                fees_map[old_rate_id],
+                data=rate,
+                partial=True,
+                context=context,
+            )
             serializer.is_valid(raise_exception=True)
             self.perform_update(serializer)
 

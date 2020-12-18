@@ -66,6 +66,7 @@ class CarrierSerializer(CarrierBaseSerializer):
 
 class PortSerializer(serializers.ModelSerializer):
     is_local = serializers.SerializerMethodField()
+    coordinates = serializers.ListField(source='coordinates.coords', default=[])
 
     class Meta:
         model = Port
@@ -75,6 +76,7 @@ class PortSerializer(serializers.ModelSerializer):
             'name',
             'display_name',
             'is_local',
+            'coordinates',
         )
 
     def get_is_local(self, obj):

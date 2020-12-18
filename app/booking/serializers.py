@@ -811,7 +811,7 @@ class OperationRetrieveSerializer(OperationListBaseSerializer):
 
     def get_tracking_events(self, obj):
         events = list()
-        if obj.freight_rate.shipping_mode.shipping_type == 'air':
+        if obj.freight_rate.shipping_mode.shipping_type.title == 'air':
             events.append(test_track_data_1)
             for i in range(1, 10, 4):
                 test_track_data_1['events'][0]['ecefLongitude'] += i

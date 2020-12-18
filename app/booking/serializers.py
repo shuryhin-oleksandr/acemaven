@@ -813,11 +813,11 @@ class OperationRetrieveSerializer(OperationListBaseSerializer):
     def get_tracking_events(self, obj):
         events = list()
         if obj.freight_rate.shipping_mode.shipping_type.title == 'air':
-            events.append(test_track_data_1)
             for i in range(1, 10, 4):
-                test_track_data_1['events'][0]['ecefLongitude'] += i
-                test_track_data_1['events'][0]['ecefLatitude'] += i
                 changed_data = copy.deepcopy(test_track_data_1)
+                changed_data['events'][0]['ecefLongitude'] += i
+                changed_data['events'][0]['ecefLatitude'] += i
+                changed_data = copy.deepcopy(changed_data)
                 events.append(changed_data)
         return events
 

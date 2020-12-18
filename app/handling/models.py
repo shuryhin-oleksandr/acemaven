@@ -663,3 +663,32 @@ class GeneralSetting(SingletonModel):
         _('Number of days that the agent will have to confirm a booking request(import)'),
         validators=[MinValueValidator(1)],
     )
+
+    def __str__(self):
+        return 'General platform settings'
+
+
+class AirTrackingSetting(SingletonModel):
+    """
+    Settings of air tracking api.
+    """
+
+    url = models.CharField(
+        _('Api url to track delivery progress of air shipment'),
+        max_length=256,
+    )
+    user = models.CharField(
+        _('Username credential'),
+        max_length=30,
+    )
+    password = models.CharField(
+        _('Password credential'),
+        max_length=30,
+    )
+    pima = models.CharField(
+        _('PIMA'),
+        max_length=20,
+    )
+
+    def __str__(self):
+        return 'Air tracking api general settings'

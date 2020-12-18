@@ -1,7 +1,8 @@
 from django.contrib import admin
 
 from app.handling.models import GlobalFee, LocalFee, ShippingType, ShippingMode, PackagingType, ContainerType, \
-    IMOClass, ReleaseType, Carrier, Airline, Currency, Port, ExchangeRate, ClientPlatformSetting, GeneralSetting
+    IMOClass, ReleaseType, Carrier, Airline, Currency, Port, ExchangeRate, ClientPlatformSetting, GeneralSetting, \
+    AirTrackingSetting
 
 
 @admin.register(ClientPlatformSetting)
@@ -17,6 +18,11 @@ class ClientPlatformSettingAdmin(admin.ModelAdmin):
 
 @admin.register(GeneralSetting)
 class GeneralSettingAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(AirTrackingSetting)
+class AirTrackingSettingAdmin(admin.ModelAdmin):
     pass
 
 

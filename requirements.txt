@@ -9,6 +9,7 @@ phonenumbers==8.12.8
 pillow==7.2.0
 psycopg2==2.8.5
 redis==3.5.3
+requests==2.25.1
 drf-yasg==1.17.1
 django-rest-auth==0.9.5
 django-tabbed-admin==1.0.4

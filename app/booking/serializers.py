@@ -5,8 +5,8 @@ from django.db.models import Min
 
 from app.booking.models import Surcharge, UsageFee, Charge, AdditionalSurcharge, FreightRate, Rate, CargoGroup, Quote, \
     Booking, Status, ShipmentDetails, CancellationReason, Track
-from app.booking.utils import rate_surcharges_filter, calculate_freight_rate_charges, get_fees, generate_aceid, \
-    make_copy_of_surcharge, make_copy_of_freight_rate
+from app.booking.tasks import send_awb_number_to_air_tracking_api
+from app.booking.utils import rate_surcharges_filter, calculate_freight_rate_charges, get_fees, generate_aceid
 from app.core.models import Shipper
 from app.core.serializers import ShipperSerializer, BankAccountBaseSerializer
 from app.handling.models import ShippingType, ClientPlatformSetting, Currency
@@ -175,11 +175,6 @@ class SurchargeSerializer(SurchargeEditSerializer):
         Charge.objects.bulk_create(new_charges)
         return surcharge
 
-    def update(self, instance, validated_data):
-        instance, _ = make_copy_of_surcharge(instance)
-        super().update(instance, validated_data)
-        return instance
-
 
 class SurchargeRetrieveSerializer(SurchargeSerializer):
     carrier = CarrierBaseSerializer()
@@ -339,11 +334,6 @@ class FreightRateSerializer(FreightRateEditSerializer):
                 surcharges = rate_surcharges_filter(rate, company, temporary=temporary)
                 rate.surcharges.set(surcharges)
         return new_freight_rate
-
-    def update(self, instance, validated_data):
-        instance, _ = make_copy_of_freight_rate(instance)
-        super().update(instance, validated_data)
-        return instance
 
 
 class FreightRateRetrieveSerializer(FreightRateSerializer):
@@ -696,6 +686,7 @@ class ShipmentDetailsBaseSerializer(serializers.ModelSerializer):
         booking = validated_data['booking']
         booking.status = Booking.CONFIRMED
         booking.save()
+        send_awb_number_to_air_tracking_api.delay(shipment_detail.booking_number)
         return shipment_detail
 
 

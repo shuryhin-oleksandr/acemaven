@@ -455,6 +455,8 @@ def make_copy_of_surcharge(surcharge, get_usage_fees_map=False, get_charges_map=
     original_surcharge = Surcharge.objects.get(id=original_surcharge_id)
 
     fees_map = dict()
+    fees_map['usage_fees'] = dict()
+    fees_map['charges'] = dict()
 
     surcharge.pk = None
     surcharge.save()
@@ -465,7 +467,7 @@ def make_copy_of_surcharge(surcharge, get_usage_fees_map=False, get_charges_map=
         usage_fee.surcharge = surcharge
         usage_fee.save()
         if get_usage_fees_map:
-            fees_map[old_usage_fee_id] = usage_fee
+            fees_map['usage_fees'][old_usage_fee_id] = usage_fee
 
     for charge in original_surcharge.charges.all():
         old_charge_id = charge.id
@@ -473,7 +475,7 @@ def make_copy_of_surcharge(surcharge, get_usage_fees_map=False, get_charges_map=
         charge.surcharge = surcharge
         charge.save()
         if get_charges_map:
-            fees_map[old_charge_id] = charge
+            fees_map['charges'][old_charge_id] = charge
 
     original_surcharge.is_archived = True
     original_surcharge.save()

@@ -758,6 +758,7 @@ class OperationListBaseSerializer(OperationSerializer):
     shipment_details = ShipmentDetailsBaseSerializer(many=True)
     has_change_request = serializers.SerializerMethodField()
     can_be_patched = serializers.SerializerMethodField()
+    tracking_events = serializers.SerializerMethodField()
 
     class Meta(OperationSerializer.Meta):
         model = Booking
@@ -768,6 +769,7 @@ class OperationListBaseSerializer(OperationSerializer):
             'shipment_details',
             'has_change_request',
             'can_be_patched',
+            'tracking_events',
         )
 
     def get_status(self, obj):
@@ -779,6 +781,17 @@ class OperationListBaseSerializer(OperationSerializer):
     def get_can_be_patched(self, obj):
         return True if obj.status in (Booking.PENDING, Booking.REQUEST_RECEIVED) else False
 
+    def get_tracking_events(self, obj):
+        events = list()
+        if obj.freight_rate.shipping_mode.shipping_type.title == 'air':
+            for i in range(1, 10, 4):
+                changed_data = copy.deepcopy(test_track_data_1)
+                changed_data['events'][0]['ecefLongitude'] += i
+                changed_data['events'][0]['ecefLatitude'] += i
+                changed_data = copy.deepcopy(changed_data)
+                events.append(changed_data)
+        return events
+
 
 class OperationRetrieveSerializer(OperationListBaseSerializer):
     release_type = ReleaseTypeSerializer()
@@ -787,7 +800,6 @@ class OperationRetrieveSerializer(OperationListBaseSerializer):
     client = serializers.CharField(source='client_contact_person.get_company.name')
     shipper = ShipperSerializer()
     change_requests = serializers.SerializerMethodField()
-    tracking_events = serializers.SerializerMethodField()
 
     class Meta(OperationListBaseSerializer.Meta):
         model = Booking
@@ -797,7 +809,6 @@ class OperationRetrieveSerializer(OperationListBaseSerializer):
             'client',
             'charges',
             'change_requests',
-            'tracking_events',
         )
 
     def get_change_requests(self, obj):
@@ -809,17 +820,6 @@ class OperationRetrieveSerializer(OperationListBaseSerializer):
             'week_from': obj.date_from.isocalendar()[1],
             'week_to': obj.date_to.isocalendar()[1]
         }
-
-    def get_tracking_events(self, obj):
-        events = list()
-        if obj.freight_rate.shipping_mode.shipping_type.title == 'air':
-            for i in range(1, 10, 4):
-                changed_data = copy.deepcopy(test_track_data_1)
-                changed_data['events'][0]['ecefLongitude'] += i
-                changed_data['events'][0]['ecefLatitude'] += i
-                changed_data = copy.deepcopy(changed_data)
-                events.append(changed_data)
-        return events
 
 
 class OperationRetrieveClientSerializer(OperationRetrieveSerializer):

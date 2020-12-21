@@ -66,7 +66,7 @@ class CarrierSerializer(CarrierBaseSerializer):
 
 class PortSerializer(serializers.ModelSerializer):
     is_local = serializers.SerializerMethodField()
-    coordinates = serializers.ListField(source='coordinates.coords', default=[])
+    coordinates = serializers.DictField(source='get_lat_long_coordinates')
 
     class Meta:
         model = Port

@@ -576,6 +576,15 @@ class Port(gis_models.Model):
     def display_name(self):
         return f'{self.code}, {self.name}, {self.code[:2]}'
 
+    def get_lat_long_coordinates(self):
+        result = dict()
+        if coordinates := self.coordinates:
+            result = {
+                'latitude': coordinates.y,
+                'longitude': coordinates.x,
+            }
+        return result
+
 
 class ExchangeRate(models.Model):
     """

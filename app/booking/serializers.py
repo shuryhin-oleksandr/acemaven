@@ -14,6 +14,11 @@ from app.core.serializers import ShipperSerializer, BankAccountBaseSerializer
 from app.handling.models import ShippingType, ClientPlatformSetting, Currency
 from app.handling.serializers import ContainerTypesSerializer, CurrencySerializer, CarrierBaseSerializer, \
     PortSerializer, ShippingModeBaseSerializer, PackagingTypeBaseSerializer, ReleaseTypeSerializer
+from app.location.models import Country
+
+
+main_country = Country.objects.filter(is_main=True).first()
+MAIN_COUNTRY_CODE = main_country.code if main_country else 'BR'
 
 
 class UserUpdateMixin:
@@ -759,6 +764,7 @@ class OperationListBaseSerializer(OperationSerializer):
     has_change_request = serializers.SerializerMethodField()
     can_be_patched = serializers.SerializerMethodField()
     tracking_events = serializers.SerializerMethodField()
+    tracking = serializers.SerializerMethodField()
 
     class Meta(OperationSerializer.Meta):
         model = Booking
@@ -770,6 +776,7 @@ class OperationListBaseSerializer(OperationSerializer):
             'has_change_request',
             'can_be_patched',
             'tracking_events',
+            'tracking',
         )
 
     def get_status(self, obj):
@@ -791,6 +798,14 @@ class OperationListBaseSerializer(OperationSerializer):
                 changed_data = copy.deepcopy(changed_data)
                 events.append(changed_data)
         return events
+
+    def get_tracking(self, obj):
+        data = dict()
+        data['shipping_type'] = obj.freight_rate.shipping_mode.shipping_type.title
+        data['direction'] = 'export' if obj.freight_rate.origin.code.startswith(MAIN_COUNTRY_CODE) else 'import'
+        data['origin'] = obj.freight_rate.origin.get_lat_long_coordinates()
+        data['destination'] = obj.freight_rate.destination.get_lat_long_coordinates()
+        data['events'] = test_track_data_1.get('events')
 
 
 class OperationRetrieveSerializer(OperationListBaseSerializer):

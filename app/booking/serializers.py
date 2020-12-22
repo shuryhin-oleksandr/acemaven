@@ -801,7 +801,7 @@ class OperationListBaseSerializer(OperationSerializer):
 
     def get_tracking(self, obj):
         data = dict()
-        if shipping_type := obj.freight_rate.shipping_mode.shipping_type.title == 'air':
+        if (shipping_type := obj.freight_rate.shipping_mode.shipping_type.title) == 'air':
             data['shipping_type'] = shipping_type
             data['direction'] = 'export' if obj.freight_rate.origin.code.startswith(MAIN_COUNTRY_CODE) else 'import'
             data['origin'] = obj.freight_rate.origin.get_lat_long_coordinates()

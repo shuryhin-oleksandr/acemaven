@@ -806,6 +806,7 @@ class OperationListBaseSerializer(OperationSerializer):
         data['origin'] = obj.freight_rate.origin.get_lat_long_coordinates()
         data['destination'] = obj.freight_rate.destination.get_lat_long_coordinates()
         data['events'] = test_track_data_1.get('events')
+        return data
 
 
 class OperationRetrieveSerializer(OperationListBaseSerializer):

@@ -801,11 +801,12 @@ class OperationListBaseSerializer(OperationSerializer):
 
     def get_tracking(self, obj):
         data = dict()
-        data['shipping_type'] = obj.freight_rate.shipping_mode.shipping_type.title
-        data['direction'] = 'export' if obj.freight_rate.origin.code.startswith(MAIN_COUNTRY_CODE) else 'import'
-        data['origin'] = obj.freight_rate.origin.get_lat_long_coordinates()
-        data['destination'] = obj.freight_rate.destination.get_lat_long_coordinates()
-        data['events'] = test_track_data_1.get('events')
+        if shipping_type := obj.freight_rate.shipping_mode.shipping_type.title == 'air':
+            data['shipping_type'] = shipping_type
+            data['direction'] = 'export' if obj.freight_rate.origin.code.startswith(MAIN_COUNTRY_CODE) else 'import'
+            data['origin'] = obj.freight_rate.origin.get_lat_long_coordinates()
+            data['destination'] = obj.freight_rate.destination.get_lat_long_coordinates()
+            data['events'] = test_track_data_1.get('events')
         return data
 
 

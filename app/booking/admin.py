@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from app.booking.models import Surcharge, AdditionalSurcharge, FreightRate
+from app.booking.models import Surcharge, AdditionalSurcharge, FreightRate, TrackStatus, Direction
 
 
 @admin.register(AdditionalSurcharge)
@@ -16,3 +16,13 @@ class SurchargeAdmin(admin.ModelAdmin):
 @admin.register(FreightRate)
 class FreightRateAdmin(admin.ModelAdmin):
     pass
+
+
+@admin.register(TrackStatus)
+class TrackStatusAdmin(admin.ModelAdmin):
+    list_display = ('title', )
+
+
+@admin.register(Direction)
+class DirectionAdmin(admin.ModelAdmin):
+    list_display = ('title', )

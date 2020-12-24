@@ -1,11 +1,10 @@
-from django.db.models import Q
 from phonenumber_field.modelfields import PhoneNumberField
 
+from django.db import models
 from django.contrib.auth import get_user_model
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser, Group
 from django.core.validators import RegexValidator
-from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 
@@ -127,8 +126,8 @@ class CustomUser(AbstractUser):
         return self.role_set.first().groups.all()
 
     def set_roles(self, roles_list):
-        query_roles_list = [Q(name=role) for role in roles_list]
-        groups = Group.objects.filter(Q(*query_roles_list, _connector='OR'))
+        query_roles_list = [models.Q(name=role) for role in roles_list]
+        groups = Group.objects.filter(models.Q(*query_roles_list, _connector='OR'))
         self.role_set.first().groups.set(groups)
 
     @property

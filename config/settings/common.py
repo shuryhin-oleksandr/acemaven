@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'rest_auth',
     'tabbed_admin',
     'debug_toolbar',
+    'channels',
 
     'app.core',
     'app.booking',
@@ -116,6 +117,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
+ASGI_APPLICATION = 'app.booking.routing.application'
+
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
@@ -178,6 +181,10 @@ CELERY_BEAT_SCHEDULE = {
     'archive-expired-quotes': {
         'task': 'archive_quotes',
         'schedule': crontab(hour=0, minute=0),
+    },
+    'update-sea-operations-tracking': {
+        'task': 'track_sea_operations',
+        'schedule': crontab(hour='*/3', minute=0),
     }
 }
 
@@ -193,3 +200,13 @@ OLD_PASSWORD_FIELD_ENABLED = True
 
 # Tabbed Admin
 TABBED_ADMIN_USE_JQUERY_UI = True
+
+# Channels config
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [('0.0.0.0', 6379)]
+        }
+    }
+}

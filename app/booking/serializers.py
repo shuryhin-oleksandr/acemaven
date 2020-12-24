@@ -5,10 +5,9 @@ from rest_framework import serializers
 from django.db.models import Min
 
 from app.booking.models import Surcharge, UsageFee, Charge, AdditionalSurcharge, FreightRate, Rate, CargoGroup, Quote, \
-    Booking, Status, ShipmentDetails, CancellationReason, Track
+    Booking, Status, ShipmentDetails, CancellationReason, Track, TrackStatus
 from app.booking.tasks import send_awb_number_to_air_tracking_api
-from app.booking.utils import rate_surcharges_filter, calculate_freight_rate_charges, get_fees, generate_aceid, \
-    test_track_data_1
+from app.booking.utils import rate_surcharges_filter, calculate_freight_rate_charges, get_fees, generate_aceid
 from app.core.models import Shipper
 from app.core.serializers import ShipperSerializer, BankAccountBaseSerializer
 from app.handling.models import ShippingType, ClientPlatformSetting, Currency
@@ -693,8 +692,42 @@ class ShipmentDetailsBaseSerializer(serializers.ModelSerializer):
         booking = validated_data['booking']
         booking.status = Booking.CONFIRMED
         booking.save()
-        send_awb_number_to_air_tracking_api.delay(shipment_detail.booking_number)
+        if booking.shipping_type == 'air':
+            send_awb_number_to_air_tracking_api.delay(shipment_detail.booking_number)
         return shipment_detail
+
+
+class TrackSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Track
+        fields = (
+            'id',
+            'date_created',
+            'data',
+            'route',
+            'comment',
+            'status',
+            'booking',
+        )
+
+    def create(self, validated_data):
+        validated_data['manual'] = True
+        instance = super().create(validated_data)
+        return instance
+
+    def update(self, instance, validated_data):
+        validated_data['manual'] = True
+        instance = super().update(instance, validated_data)
+        return instance
+
+
+class TrackStatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TrackStatus
+        fields = (
+            'id',
+            'title',
+        )
 
 
 class OperationSerializer(serializers.ModelSerializer):
@@ -751,6 +784,8 @@ class OperationSerializer(serializers.ModelSerializer):
                 CargoGroup.objects.bulk_create(new_cargo_groups)
         except Exception as error:
             raise serializers.ValidationError({'error': error})
+        original_booking.change_request_status = Booking.CHANGE_REQUESTED
+        original_booking.save()
         return operation
 
 
@@ -763,8 +798,8 @@ class OperationListBaseSerializer(OperationSerializer):
     shipment_details = ShipmentDetailsBaseSerializer(many=True)
     has_change_request = serializers.SerializerMethodField()
     can_be_patched = serializers.SerializerMethodField()
-    tracking_events = serializers.SerializerMethodField()
-    tracking = serializers.SerializerMethodField()
+    tracking_initial = serializers.SerializerMethodField()
+    tracking = TrackSerializer(many=True)
 
     class Meta(OperationSerializer.Meta):
         model = Booking
@@ -775,11 +810,13 @@ class OperationListBaseSerializer(OperationSerializer):
             'shipment_details',
             'has_change_request',
             'can_be_patched',
-            'tracking_events',
+            'tracking_initial',
             'tracking',
         )
 
     def get_status(self, obj):
+        if change_request_status := obj.change_request_status:
+            return list(filter(lambda x: x[0] == change_request_status, Booking.CHANGE_REQUESTED_CHOICES))[0][1]
         return list(filter(lambda x: x[0] == obj.status, Booking.STATUS_CHOICES))[0][1]
 
     def get_has_change_request(self, obj):
@@ -788,32 +825,12 @@ class OperationListBaseSerializer(OperationSerializer):
     def get_can_be_patched(self, obj):
         return True if obj.status in (Booking.PENDING, Booking.REQUEST_RECEIVED) else False
 
-    def get_tracking_events(self, obj):
-        events = list()
-        if obj.freight_rate.shipping_mode.shipping_type.title == 'air':
-            for i in range(1, 10, 4):
-                changed_data = copy.deepcopy(test_track_data_1)
-                changed_data['events'][0]['ecefLongitude'] += i
-                changed_data['events'][0]['ecefLatitude'] += i
-                changed_data = copy.deepcopy(changed_data)
-                events.append(changed_data)
-        return events
-
-    def get_tracking(self, obj):
+    def get_tracking_initial(self, obj):
         data = dict()
-        events = list()
-        if (shipping_type := obj.freight_rate.shipping_mode.shipping_type.title) == 'air':
-            data['shipping_type'] = shipping_type
-            data['direction'] = 'export' if obj.freight_rate.origin.code.startswith(MAIN_COUNTRY_CODE) else 'import'
-            data['origin'] = obj.freight_rate.origin.get_lat_long_coordinates()
-            data['destination'] = obj.freight_rate.destination.get_lat_long_coordinates()
-            changed_data = copy.deepcopy(test_track_data_1['events'])
-            for i in range(1, 10, 4):
-                changed_data[0]['ecefLongitude'] += i
-                changed_data[0]['ecefLatitude'] += i
-                changed_data = copy.deepcopy(changed_data)
-                events.append(changed_data)
-            data['events'] = events
+        data['shipping_type'] = obj.freight_rate.shipping_mode.shipping_type.title
+        data['direction'] = 'export' if obj.freight_rate.origin.code.startswith(MAIN_COUNTRY_CODE) else 'import'
+        data['origin'] = obj.freight_rate.origin.get_lat_long_coordinates()
+        data['destination'] = obj.freight_rate.destination.get_lat_long_coordinates()
         return data
 
 
@@ -883,13 +900,3 @@ class QuoteStatusRetrieveSerializer(QuoteStatusBaseSerializer):
     class Meta(QuoteStatusBaseSerializer.Meta):
         fields = QuoteStatusBaseSerializer.Meta.fields
         model = Status
-
-
-class TrackSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Track
-        fields = (
-            'id',
-            'date_created',
-            'data',
-        )

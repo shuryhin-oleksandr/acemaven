@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from app.handling.models import GlobalFee, LocalFee, ShippingType, ShippingMode, PackagingType, ContainerType, \
     IMOClass, ReleaseType, Carrier, Airline, Currency, Port, ExchangeRate, ClientPlatformSetting, GeneralSetting, \
-    AirTrackingSetting
+    AirTrackingSetting, SeaTrackingSetting
 
 
 @admin.register(ClientPlatformSetting)
@@ -26,6 +26,11 @@ class AirTrackingSettingAdmin(admin.ModelAdmin):
     pass
 
 
+@admin.register(SeaTrackingSetting)
+class SeaTrackingSettingAdmin(admin.ModelAdmin):
+    pass
+
+
 @admin.register(Port)
 class PortAdmin(admin.ModelAdmin):
     pass
@@ -43,7 +48,8 @@ class AirlineAdmin(admin.ModelAdmin):
 
 @admin.register(Carrier)
 class CarrierAdmin(admin.ModelAdmin):
-    list_display = ('title', 'shipping_type', )
+    list_display = ('title', 'shipping_type', 'scac',)
+    list_filter = ('shipping_type', )
 
 
 @admin.register(ReleaseType)

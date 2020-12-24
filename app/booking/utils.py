@@ -508,6 +508,28 @@ def make_copy_of_freight_rate(freight_rate, get_rates_map=False):
     return freight_rate, fees_map
 
 
+sea_event_codes = {
+    'UNK': 'Unknown',
+    'LTS': 'Land Transshipment',
+    'BTS': 'Barge Transshipment',
+    'CEP': 'Container empty to shipper',
+    'CPS': 'Container pickup at shipper',
+    'CGI': 'Container arrival at first POL (Gate in)',
+    'CLL': 'Container loaded at first POL',
+    'VDL': 'Vessel departure from first POL',
+    'VAT': 'Vessel arrival at T/S port',
+    'CDT': 'Container discharge at T/S port',
+    'TSD': 'Transshipment delay',
+    'CLT': 'Container loaded at T/S port',
+    'VDT': 'Vessel departure from T/S',
+    'VAD': 'Vessel arrival at final POD',
+    'CDD': 'Container discharge at final POD',
+    'CGO': 'Container departure from final POD (Gate out)',
+    'CDC': 'Container delivery to consignee',
+    'CER': 'Container empty return to depot',
+}
+
+
 test_track_data_1 = {
     "type": "flight status",
     "id": "1f7cb56b-7aa4-4077-b38d-9371a24fa45c",

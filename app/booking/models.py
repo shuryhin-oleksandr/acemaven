@@ -311,6 +311,13 @@ class Booking(models.Model):
     Model for booking instance.
     """
 
+    CHANGE_REQUESTED = 'change_requested'
+    CHANGE_CONFIRMED = 'change_confirmed'
+    CHANGE_REQUESTED_CHOICES = (
+        (CHANGE_REQUESTED, 'Booking Change Requested'),
+        (CHANGE_CONFIRMED, 'Booking Change Confirmed'),
+    )
+
     CONFIRMED = 'confirmed'
     ACCEPTED = 'accepted'
     REQUEST_RECEIVED = 'received'
@@ -352,6 +359,12 @@ class Booking(models.Model):
     is_assigned = models.BooleanField(
         _('Is assigned to user'),
         default=False,
+    )
+    change_request_status = models.CharField(
+        _('Booking change request status'),
+        max_length=30,
+        choices=CHANGE_REQUESTED_CHOICES,
+        null=True,
     )
     status = models.CharField(
         _('Booking confirmed or not'),
@@ -405,6 +418,10 @@ class Booking(models.Model):
 
     def __str__(self):
         return f'Booking of rate [{self.freight_rate}]'
+
+    @property
+    def shipping_type(self):
+        return self.freight_rate.shipping_mode.shipping_type.title
 
 
 class CancellationReason(models.Model):
@@ -807,7 +824,7 @@ class Transaction(models.Model):
 
 class Track(models.Model):
     """
-    Temporary model for tracking json.
+    Model for tracking json.
     """
 
     date_created = models.DateTimeField(
@@ -816,4 +833,60 @@ class Track(models.Model):
     )
     data = models.JSONField(
         _('Json data from tracking api'),
+        null=True,
     )
+    route = models.JSONField(
+        _('Json route data from tracking api'),
+        null=True,
+    )
+    comment = models.TextField(
+        _('Comment text'),
+        null=True,
+    )
+    manual = models.BooleanField(
+        _('Manually created tracking event'),
+        default=False,
+    )
+    status = models.ForeignKey(
+        'TrackStatus',
+        on_delete=models.SET_NULL,
+        null=True,
+    )
+    booking = models.ForeignKey(
+        'Booking',
+        on_delete=models.CASCADE,
+        related_name='tracking',
+        null=True,
+    )
+
+
+class TrackStatus(models.Model):
+    """
+    Tracking status model.
+    """
+
+    title = models.CharField(
+        _('Status title'),
+        max_length=256,
+    )
+    shipping_mode = models.ManyToManyField(
+        'handling.ShippingMode',
+        related_name='tracking_statuses',
+    )
+    direction = models.ManyToManyField(
+        'Direction',
+    )
+
+
+class Direction(models.Model):
+    """
+    Export/import direction model.
+    """
+
+    title = models.CharField(
+        _('Direction title'),
+        max_length=6,
+    )
+
+    def __str__(self):
+        return f'{self.title}'

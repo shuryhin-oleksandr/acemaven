@@ -11,10 +11,11 @@ from django.db import transaction
 from django.db.models import CharField, Case, When, Value, Q, Count
 
 from app.booking.filters import SurchargeFilterSet, FreightRateFilterSet, QuoteFilterSet, QuoteOrderingFilterBackend, \
-    BookingFilterSet, BookingOrderingFilterBackend, OperationFilterSet, OperationOrderingFilterBackend
+    BookingFilterSet, BookingOrderingFilterBackend, OperationFilterSet, OperationOrderingFilterBackend, \
+    TrackStatusFilterSet
 from app.booking.mixins import FeeGetQuerysetMixin
 from app.booking.models import Surcharge, UsageFee, Charge, FreightRate, Rate, Quote, Booking, Status, \
-    ShipmentDetails, CancellationReason, CargoGroup, Track
+    ShipmentDetails, CancellationReason, CargoGroup, Track, TrackStatus
 from app.booking.serializers import SurchargeSerializer, SurchargeEditSerializer, SurchargeListSerializer, \
     SurchargeRetrieveSerializer, UsageFeeSerializer, ChargeSerializer, FreightRateListSerializer, \
     SurchargeCheckDatesSerializer, FreightRateEditSerializer, FreightRateSerializer, FreightRateRetrieveSerializer, \
@@ -23,7 +24,7 @@ from app.booking.serializers import SurchargeSerializer, SurchargeEditSerializer
     QuoteClientListOrRetrieveSerializer, QuoteAgentListSerializer, QuoteAgentRetrieveSerializer, \
     QuoteStatusBaseSerializer, CargoGroupSerializer, BookingListBaseSerializer, BookingRetrieveSerializer, \
     ShipmentDetailsBaseSerializer, OperationSerializer, OperationListBaseSerializer, OperationRetrieveSerializer, \
-    OperationRetrieveClientSerializer, OperationRecalculateSerializer, TrackSerializer
+    OperationRetrieveClientSerializer, OperationRecalculateSerializer, TrackSerializer, TrackStatusSerializer
 from app.booking.utils import date_format, wm_calculate, freight_rate_search, calculate_freight_rate_charges, \
     get_fees, surcharge_search, make_copy_of_surcharge, make_copy_of_freight_rate
 from app.core.mixins import PermissionClassByActionMixin
@@ -730,6 +731,8 @@ class OperationViewSet(PermissionClassByActionMixin,
         change_request = operation.change_requests.first()
         operation.shipment_details.update(booking=change_request)
         operation.delete()
+        change_request.change_request_status = Booking.CHANGE_CONFIRMED
+        change_request.save()
         return Response(data={'id': change_request.id}, status=status.HTTP_200_OK)
 
     @action(methods=['post'], detail=True, url_path='cancel_change_request')
@@ -737,6 +740,8 @@ class OperationViewSet(PermissionClassByActionMixin,
         operation = self.get_object()
         change_requests = operation.change_requests.all()
         change_requests.delete()
+        operation.change_request_status = None
+        operation.save()
         return Response(status=status.HTTP_200_OK)
 
     @action(methods=['post'], detail=True, url_path='recalculate')
@@ -780,15 +785,29 @@ class TrackView(views.APIView):
     permission_classes = (AllowAny,)
 
     def post(self, request, *args, **kwargs):
+        data = request.data
+        booking_number = data.get('airWaybillNumber')
+        booking = Booking.objects.filter(shipment_details__booking_number=booking_number).first()
         try:
-            Track.objects.create(data=request.data)
+            Track.objects.create(data=data, booking=booking)
         except Exception:
-            Track.objects.create(data=str(request.data))
+            Track.objects.create(data=str(data), booking=booking)
         return Response(status=status.HTTP_201_CREATED)
 
 
 class TrackViewSet(mixins.ListModelMixin,
+                   mixins.CreateModelMixin,
+                   mixins.UpdateModelMixin,
                    viewsets.GenericViewSet):
     queryset = Track.objects.all()
     serializer_class = TrackSerializer
     permission_classes = (IsAuthenticated, )
+
+
+class TrackStatusViewSet(mixins.ListModelMixin,
+                         viewsets.GenericViewSet):
+    queryset = TrackStatus.objects.all()
+    serializer_class = TrackStatusSerializer
+    permission_classes = (IsAuthenticated, )
+    filter_class = TrackStatusFilterSet
+    filter_backends = (rest_framework.DjangoFilterBackend, )

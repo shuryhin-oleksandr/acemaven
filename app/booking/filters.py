@@ -3,7 +3,7 @@ from rest_framework import filters
 import django_filters
 from django.db.models import Q
 
-from app.booking.models import FreightRate, Surcharge, Quote, Booking
+from app.booking.models import FreightRate, Surcharge, Quote, Booking, TrackStatus
 from app.core.models import Company
 
 
@@ -200,3 +200,14 @@ class OperationOrderingFilterBackend(filters.BaseFilterBackend):
                 queryset = queryset.order_by(ordering)
 
         return queryset
+
+
+class TrackStatusFilterSet(django_filters.FilterSet):
+    direction = django_filters.CharFilter(field_name='direction__title')
+
+    class Meta:
+        model = TrackStatus
+        fields = (
+            'shipping_mode',
+            'direction',
+        )

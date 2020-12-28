@@ -4,7 +4,7 @@ from rest_framework.routers import DefaultRouter
 
 from app.booking.views import SurchargeViesSet, UsageFeeViesSet, ChargeViesSet, FreightRateViesSet, \
     RateViesSet, WMCalculateView, QuoteViesSet, BookingViesSet, StatusViesSet, ShipmentDetailsViesSet, \
-    OperationViewSet, TrackView, TrackViewSet, TrackStatusViewSet
+    OperationViewSet, TrackView, TrackViewSet, TrackStatusViewSet, PixApiView
 
 
 app_name = 'booking'
@@ -28,4 +28,5 @@ urlpatterns = router.urls
 urlpatterns += [
     path('calculate/', WMCalculateView.as_view()),
     path('champ-tracking/', TrackView.as_view()),
+    path('pix-api-hook/', PixApiView.as_view()),
 ]

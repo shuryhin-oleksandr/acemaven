@@ -822,6 +822,16 @@ class Transaction(models.Model):
     )
 
 
+class PaymentData(models.Model):
+    """
+    Model to save pix api callback data.
+    """
+
+    data = models.JSONField(
+        _('Json data'),
+    )
+
+
 class Track(models.Model):
     """
     Model for tracking json.

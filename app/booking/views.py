@@ -15,7 +15,7 @@ from app.booking.filters import SurchargeFilterSet, FreightRateFilterSet, QuoteF
     TrackStatusFilterSet
 from app.booking.mixins import FeeGetQuerysetMixin
 from app.booking.models import Surcharge, UsageFee, Charge, FreightRate, Rate, Quote, Booking, Status, \
-    ShipmentDetails, CancellationReason, CargoGroup, Track, TrackStatus
+    ShipmentDetails, CancellationReason, CargoGroup, Track, TrackStatus, PaymentData
 from app.booking.serializers import SurchargeSerializer, SurchargeEditSerializer, SurchargeListSerializer, \
     SurchargeRetrieveSerializer, UsageFeeSerializer, ChargeSerializer, FreightRateListSerializer, \
     SurchargeCheckDatesSerializer, FreightRateEditSerializer, FreightRateSerializer, FreightRateRetrieveSerializer, \
@@ -792,6 +792,18 @@ class TrackView(views.APIView):
             Track.objects.create(data=data, booking=booking)
         except Exception:
             Track.objects.create(data=str(data), booking=booking)
+        return Response(status=status.HTTP_201_CREATED)
+
+
+class PixApiView(views.APIView):
+    permission_classes = (AllowAny, )
+
+    def post(self, request, *args, **kwargs):
+        data = request.data
+        try:
+            PaymentData.objects.create(data=data)
+        except Exception:
+            PaymentData.objects.create(data=str(data))
         return Response(status=status.HTTP_201_CREATED)
 
 

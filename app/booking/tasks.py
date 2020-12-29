@@ -53,7 +53,7 @@ def track_confirmed_sea_operations():
     operations = Booking.objects.filter(
         status=Booking.CONFIRMED,
         freight_rate__shipping_mode__shipping_type__title='sea',
-        freight_rate__carrier__scac__isnull=False,
+        automatic_tracking=True,
         original_booking__isnull=True,
     )
     for operation in operations:

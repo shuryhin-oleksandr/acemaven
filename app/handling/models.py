@@ -301,6 +301,16 @@ class Carrier(models.Model):
         max_length=4,
         null=True,
     )
+    code = models.CharField(
+        _('2 letter air code'),
+        max_length=2,
+        null=True,
+    )
+    prefix = models.CharField(
+        _('Airline prefix'),
+        max_length=3,
+        null=True,
+    )
     shipping_type = models.ForeignKey(
         'ShippingType',
         on_delete=models.CASCADE,
@@ -734,6 +744,29 @@ class SeaTrackingSetting(SingletonModel):
 
     def __str__(self):
         return 'Sea tracking api general settings'
+
+#
+# class PixApiSetting(models.Model):
+#     """
+#     Pix api setting model.
+#     """
+#
+#     token_url = models.CharField(
+#         _('Pix api token url'),
+#         max_length=256,
+#     )
+#     client_id = models.TextField(
+#         _('Client id'),
+#     )
+#     client_secret = models.TextField(
+#         _('Client secret'),
+#     )
+#     developer_key = models.TextField(
+#         _('Developer key'),
+#     )
+#     basic_token = models.TextField(
+#         _('Basic '),
+#     )
 
 
 class Notification(models.Model):

@@ -48,7 +48,7 @@ class AirlineAdmin(admin.ModelAdmin):
 
 @admin.register(Carrier)
 class CarrierAdmin(admin.ModelAdmin):
-    list_display = ('title', 'shipping_type', 'scac',)
+    list_display = ('title', 'shipping_type', 'scac', 'code', 'prefix', )
     list_filter = ('shipping_type', )
 
 

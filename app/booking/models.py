@@ -398,6 +398,10 @@ class Booking(models.Model):
         _('Charges calculations'),
         null=True,
     )
+    automatic_tracking = models.BooleanField(
+        _('Automatic status tracking'),
+        default=False,
+    )
     freight_rate = models.ForeignKey(
         'FreightRate',
         on_delete=models.CASCADE,

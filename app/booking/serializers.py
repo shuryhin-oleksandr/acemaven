@@ -691,8 +691,11 @@ class ShipmentDetailsBaseSerializer(serializers.ModelSerializer):
         shipment_detail = super().create(validated_data)
         booking = validated_data['booking']
         booking.status = Booking.CONFIRMED
+        carrier = booking.freight_rate.carrier
+        if carrier.scac or carrier.code:
+            booking.automatic_tracking = True
         booking.save()
-        if booking.shipping_type == 'air':
+        if booking.shipping_type == 'air' and booking.automatic_tracking:
             send_awb_number_to_air_tracking_api.delay(shipment_detail.booking_number)
         return shipment_detail
 
@@ -719,6 +722,14 @@ class TrackSerializer(serializers.ModelSerializer):
         validated_data['manual'] = True
         instance = super().update(instance, validated_data)
         return instance
+
+
+class TrackRetrieveSerializer(TrackSerializer):
+    status = serializers.CharField(source='status.title', default=None)
+
+    class Meta(TrackSerializer.Meta):
+        model = Track
+        fields = TrackSerializer.Meta.fields
 
 
 class TrackStatusSerializer(serializers.ModelSerializer):
@@ -799,7 +810,7 @@ class OperationListBaseSerializer(OperationSerializer):
     has_change_request = serializers.SerializerMethodField()
     can_be_patched = serializers.SerializerMethodField()
     tracking_initial = serializers.SerializerMethodField()
-    tracking = TrackSerializer(many=True)
+    tracking = TrackRetrieveSerializer(many=True)
 
     class Meta(OperationSerializer.Meta):
         model = Booking
@@ -812,6 +823,7 @@ class OperationListBaseSerializer(OperationSerializer):
             'can_be_patched',
             'tracking_initial',
             'tracking',
+            'automatic_tracking',
         )
 
     def get_status(self, obj):

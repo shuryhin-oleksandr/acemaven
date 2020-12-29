@@ -54,6 +54,7 @@ def track_confirmed_sea_operations():
         status=Booking.CONFIRMED,
         freight_rate__shipping_mode__shipping_type__title='sea',
         freight_rate__carrier__scac__isnull=False,
+        original_booking__isnull=True,
     )
     for operation in operations:
         booking_number = operation.shipment_details.first().booking_number

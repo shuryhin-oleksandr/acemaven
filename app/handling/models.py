@@ -745,28 +745,41 @@ class SeaTrackingSetting(SingletonModel):
     def __str__(self):
         return 'Sea tracking api general settings'
 
-#
-# class PixApiSetting(models.Model):
-#     """
-#     Pix api setting model.
-#     """
-#
-#     token_url = models.CharField(
-#         _('Pix api token url'),
-#         max_length=256,
-#     )
-#     client_id = models.TextField(
-#         _('Client id'),
-#     )
-#     client_secret = models.TextField(
-#         _('Client secret'),
-#     )
-#     developer_key = models.TextField(
-#         _('Developer key'),
-#     )
-#     basic_token = models.TextField(
-#         _('Basic '),
-#     )
+
+class PixApiSetting(models.Model):
+    """
+    Pix api setting model.
+    """
+
+    base_url = models.CharField(
+        _('Pix api base url'),
+        max_length=256,
+    )
+    token_uri = models.CharField(
+        _('Pix api token uri'),
+        max_length=256,
+    )
+    cob_uri = models.CharField(
+        _('Pix api cob uri'),
+        max_length=256,
+    )
+    client_id = models.TextField(
+        _('Client id'),
+    )
+    client_secret = models.TextField(
+        _('Client secret'),
+    )
+    developer_key = models.TextField(
+        _('Developer key'),
+    )
+    basic_token = models.TextField(
+        _('Basic token value'),
+    )
+    bank_account = models.OneToOneField(
+        'core.BankAccount',
+        on_delete=models.CASCADE,
+        related_name='pix_api',
+    )
 
 
 class Notification(models.Model):

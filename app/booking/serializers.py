@@ -715,6 +715,7 @@ class TrackSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data['manual'] = True
+        validated_data['created_by'] = self.context['request'].user
         instance = super().create(validated_data)
         return instance
 
@@ -726,10 +727,13 @@ class TrackSerializer(serializers.ModelSerializer):
 
 class TrackRetrieveSerializer(TrackSerializer):
     status = serializers.CharField(source='status.title', default=None)
+    created_by = serializers.CharField(source='created_by.get_full_name', default=None)
 
     class Meta(TrackSerializer.Meta):
         model = Track
-        fields = TrackSerializer.Meta.fields
+        fields = TrackSerializer.Meta.fields + (
+            'created_by',
+        )
 
 
 class TrackStatusSerializer(serializers.ModelSerializer):

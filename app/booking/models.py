@@ -861,6 +861,11 @@ class Track(models.Model):
         _('Manually created tracking event'),
         default=False,
     )
+    created_by = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.SET_NULL,
+        null=True,
+    )
     status = models.ForeignKey(
         'TrackStatus',
         on_delete=models.SET_NULL,

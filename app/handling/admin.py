@@ -85,6 +85,23 @@ class ShippingTypeAdmin(admin.ModelAdmin):
 @admin.register(ExchangeRate)
 class ExchangeRateTypeAdmin(admin.ModelAdmin):
     list_display = ('currency', 'rate', 'spread',)
+    fieldsets = (
+        (None, {
+            'fields': (
+                'rate',
+                'spread',
+                'currency',
+            ),
+        }),
+    )
+
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+        return queryset.filter(is_platforms=True)
+
+    def save_model(self, request, obj, form, change):
+        obj.is_platforms = True
+        obj.save()
 
 
 class ListTopFilter(admin.filters.ChoicesFieldListFilter):

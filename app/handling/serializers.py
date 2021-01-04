@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from app.handling.models import Carrier, Port, ShippingMode, ShippingType, ContainerType, Currency, PackagingType, \
-    ReleaseType
+    ReleaseType, ExchangeRate, BillingExchangeRate
 from app.booking.models import AdditionalSurcharge
 from app.location.models import Country
 
@@ -141,3 +141,53 @@ class ReleaseTypeSerializer(serializers.ModelSerializer):
             'code',
             'title',
         )
+
+
+class ExchangeRateBaseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ExchangeRate
+        fields = (
+            'id',
+            'rate',
+            'spread',
+            'currency',
+        )
+
+
+class ExchangeRateRetrieveSerializer(ExchangeRateBaseSerializer):
+    currency = serializers.CharField(source='currency.code', default=None)
+
+    class Meta(ExchangeRateBaseSerializer.Meta):
+        model = ExchangeRate
+        fields = ExchangeRateBaseSerializer.Meta.fields
+
+
+class BillingExchangeRateBaseSerializer(serializers.ModelSerializer):
+    rates = ExchangeRateBaseSerializer(many=True)
+
+    class Meta:
+        model = BillingExchangeRate
+        fields = (
+            'id',
+            'date',
+            'rates',
+        )
+
+    def create(self, validated_data):
+        user = self.context['request'].user
+        company = user.get_company()
+        validated_data['company'] = company
+        rates = validated_data.pop('rates', [])
+        billing_exchange_rate = super().create(validated_data)
+        rates = [{**item, **{'billing_exchange_rate': billing_exchange_rate}} for item in rates]
+        new_rates = [ExchangeRate(**fields) for fields in rates]
+        ExchangeRate.objects.bulk_create(new_rates)
+        return billing_exchange_rate
+
+
+class BillingExchangeRateListSerializer(BillingExchangeRateBaseSerializer):
+    rates = ExchangeRateRetrieveSerializer(many=True)
+
+    class Meta(BillingExchangeRateBaseSerializer.Meta):
+        model = BillingExchangeRate
+        fields = BillingExchangeRateBaseSerializer.Meta.fields

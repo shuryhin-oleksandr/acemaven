@@ -193,7 +193,10 @@ def calculate_freight_rate_charges(freight_rate,
         totals['booking_fee'] = dict()
     if shipping_mode.is_need_volume:
         rate = freight_rate.rates.first()
-        exchange_rate = ExchangeRate.objects.filter(currency__code=rate.currency.code).first()
+        exchange_rate = ExchangeRate.objects.filter(
+            currency__code=rate.currency.code,
+            is_platforms=True,
+        ).first()
         for cargo_group in cargo_groups:
             new_cargo_group = dict()
             total_weight_per_pack, total_weight = wm_calculate(cargo_group, shipping_mode.shipping_type.title)
@@ -232,7 +235,10 @@ def calculate_freight_rate_charges(freight_rate,
         for cargo_group in cargo_groups:
             new_cargo_group = dict()
             rate = rates.filter(container_type=cargo_group.get('container_type')).first()
-            exchange_rate = ExchangeRate.objects.filter(currency__code=rate.currency.code).first()
+            exchange_rate = ExchangeRate.objects.filter(
+                currency__code=rate.currency.code,
+                is_platforms=True,
+            ).first()
 
             new_cargo_group['freight'] = calculate_freight_rate(totals,
                                                                 rate,
@@ -286,7 +292,10 @@ def calculate_freight_rate_charges(freight_rate,
         result['booking_fee'] = totals.pop('booking_fee', {})
         exchange_rates = dict()
         for key, _ in result['booking_fee'].items():
-            exchange_rate = ExchangeRate.objects.filter(currency__code=key).first()
+            exchange_rate = ExchangeRate.objects.filter(
+                currency__code=key,
+                is_platforms=True,
+            ).first()
             exchange_rates[key] = float(exchange_rate.rate) * (1 + float(exchange_rate.spread) / 100)
         result['exchange_rates'] = exchange_rates
         booking_fee_in_local_currency = totals.pop('booking_fee_in_local_currency', 0)
@@ -300,7 +309,10 @@ def calculate_freight_rate_charges(freight_rate,
                 for currency, value in totals.items():
                     current_value = value * float_service_fee_value / 100
                     if currency != main_currency_code:
-                        exchange_rate = ExchangeRate.objects.filter(currency__code=currency).first()
+                        exchange_rate = ExchangeRate.objects.filter(
+                            currency__code=currency,
+                            is_platforms=True,
+                        ).first()
                         current_value = current_value * (float(exchange_rate.rate) *
                                                          (1 + float(exchange_rate.spread) / 100))
                     service_fee_value += current_value

@@ -632,9 +632,35 @@ class ExchangeRate(models.Model):
         on_delete=models.CASCADE,
         limit_choices_to=models.Q(is_active=True, is_main=False),
     )
+    is_platforms = models.BooleanField(
+        _('Is exchange rate of the platform'),
+        default=False,
+    )
+    billing_exchange_rate = models.ForeignKey(
+        'BillingExchangeRate',
+        on_delete=models.CASCADE,
+        related_name='rates',
+        null=True,
+    )
 
     def __str__(self):
         return f'Exchange rate from {self.currency.code}'
+
+
+class BillingExchangeRate(models.Model):
+    """
+    Billing company exchange rate model.
+    """
+
+    date = models.DateField(
+        _('Exchange rate date'),
+        auto_now_add=True,
+    )
+    company = models.ForeignKey(
+        'core.Company',
+        on_delete=models.CASCADE,
+        related_name='exchange_rates',
+    )
 
 
 class ClientPlatformSetting(SingletonModel):

@@ -5,10 +5,12 @@ from rest_framework.filters import SearchFilter
 
 from django.db.models import BooleanField, Case, QuerySet, When, Q
 
+from app.core.permissions import IsAgentCompany, IsMasterOrBilling
 from app.handling.filters import CarrierFilterSet, PortFilterSet
-from app.handling.models import Carrier, Port, ShippingMode, ShippingType, Currency, PackagingType
+from app.handling.models import Carrier, Port, ShippingMode, ShippingType, Currency, PackagingType, BillingExchangeRate
 from app.handling.serializers import CarrierSerializer, CurrencySerializer, PortSerializer, ShippingModeSerializer, \
-    ShippingTypeSerializer, PackagingTypeBaseSerializer
+    ShippingTypeSerializer, PackagingTypeBaseSerializer, BillingExchangeRateBaseSerializer, \
+    BillingExchangeRateListSerializer
 from app.location.models import Country
 
 
@@ -76,3 +78,25 @@ class CurrencyViewSet(mixins.ListModelMixin,
 
     def get_queryset(self):
         return Currency.objects.filter(Q(country__code=MAIN_COUNTRY_CODE) | (Q(is_active=True))).distinct()
+
+
+class BillingExchangeRateViewSet(mixins.CreateModelMixin,
+                                 mixins.ListModelMixin,
+                                 viewsets.GenericViewSet):
+    queryset = BillingExchangeRate.objects.all()
+    serializer_class = BillingExchangeRateBaseSerializer
+    permission_classes = (
+        IsAuthenticated,
+        IsAgentCompany,
+        IsMasterOrBilling,
+    )
+
+    def get_queryset(self):
+        user = self.request.user
+        company = user.get_company()
+        return self.queryset.filter(company=company)
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return BillingExchangeRateListSerializer
+        return self.serializer_class

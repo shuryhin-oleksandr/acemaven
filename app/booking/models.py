@@ -878,6 +878,9 @@ class Track(models.Model):
         null=True,
     )
 
+    class Meta:
+        ordering = ('-date_created', )
+
 
 class TrackStatus(models.Model):
     """

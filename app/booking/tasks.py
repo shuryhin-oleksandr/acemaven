@@ -4,6 +4,7 @@ import requests
 
 from config.celery import celery_app
 from django.db.models import Q
+from django.utils import timezone
 
 from app.booking.models import Quote, Booking, Track
 from app.booking.utils import sea_event_codes
@@ -15,7 +16,7 @@ logger = logging.getLogger("acemaven.task.logging")
 @celery_app.task(name='archive_quotes')
 def daily_archive_expired_quotes():
     settings_days_limit = ClientPlatformSetting.load().number_of_days
-    now_date = datetime.datetime.now().date()
+    now_date = timezone.localtime().date()
     Quote.objects.filter(
         Q(
             date_created__lt=now_date - datetime.timedelta(days=settings_days_limit),

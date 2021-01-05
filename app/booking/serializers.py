@@ -1,8 +1,10 @@
-import copy
-from django.db import transaction
+from datetime import timedelta
+
 from rest_framework import serializers
 
+from django.db import transaction
 from django.db.models import Min
+from django.utils import timezone
 
 from app.booking.models import Surcharge, UsageFee, Charge, AdditionalSurcharge, FreightRate, Rate, CargoGroup, Quote, \
     Booking, Status, ShipmentDetails, CancellationReason, Track, TrackStatus
@@ -881,6 +883,7 @@ class OperationRetrieveSerializer(OperationListBaseSerializer):
 
 class OperationRetrieveClientSerializer(OperationRetrieveSerializer):
     agent_bank_account = serializers.SerializerMethodField()
+    tracking = serializers.SerializerMethodField()
 
     class Meta(OperationRetrieveSerializer.Meta):
         model = Booking
@@ -894,6 +897,13 @@ class OperationRetrieveClientSerializer(OperationRetrieveSerializer):
             if bank_account:
                 return BankAccountBaseSerializer(bank_account).data
         return {}
+
+    def get_tracking(self, obj):
+        serializer = TrackRetrieveSerializer(
+            obj.tracking.filter(date_created__lt=timezone.localtime()-timedelta(minutes=5)),
+            many=True
+        )
+        return serializer.data
 
 
 class QuoteStatusBaseSerializer(serializers.ModelSerializer):

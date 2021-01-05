@@ -1,3 +1,5 @@
+from django.utils import timezone
+
 from rest_framework import serializers
 
 from app.handling.models import Carrier, Port, ShippingMode, ShippingType, ContainerType, Currency, PackagingType, \
@@ -176,9 +178,16 @@ class BillingExchangeRateBaseSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = self.context['request'].user
         company = user.get_company()
-        validated_data['company'] = company
         rates = validated_data.pop('rates', [])
-        billing_exchange_rate = super().create(validated_data)
+        billing_exchange_rate = BillingExchangeRate.objects.filter(
+            date=timezone.localtime().date(),
+            company=company,
+        ).first()
+        if billing_exchange_rate:
+            billing_exchange_rate.rates.all().delete()
+        else:
+            validated_data['company'] = company
+            billing_exchange_rate = super().create(validated_data)
         rates = [{**item, **{'billing_exchange_rate': billing_exchange_rate}} for item in rates]
         new_rates = [ExchangeRate(**fields) for fields in rates]
         ExchangeRate.objects.bulk_create(new_rates)

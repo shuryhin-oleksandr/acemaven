@@ -24,7 +24,8 @@ from app.booking.serializers import SurchargeSerializer, SurchargeEditSerializer
     QuoteClientListOrRetrieveSerializer, QuoteAgentListSerializer, QuoteAgentRetrieveSerializer, \
     QuoteStatusBaseSerializer, CargoGroupSerializer, BookingListBaseSerializer, BookingRetrieveSerializer, \
     ShipmentDetailsBaseSerializer, OperationSerializer, OperationListBaseSerializer, OperationRetrieveSerializer, \
-    OperationRetrieveClientSerializer, OperationRecalculateSerializer, TrackSerializer, TrackStatusSerializer
+    OperationRetrieveClientSerializer, OperationRecalculateSerializer, TrackSerializer, TrackStatusSerializer, \
+    TrackRetrieveSerializer
 from app.booking.utils import date_format, wm_calculate, freight_rate_search, calculate_freight_rate_charges, \
     get_fees, surcharge_search, make_copy_of_surcharge, make_copy_of_freight_rate
 from app.core.mixins import PermissionClassByActionMixin
@@ -810,10 +811,21 @@ class PixApiView(views.APIView):
 class TrackViewSet(mixins.ListModelMixin,
                    mixins.CreateModelMixin,
                    mixins.UpdateModelMixin,
+                   mixins.DestroyModelMixin,
                    viewsets.GenericViewSet):
     queryset = Track.objects.all()
     serializer_class = TrackSerializer
     permission_classes = (IsAuthenticated, )
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        new_track_id = serializer.data.get('id')
+        track = Track.objects.get(id=new_track_id)
+        data = TrackRetrieveSerializer(track).data
+        return Response(data=data, status=status.HTTP_201_CREATED, headers=headers)
 
 
 class TrackStatusViewSet(mixins.ListModelMixin,

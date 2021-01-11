@@ -76,6 +76,7 @@ class CompanySerializer(CompanyBaseSerializer):
 
 class CompanyReviewSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField()
+    shipping_types = serializers.SerializerMethodField()
     date_created = serializers.SerializerMethodField()
     operations_are_done = serializers.SerializerMethodField()
     rating = serializers.SerializerMethodField()
@@ -86,6 +87,7 @@ class CompanyReviewSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'name',
+            'shipping_types',
             'date_created',
             'operations_are_done',
             'rating',
@@ -96,6 +98,11 @@ class CompanyReviewSerializer(serializers.ModelSerializer):
         general_settings = GeneralSetting.load()
         show_freight_forwarder_name = general_settings.show_freight_forwarder_name
         return obj.name if show_freight_forwarder_name == GeneralSetting.ALL else '*Agent company name'
+
+    def get_shipping_types(self, obj):
+        return obj.freight_rates.\
+            distinct('shipping_mode__shipping_type').\
+            values_list('shipping_mode__shipping_type__title', flat=True)
 
     def get_date_created(self, obj):
         return f'{obj.date_created.strftime("%m %B %Y")} ' \

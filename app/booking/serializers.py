@@ -895,11 +895,13 @@ class OperationRetrieveSerializer(OperationListBaseSerializer):
 class OperationRetrieveClientSerializer(OperationRetrieveSerializer):
     agent_bank_account = serializers.SerializerMethodField()
     tracking = serializers.SerializerMethodField()
+    has_review = serializers.SerializerMethodField()
 
     class Meta(OperationRetrieveSerializer.Meta):
         model = Booking
         fields = OperationRetrieveSerializer.Meta.fields + (
             'agent_bank_account',
+            'has_review',
         )
 
     def get_agent_bank_account(self, obj):
@@ -915,6 +917,9 @@ class OperationRetrieveClientSerializer(OperationRetrieveSerializer):
             many=True
         )
         return serializer.data
+
+    def get_has_review(self,  obj):
+        return True if hasattr(obj, 'review') else False
 
 
 class QuoteStatusBaseSerializer(serializers.ModelSerializer):

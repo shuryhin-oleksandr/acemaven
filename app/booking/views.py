@@ -32,7 +32,6 @@ from app.core.mixins import PermissionClassByActionMixin
 from app.core.models import Company
 from app.core.permissions import IsMasterOrAgent, IsClientCompany, IsAgentCompany, IsMaster
 from app.core.serializers import ReviewBaseSerializer
-from app.core.utils import get_average_company_rating
 from app.handling.models import Port, Currency, ClientPlatformSetting
 from app.location.models import Country
 

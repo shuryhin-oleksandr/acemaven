@@ -4,7 +4,7 @@ from rest_framework import serializers
 from django.db import transaction
 from django.contrib.auth import get_user_model
 
-from app.core.models import BankAccount, Company, SignUpRequest, Role, Shipper
+from app.core.models import BankAccount, Company, SignUpRequest, Role, Shipper, Review
 from app.core.utils import process_sign_up_token
 from app.core.validators import PasswordValidator
 from app.handling.serializers import ReleaseTypeSerializer, PackagingTypeBaseSerializer, ContainerTypesBaseSerializer
@@ -257,3 +257,20 @@ class ShipperSerializer(serializers.ModelSerializer):
             'phone_additional',
             'email',
         )
+
+
+class ReviewBaseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = (
+            'id',
+            'rating',
+            'comment',
+            'operation',
+        )
+
+    def create(self, validated_data):
+        user = self.context['request'].user
+        validated_data['reviewer'] = user
+        review = super().create(validated_data)
+        return review

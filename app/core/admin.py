@@ -6,7 +6,7 @@ from django.db import transaction
 from django.forms import model_to_dict
 from django.http import HttpResponseRedirect
 
-from app.core.models import CustomUser, Company, BankAccount, Role, SignUpRequest, SignUpToken
+from app.core.models import CustomUser, Company, BankAccount, Role, SignUpRequest, SignUpToken, Review
 from app.core.utils import master_account_processing
 from app.handling.models import LocalFee
 from app.core.tasks import create_company_empty_fees
@@ -118,8 +118,16 @@ class CustomUserAdmin(admin.ModelAdmin):
 @admin.register(Company)
 class CompanyAdmin(TabbedModelAdmin):
     model = Company
-    list_display = ('id', 'name', 'type', )
-    list_display_links = ('id', 'name', )
+    list_display = (
+        'id',
+        'name',
+        'type',
+        'date_created',
+    )
+    list_display_links = (
+        'id',
+        'name',
+    )
     tab_company = (
         (None, {
             'fields': (
@@ -213,5 +221,47 @@ class SignUpRequestAdmin(admin.ModelAdmin):
                 except Exception as error:
                     self.message_user(request, f"Company with provided phone number or tax id already exists. "
                                                f"Additional info [{error}]")
+            return HttpResponseRedirect(".")
+        return super().response_change(request, obj)
+
+
+@admin.register(Review)
+class ReviewAdmin(admin.ModelAdmin):
+    change_form_template = 'core/review_changeform.html'
+    list_display = (
+        'operation',
+        'rating',
+        'comment',
+        'date_created',
+        'approved',
+    )
+    ordering = (
+        'approved',
+        'date_created',
+    )
+    fieldsets = (
+        ('Review info', {
+            'fields': (
+                'rating',
+                'comment',
+                'reviewer',
+                'operation',
+            ),
+        }),
+        ('Approved', {
+            'fields': (
+                'approved',
+            ),
+        }),
+    )
+
+    def response_change(self, request, obj):
+        if "_approve_review" in request.POST:
+            if obj.approved:
+                self.message_user(request, "Review was already approved.")
+            else:
+                obj.approved = True
+                obj.save()
+                self.message_user(request, "Review successfully approved.")
             return HttpResponseRedirect(".")
         return super().response_change(request, obj)

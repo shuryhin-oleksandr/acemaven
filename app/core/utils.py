@@ -2,8 +2,9 @@ import random
 import string
 
 from django.contrib.auth import get_user_model
+from django.db.models import Avg
 
-from app.core.models import Role, SignUpToken
+from app.core.models import Role, SignUpToken, Review
 from app.core.tasks import send_registration_email
 
 
@@ -28,3 +29,11 @@ def choice_to_value_name(choices):
     for value, name in choices:
         value_name_list.append({'id': value, 'title': name})
     return value_name_list
+
+
+def get_average_company_rating(company):
+    average_rating = Review.objects.filter(
+        operation__agent_contact_person__companies=company,
+        approved=True,
+    ).aggregate(average_rating=Avg('rating')).get('average_rating')
+    return average_rating

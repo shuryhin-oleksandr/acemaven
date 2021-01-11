@@ -4,7 +4,7 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser, Group
-from django.core.validators import RegexValidator
+from django.core.validators import RegexValidator, MinValueValidator, MaxValueValidator
 from django.utils.translation import gettext_lazy as _
 
 
@@ -201,6 +201,10 @@ class Company(models.Model):
         max_length=100,
         blank=True,
         null=True,
+    )
+    date_created = models.DateField(
+        _('Date company created'),
+        auto_now_add=True,
     )
 
     def __str__(self):
@@ -470,3 +474,43 @@ class Shipper(models.Model):
 
     def __str__(self):
         return f'Shipper {self.name}, {self.phone}'
+
+
+class Review(models.Model):
+    """
+    Model for company reviews from clients.
+    """
+
+    rating = models.PositiveIntegerField(
+        _('Company rating from 1 to 10'),
+        validators=[MinValueValidator(1), MaxValueValidator(10)],
+    )
+    comment = models.TextField(
+        _('Review text'),
+    )
+    approved = models.BooleanField(
+        _('Approved by platform'),
+        default=False,
+    )
+    date_created = models.DateTimeField(
+        _('Date review created'),
+        auto_now_add=True,
+    )
+    reviewer = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.SET_NULL,
+        null=True,
+    )
+    operation = models.OneToOneField(
+        'booking.Booking',
+        on_delete=models.CASCADE,
+    )
+
+    class Meta:
+        ordering = [
+            'reviewer__companies__name',
+            '-date_created',
+        ]
+
+    def __str__(self):
+        return f'Client review for company [{self.operation.agent_contact_person.get_company()}]'

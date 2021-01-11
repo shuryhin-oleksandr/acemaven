@@ -421,7 +421,7 @@ class Booking(models.Model):
     )
 
     def __str__(self):
-        return f'Booking of rate [{self.freight_rate}]'
+        return f'Booking [{self.id}] of rate [{self.freight_rate}]'
 
     @property
     def shipping_type(self):

@@ -31,6 +31,8 @@ from app.booking.utils import date_format, wm_calculate, freight_rate_search, ca
 from app.core.mixins import PermissionClassByActionMixin
 from app.core.models import Company
 from app.core.permissions import IsMasterOrAgent, IsClientCompany, IsAgentCompany, IsMaster
+from app.core.serializers import ReviewBaseSerializer
+from app.core.utils import get_average_company_rating
 from app.handling.models import Port, Currency, ClientPlatformSetting
 from app.location.models import Country
 
@@ -366,6 +368,8 @@ class FreightRateViesSet(PermissionClassByActionMixin,
                                                     service_fee=service_fee,
                                                     calculate_fees=calculate_fees,)
 
+            result['rating'] = get_average_company_rating(freight_rate.company)
+
             results.append(result)
 
         return Response(data=results, status=status.HTTP_200_OK)
@@ -684,6 +688,9 @@ class OperationViewSet(PermissionClassByActionMixin,
     queryset = Booking.objects.all()
     serializer_class = OperationSerializer
     permission_classes = (IsAuthenticated, )
+    permission_classes_by_action = {
+        'leave_review': (IsAuthenticated, IsClientCompany,),
+    }
     filter_class = OperationFilterSet
     filter_backends = (OperationOrderingFilterBackend, rest_framework.DjangoFilterBackend,)
 
@@ -710,6 +717,8 @@ class OperationViewSet(PermissionClassByActionMixin,
                 return OperationRetrieveClientSerializer
             else:
                 return OperationRetrieveSerializer
+        if self.action == 'leave_review':
+            return ReviewBaseSerializer
         return self.serializer_class
 
     @action(methods=['post'], detail=True, url_path='cancel')
@@ -767,6 +776,12 @@ class OperationViewSet(PermissionClassByActionMixin,
                                                 number_of_documents=number_of_documents)
 
         return Response(data=result, status=status.HTTP_200_OK)
+
+    @action(methods=['post'], detail=True, url_path='review')
+    def leave_review(self, request, *args, **kwargs):
+        operation = self.get_object()
+        request.data['operation'] = operation.id
+        return self.create(request, *args, **kwargs)
 
 
 class StatusViesSet(mixins.UpdateModelMixin,

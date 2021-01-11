@@ -3,11 +3,50 @@ from rest_framework import serializers
 
 from django.db import transaction
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 
+from app.booking.models import Booking
 from app.core.models import BankAccount, Company, SignUpRequest, Role, Shipper, Review
-from app.core.utils import process_sign_up_token
+from app.core.utils import process_sign_up_token, get_average_company_rating
 from app.core.validators import PasswordValidator
+from app.handling.models import GeneralSetting
 from app.handling.serializers import ReleaseTypeSerializer, PackagingTypeBaseSerializer, ContainerTypesBaseSerializer
+
+
+class ReviewBaseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = (
+            'id',
+            'rating',
+            'comment',
+            'operation',
+        )
+
+    def create(self, validated_data):
+        user = self.context['request'].user
+        validated_data['reviewer'] = user
+        review = super().create(validated_data)
+        return review
+
+
+class ReviewListSerializer(ReviewBaseSerializer):
+    route = serializers.SerializerMethodField()
+    company = serializers.CharField(source='reviewer.get_company')
+    reviewer_photo = serializers.ImageField(source='reviewer.photo')
+
+    class Meta(ReviewBaseSerializer.Meta):
+        model = Review
+        fields = ReviewBaseSerializer.Meta.fields + (
+            'date_created',
+            'route',
+            'company',
+            'reviewer_photo',
+        )
+
+    def get_route(self, obj):
+        freight_rate = obj.operation.freight_rate
+        return f'{freight_rate.shipping_mode.title}, {freight_rate.origin.code}-{freight_rate.destination.code}'
 
 
 class CompanyBaseSerializer(serializers.ModelSerializer):
@@ -33,6 +72,43 @@ class CompanySerializer(CompanyBaseSerializer):
             'employees_number',
             'website',
         )
+
+
+class CompanyReviewSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+    date_created = serializers.SerializerMethodField()
+    operations_are_done = serializers.SerializerMethodField()
+    rating = serializers.SerializerMethodField()
+    reviews = ReviewListSerializer(source='get_reviews', many=True)
+
+    class Meta:
+        model = Company
+        fields = (
+            'id',
+            'name',
+            'date_created',
+            'operations_are_done',
+            'rating',
+            'reviews',
+        )
+
+    def get_name(self, obj):
+        general_settings = GeneralSetting.load()
+        show_freight_forwarder_name = general_settings.show_freight_forwarder_name
+        return obj.name if show_freight_forwarder_name == GeneralSetting.ALL else '*Agent company name'
+
+    def get_date_created(self, obj):
+        return f'{obj.date_created.strftime("%m %B %Y")} ' \
+               f'({(timezone.localtime().date() - obj.date_created).days // 365} YEARS)'
+
+    def get_operations_are_done(self, obj):
+        return Booking.objects.filter(
+            freight_rate__company=obj,
+            status=Booking.COMPLETED,
+        ).count()
+
+    def get_rating(self, obj):
+        return get_average_company_rating(obj)
 
 
 class SignUpRequestSerializer(serializers.ModelSerializer):
@@ -257,20 +333,3 @@ class ShipperSerializer(serializers.ModelSerializer):
             'phone_additional',
             'email',
         )
-
-
-class ReviewBaseSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Review
-        fields = (
-            'id',
-            'rating',
-            'comment',
-            'operation',
-        )
-
-    def create(self, validated_data):
-        user = self.context['request'].user
-        validated_data['reviewer'] = user
-        review = super().create(validated_data)
-        return review

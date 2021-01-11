@@ -210,6 +210,12 @@ class Company(models.Model):
     def __str__(self):
         return f'{self.name}'
 
+    def get_reviews(self):
+        return Review.objects.filter(
+            operation__agent_contact_person__companies=self,
+            approved=True,
+        )
+
 
 class SignUpRequest(models.Model):
     """

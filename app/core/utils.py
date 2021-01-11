@@ -32,8 +32,5 @@ def choice_to_value_name(choices):
 
 
 def get_average_company_rating(company):
-    average_rating = Review.objects.filter(
-        operation__agent_contact_person__companies=company,
-        approved=True,
-    ).aggregate(average_rating=Avg('rating')).get('average_rating')
+    average_rating = company.get_reviews().aggregate(average_rating=Avg('rating')).get('average_rating')
     return average_rating

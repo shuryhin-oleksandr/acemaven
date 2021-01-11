@@ -11,7 +11,7 @@ from app.core.models import BankAccount, Company, SignUpRequest
 from app.core.permissions import IsMaster, IsMasterOrBilling, IsAgentCompany
 from app.core.serializers import CompanySerializer, SignUpRequestSerializer, UserBaseSerializer, UserCreateSerializer, \
     UserSignUpSerializer, BankAccountSerializer, UserMasterSerializer, UserSerializer, SelectChoiceSerializer, \
-    UserBaseSerializerWithPhoto
+    UserBaseSerializerWithPhoto, CompanyReviewSerializer
 from app.core.utils import choice_to_value_name
 from app.booking.models import CargoGroup, CancellationReason
 from app.handling.models import ReleaseType, PackagingType, ContainerType
@@ -42,6 +42,15 @@ class CompanyEditViewSet(mixins.RetrieveModelMixin,
     queryset = Company.objects.all()
     serializer_class = CompanySerializer
     permission_classes = (IsAuthenticated, )
+
+    def get_serializer_class(self):
+        if self.action == 'get_review':
+            return CompanyReviewSerializer
+        return self.serializer_class
+
+    @action(methods=['get'], detail=True, url_path='reviews')
+    def get_review(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
 
 
 class SignUpRequestViewSet(mixins.CreateModelMixin,

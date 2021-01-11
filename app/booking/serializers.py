@@ -12,7 +12,7 @@ from app.booking.tasks import send_awb_number_to_air_tracking_api
 from app.booking.utils import rate_surcharges_filter, calculate_freight_rate_charges, get_fees, generate_aceid
 from app.core.models import Shipper
 from app.core.serializers import ShipperSerializer, BankAccountBaseSerializer
-from app.handling.models import ShippingType, ClientPlatformSetting, Currency
+from app.handling.models import ShippingType, ClientPlatformSetting, Currency, GeneralSetting
 from app.handling.serializers import ContainerTypesSerializer, CurrencySerializer, CarrierBaseSerializer, \
     PortSerializer, ShippingModeBaseSerializer, PackagingTypeBaseSerializer, ReleaseTypeSerializer
 from app.location.models import Country
@@ -266,7 +266,7 @@ class FreightRateSearchListSerializer(FreightRateListSerializer):
     carrier = serializers.SerializerMethodField()
     origin = PortSerializer()
     destination = PortSerializer()
-    company = serializers.CharField(source='company.name')
+    company = serializers.SerializerMethodField()
 
     class Meta(FreightRateListSerializer.Meta):
         model = FreightRate
@@ -278,6 +278,15 @@ class FreightRateSearchListSerializer(FreightRateListSerializer):
     def get_carrier(self, obj):
         hide_carrier_name = ClientPlatformSetting.load().hide_carrier_name
         return 'disclosed' if obj.carrier_disclosure or hide_carrier_name else obj.carrier.title
+
+    def get_company(self, obj):
+        company_data = dict()
+        general_settings = GeneralSetting.load()
+        show_freight_forwarder_name = general_settings.show_freight_forwarder_name
+        name = obj.company.name if show_freight_forwarder_name == GeneralSetting.ALL else '*Agent company name'
+        company_data['name'] = name
+        company_data['id'] = obj.company.id
+        return company_data
 
 
 class FreightRateEditSerializer(serializers.ModelSerializer):

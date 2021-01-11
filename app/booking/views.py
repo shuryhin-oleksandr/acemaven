@@ -27,7 +27,8 @@ from app.booking.serializers import SurchargeSerializer, SurchargeEditSerializer
     OperationRetrieveClientSerializer, OperationRecalculateSerializer, TrackSerializer, TrackStatusSerializer, \
     TrackRetrieveSerializer
 from app.booking.utils import date_format, wm_calculate, freight_rate_search, calculate_freight_rate_charges, \
-    get_fees, surcharge_search, make_copy_of_surcharge, make_copy_of_freight_rate
+    get_fees, surcharge_search, make_copy_of_surcharge, make_copy_of_freight_rate, \
+    apply_operation_select_prefetch_related
 from app.core.mixins import PermissionClassByActionMixin
 from app.core.models import Company
 from app.core.permissions import IsMasterOrAgent, IsClientCompany, IsAgentCompany, IsMaster
@@ -705,7 +706,7 @@ class OperationViewSet(PermissionClassByActionMixin,
                 is_assigned=True,
                 is_paid=True,
             )
-        return queryset
+        return apply_operation_select_prefetch_related(queryset)
 
     def get_serializer_class(self):
         if self.action == 'list':

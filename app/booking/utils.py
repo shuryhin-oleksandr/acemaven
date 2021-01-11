@@ -541,7 +541,6 @@ sea_event_codes = {
     'CER': 'Container empty return to depot',
 }
 
-
 test_track_data_1 = {
     "type": "flight status",
     "id": "1f7cb56b-7aa4-4077-b38d-9371a24fa45c",
@@ -645,3 +644,30 @@ test_track_data_1 = {
     },
     "otherServiceInformation": "Extra charge due to special handling requirements.",
 }
+
+
+def apply_operation_select_prefetch_related(queryset):
+    queryset = queryset.select_related(
+        'freight_rate',
+        'client_contact_person',
+        'agent_contact_person',
+        'shipper',
+        'freight_rate__origin',
+        'freight_rate__destination',
+        'freight_rate__carrier',
+        'freight_rate__shipping_mode',
+    ).prefetch_related(
+        'cargo_groups',
+        'cargo_groups__container_type',
+        'freight_rate__rates',
+        'freight_rate__rates__currency',
+        'freight_rate__rates__surcharges',
+        'freight_rate__rates__surcharges__additional_surcharges',
+        'freight_rate__rates__surcharges__usage_fees',
+        'freight_rate__rates__surcharges__usage_fees__currency',
+        'freight_rate__rates__surcharges__charges',
+        'freight_rate__rates__surcharges__charges__currency',
+        'freight_rate__rates__surcharges__carrier',
+        'freight_rate__rates__surcharges__shipping_mode',
+    )
+    return queryset

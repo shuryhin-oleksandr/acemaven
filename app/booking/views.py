@@ -344,7 +344,7 @@ class FreightRateViesSet(PermissionClassByActionMixin,
         date_to = date_format(data.get('date_to'))
         freight_rates, shipping_mode = freight_rate_search(data)
 
-        client_platform_settings = ClientPlatformSetting.objects.first()
+        client_platform_settings = ClientPlatformSetting.load()
         number_of_results = client_platform_settings.number_of_results
         calculate_fees = client_platform_settings.enable_booking_fee_payment
         freight_rates = freight_rates.order_by('transit_time').distinct()[:number_of_results]
@@ -454,7 +454,7 @@ class QuoteViesSet(PermissionClassByActionMixin,
                                         statuses__status=Status.SUBMITTED,
                                         freight_rates__company=company)
 
-        number_of_bids = ClientPlatformSetting.objects.first().number_of_bids
+        number_of_bids = ClientPlatformSetting.load().number_of_bids
         queryset = queryset.annotate(bids_count=Count('statuses')).filter(bids_count__lt=number_of_bids)
 
         not_submitted_air = queryset.filter(shipping_mode__shipping_type__title='air').exclude(
@@ -487,7 +487,7 @@ class QuoteViesSet(PermissionClassByActionMixin,
     @action(methods=['post'], detail=True, url_path='submit')
     def submit_quote(self, request, *args, **kwargs):
         quote = self.get_object()
-        number_of_bids = ClientPlatformSetting.objects.first().number_of_bids
+        number_of_bids = ClientPlatformSetting.load().number_of_bids
         if quote.statuses.filter(status=Status.SUBMITTED).count() < number_of_bids:
             try:
                 with transaction.atomic():
@@ -689,6 +689,7 @@ class OperationViewSet(PermissionClassByActionMixin,
     serializer_class = OperationSerializer
     permission_classes = (IsAuthenticated, )
     permission_classes_by_action = {
+        'complete_operation': (IsAuthenticated, IsAgentCompany,),
         'leave_review': (IsAuthenticated, IsClientCompany,),
     }
     filter_class = OperationFilterSet
@@ -751,6 +752,13 @@ class OperationViewSet(PermissionClassByActionMixin,
         change_requests = operation.change_requests.all()
         change_requests.delete()
         operation.change_request_status = None
+        operation.save()
+        return Response(status=status.HTTP_200_OK)
+
+    @action(methods=['post'], detail=True, url_path='complete')
+    def complete_operation(self, request, *args, **kwargs):
+        operation = self.get_object()
+        operation.status = Booking.COMPLETED
         operation.save()
         return Response(status=status.HTTP_200_OK)
 

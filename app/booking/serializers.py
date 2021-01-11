@@ -276,7 +276,7 @@ class FreightRateSearchListSerializer(FreightRateListSerializer):
         )
 
     def get_carrier(self, obj):
-        hide_carrier_name = ClientPlatformSetting.objects.first().hide_carrier_name
+        hide_carrier_name = ClientPlatformSetting.load().hide_carrier_name
         return 'disclosed' if obj.carrier_disclosure or hide_carrier_name else obj.carrier.title
 
 
@@ -583,7 +583,7 @@ class BookingSerializer(serializers.ModelSerializer):
         freight_rate = validated_data.get('freight_rate')
         booking_fee, service_fee = get_fees(company, freight_rate.shipping_mode)
         number_of_documents = validated_data.get('number_of_documents')
-        calculate_fees = ClientPlatformSetting.objects.first().enable_booking_fee_payment
+        calculate_fees = ClientPlatformSetting.load().enable_booking_fee_payment
         try:
             with transaction.atomic():
                 result = calculate_freight_rate_charges(freight_rate,

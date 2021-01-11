@@ -8,7 +8,7 @@ from django.contrib.auth import get_user_model, authenticate
 
 from app.core.mixins import PermissionClassByActionMixin, CheckTokenMixin, CreateMixin
 from app.core.models import BankAccount, Company, SignUpRequest
-from app.core.permissions import IsMaster, IsMasterOrBilling, IsAgentCompany
+from app.core.permissions import IsMaster, IsMasterOrBilling, IsAgentCompany, IsClientCompany
 from app.core.serializers import CompanySerializer, SignUpRequestSerializer, UserBaseSerializer, UserCreateSerializer, \
     UserSignUpSerializer, BankAccountSerializer, UserMasterSerializer, UserSerializer, SelectChoiceSerializer, \
     UserBaseSerializerWithPhoto, CompanyReviewSerializer
@@ -35,13 +35,16 @@ class BankAccountViewSet(PermissionClassByActionMixin,
         return self.queryset.filter(company=user.get_company(), is_platforms=False)
 
 
-class CompanyEditViewSet(mixins.RetrieveModelMixin,
+class CompanyEditViewSet(PermissionClassByActionMixin,
+                         mixins.RetrieveModelMixin,
                          mixins.UpdateModelMixin,
-                         mixins.DestroyModelMixin,
                          viewsets.GenericViewSet):
     queryset = Company.objects.all()
     serializer_class = CompanySerializer
     permission_classes = (IsAuthenticated, )
+    permission_classes_by_action = {
+        'get_review': (IsAuthenticated, IsClientCompany,),
+    }
 
     def get_serializer_class(self):
         if self.action == 'get_review':

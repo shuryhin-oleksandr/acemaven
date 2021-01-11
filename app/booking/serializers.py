@@ -12,6 +12,7 @@ from app.booking.tasks import send_awb_number_to_air_tracking_api
 from app.booking.utils import rate_surcharges_filter, calculate_freight_rate_charges, get_fees, generate_aceid
 from app.core.models import Shipper
 from app.core.serializers import ShipperSerializer, BankAccountBaseSerializer
+from app.core.utils import get_average_company_rating
 from app.handling.models import ShippingType, ClientPlatformSetting, Currency, GeneralSetting
 from app.handling.serializers import ContainerTypesSerializer, CurrencySerializer, CarrierBaseSerializer, \
     PortSerializer, ShippingModeBaseSerializer, PackagingTypeBaseSerializer, ReleaseTypeSerializer
@@ -286,6 +287,7 @@ class FreightRateSearchListSerializer(FreightRateListSerializer):
         name = obj.company.name if show_freight_forwarder_name == GeneralSetting.ALL else '*Agent company name'
         company_data['name'] = name
         company_data['id'] = obj.company.id
+        company_data['rating'] = get_average_company_rating(obj.company)
         return company_data
 
 

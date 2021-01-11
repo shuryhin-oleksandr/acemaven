@@ -368,8 +368,6 @@ class FreightRateViesSet(PermissionClassByActionMixin,
                                                     service_fee=service_fee,
                                                     calculate_fees=calculate_fees,)
 
-            result['rating'] = get_average_company_rating(freight_rate.company)
-
             results.append(result)
 
         return Response(data=results, status=status.HTTP_200_OK)

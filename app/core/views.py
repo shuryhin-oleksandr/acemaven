@@ -43,8 +43,8 @@ class CompanyEditViewSet(PermissionClassByActionMixin,
     serializer_class = CompanySerializer
     permission_classes = (IsAuthenticated, )
     permission_classes_by_action = {
-        'get_reviews': (IsAuthenticated, IsClientCompany,),
-        'get_partners': (IsAuthenticated, IsClientCompany,),
+        'get_reviews': (IsAuthenticated, IsClientCompany, ),
+        'get_partners': (IsAuthenticated, IsClientCompany, ),
     }
 
     def get_queryset(self):
@@ -63,9 +63,9 @@ class CompanyEditViewSet(PermissionClassByActionMixin,
     def get_reviews(self, request, *args, **kwargs):
         return self.retrieve(request, *args, **kwargs)
 
-    @action(methods=['get'], detail=True, url_path='partners')
+    @action(methods=['get'], detail=False, url_path='partners')
     def get_partners(self, request, *args, **kwargs):
-        company = self.get_object()
+        company = request.user.get_company()
         queryset = Shipper.objects.filter(
             company=company,
             is_partner=True,

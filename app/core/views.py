@@ -55,7 +55,7 @@ class CompanyEditViewSet(PermissionClassByActionMixin,
         return queryset
 
     def get_serializer_class(self):
-        if self.action == 'get_review':
+        if self.action == 'get_reviews':
             return CompanyReviewSerializer
         if self.action == 'get_partners':
             return ShipperSerializer

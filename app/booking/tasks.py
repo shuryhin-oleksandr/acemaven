@@ -8,7 +8,7 @@ from django.utils import timezone
 
 from app.booking.models import Quote, Booking, Track
 from app.booking.utils import sea_event_codes
-from app.handling.models import ClientPlatformSetting, AirTrackingSetting, SeaTrackingSetting
+from app.handling.models import ClientPlatformSetting, AirTrackingSetting, SeaTrackingSetting, GeneralSetting
 
 logger = logging.getLogger("acemaven.task.logging")
 
@@ -25,6 +25,17 @@ def daily_archive_expired_quotes():
         ),
         is_archived=False,
     ).update(is_archived=True)
+
+
+@celery_app.task(name='discard_unpaid_bookings')
+def daily_discard_unpaid_client_bookings():
+    settings_days_limit = GeneralSetting.load().number_of_days_request_can_stay
+    now_date = timezone.localtime().date()
+    Booking.objects.filter(
+        status=Booking.PENDING,
+        date_created__lt=now_date - datetime.timedelta(days=settings_days_limit),
+        is_paid=False,
+    ).update(status=Booking.DISCARDED)
 
 
 @celery_app.task(name='post_awb_number')

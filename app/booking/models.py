@@ -318,6 +318,7 @@ class Booking(models.Model):
         (CHANGE_CONFIRMED, 'Booking Change Confirmed'),
     )
 
+    DISCARDED = 'discarded'
     CONFIRMED = 'confirmed'
     ACCEPTED = 'accepted'
     REQUEST_RECEIVED = 'received'
@@ -327,6 +328,7 @@ class Booking(models.Model):
     CANCELED_BY_CLIENT = 'canceled_by_client'
     COMPLETED = 'completed'
     STATUS_CHOICES = (
+        (DISCARDED, 'Booking Request Unpaid and Discarded'),
         (CONFIRMED, 'Booking Confirmed'),
         (ACCEPTED, 'Booking Request in Progress'),
         (REQUEST_RECEIVED, 'Booking Request Received'),
@@ -401,6 +403,10 @@ class Booking(models.Model):
     automatic_tracking = models.BooleanField(
         _('Automatic status tracking'),
         default=False,
+    )
+    date_created = models.DateField(
+        _('Date booking created'),
+        auto_now_add=True,
     )
     freight_rate = models.ForeignKey(
         'FreightRate',

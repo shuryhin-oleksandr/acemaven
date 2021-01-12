@@ -182,6 +182,10 @@ CELERY_BEAT_SCHEDULE = {
         'task': 'archive_quotes',
         'schedule': crontab(hour=0, minute=0),
     },
+    'discard-unpaid-bookings': {
+        'task': 'discard_unpaid_bookings',
+        'schedule': crontab(hour=0, minute=0),
+    },
     'update-sea-operations-tracking': {
         'task': 'track_sea_operations',
         'schedule': crontab(hour='*/3', minute=0),

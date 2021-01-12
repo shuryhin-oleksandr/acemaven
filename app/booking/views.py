@@ -570,7 +570,7 @@ class BookingViesSet(PermissionClassByActionMixin,
 
     def get_queryset(self):
         company = self.request.user.get_company()
-        queryset = self.queryset
+        queryset = self.queryset.exclude(status=Booking.DISCARDED)
         if self.action in ('update', 'partial_update'):
             return queryset.filter(
                 is_assigned=False,
@@ -695,7 +695,7 @@ class OperationViewSet(PermissionClassByActionMixin,
 
     def get_queryset(self):
         company = self.request.user.get_company()
-        queryset = self.queryset.filter(original_booking__isnull=True)
+        queryset = self.queryset.filter(original_booking__isnull=True).exclude(status=Booking.DISCARDED)
         if company.type == Company.CLIENT:
             queryset = queryset.filter(client_contact_person__companies=company)
         else:

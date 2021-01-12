@@ -711,7 +711,7 @@ class GeneralSetting(SingletonModel):
         default=AFTER_BOOKING,
     )
     number_of_days_request_can_stay = models.PositiveIntegerField(
-        _('Number of days request can stay in client list until discarded'),
+        _('Number of days an unpaid booking request can stay in client list until discarded'),
         validators=[MinValueValidator(1)],
     )
     export_deadline_days = models.PositiveIntegerField(

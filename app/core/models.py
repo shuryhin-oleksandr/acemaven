@@ -471,7 +471,11 @@ class Shipper(models.Model):
         null=True,
     )
     email = models.EmailField(
-        _('email address'),
+        _('Email address'),
+    )
+    is_partner = models.BooleanField(
+        _('Is company partner'),
+        default=False,
     )
     company = models.ForeignKey(
         'Company',

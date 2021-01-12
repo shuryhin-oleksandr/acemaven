@@ -7,11 +7,11 @@ from rest_framework_jwt.settings import api_settings
 from django.contrib.auth import get_user_model, authenticate
 
 from app.core.mixins import PermissionClassByActionMixin, CheckTokenMixin, CreateMixin
-from app.core.models import BankAccount, Company, SignUpRequest
+from app.core.models import BankAccount, Company, SignUpRequest, Shipper
 from app.core.permissions import IsMaster, IsMasterOrBilling, IsAgentCompany, IsClientCompany
 from app.core.serializers import CompanySerializer, SignUpRequestSerializer, UserBaseSerializer, UserCreateSerializer, \
     UserSignUpSerializer, BankAccountSerializer, UserMasterSerializer, UserSerializer, SelectChoiceSerializer, \
-    UserBaseSerializerWithPhoto, CompanyReviewSerializer
+    UserBaseSerializerWithPhoto, CompanyReviewSerializer, ShipperSerializer
 from app.core.utils import choice_to_value_name
 from app.booking.models import CargoGroup, CancellationReason
 from app.handling.models import ReleaseType, PackagingType, ContainerType
@@ -43,17 +43,35 @@ class CompanyEditViewSet(PermissionClassByActionMixin,
     serializer_class = CompanySerializer
     permission_classes = (IsAuthenticated, )
     permission_classes_by_action = {
-        'get_review': (IsAuthenticated, IsClientCompany,),
+        'get_reviews': (IsAuthenticated, IsClientCompany,),
+        'get_partners': (IsAuthenticated, IsClientCompany,),
     }
+
+    def get_queryset(self):
+        user = self.request.user
+        queryset = self.queryset.filter(users=user)
+        return queryset
 
     def get_serializer_class(self):
         if self.action == 'get_review':
             return CompanyReviewSerializer
+        if self.action == 'get_partners':
+            return ShipperSerializer
         return self.serializer_class
 
     @action(methods=['get'], detail=True, url_path='reviews')
-    def get_review(self, request, *args, **kwargs):
+    def get_reviews(self, request, *args, **kwargs):
         return self.retrieve(request, *args, **kwargs)
+
+    @action(methods=['get'], detail=True, url_path='partners')
+    def get_partners(self, request, *args, **kwargs):
+        company = self.get_object()
+        queryset = Shipper.objects.filter(
+            company=company,
+            is_partner=True,
+        )
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class SignUpRequestViewSet(mixins.CreateModelMixin,
@@ -91,6 +109,13 @@ class UserViewSet(PermissionClassByActionMixin,
         'get_users_list_to_assign': (IsAuthenticated, IsAgentCompany, IsMaster,),
     }
 
+    def get_queryset(self):
+        user = self.request.user
+        company = user.get_company()
+        if self.request.user.get_roles().filter(name='master').exists():
+            return self.queryset.filter(companies=company)
+        return self.queryset.filter(id=user.id)
+
     def get_serializer_class(self):
         if self.request.user.get_roles().filter(name='master').exists():
             if self.request.method == 'POST':
@@ -99,13 +124,6 @@ class UserViewSet(PermissionClassByActionMixin,
                 return UserSerializer
             return UserMasterSerializer
         return UserSerializer
-
-    def get_queryset(self):
-        user = self.request.user
-        company = user.get_company()
-        if self.request.user.get_roles().filter(name='master').exists():
-            return self.queryset.filter(companies=company)
-        return self.queryset.filter(id=user.id)
 
     @action(methods=['get'], detail=False, url_path='assign-users-list')
     def get_users_list_to_assign(self, request, *args, **kwargs):

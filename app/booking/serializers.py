@@ -559,8 +559,13 @@ class CancellationReasonSerializer(serializers.ModelSerializer):
 
 
 class BookingSerializer(serializers.ModelSerializer):
-    shipper = ShipperSerializer()
+    shipper = ShipperSerializer(required=False)
     cargo_groups = CargoGroupSerializer(many=True)
+    existing_shipper = serializers.PrimaryKeyRelatedField(
+        queryset=Shipper.objects.all(),
+        write_only=True,
+        required=False
+    )
 
     class Meta:
         model = Booking
@@ -573,6 +578,7 @@ class BookingSerializer(serializers.ModelSerializer):
             'number_of_documents',
             'freight_rate',
             'shipper',
+            'existing_shipper',
             'cargo_groups',
         )
 
@@ -580,10 +586,16 @@ class BookingSerializer(serializers.ModelSerializer):
         user = self.context['request'].user
         company = user.get_company()
         validated_data['client_contact_person'] = user
-        shipper = validated_data.pop('shipper')
-        shipper['company'] = company
-        new_shipper = Shipper.objects.create(**shipper)
-        validated_data['shipper'] = new_shipper
+
+        existing_shipper = validated_data.pop('existing_shipper', None)
+        if not existing_shipper:
+            shipper = validated_data.pop('shipper', {})
+            shipper['company'] = company
+            shipper['is_partner'] = False if validated_data['freight_rate'].origin.code.startswith(MAIN_COUNTRY_CODE) \
+                else True
+            existing_shipper = Shipper.objects.create(**shipper)
+
+        validated_data['shipper'] = existing_shipper
         cargo_groups = validated_data.pop('cargo_groups', [])
 
         changed_cargo_groups = CargoGroupSerializer(cargo_groups, many=True).data

@@ -48,8 +48,10 @@ class CompanyEditViewSet(PermissionClassByActionMixin,
     }
 
     def get_queryset(self):
-        user = self.request.user
-        queryset = self.queryset.filter(users=user)
+        queryset = self.queryset
+        if self.action != 'get_reviews':
+            user = self.request.user
+            queryset = self.queryset.filter(users=user)
         return queryset
 
     def get_serializer_class(self):

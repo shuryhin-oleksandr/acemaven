@@ -292,11 +292,12 @@ def calculate_freight_rate_charges(freight_rate,
         result['booking_fee'] = totals.pop('booking_fee', {})
         exchange_rates = dict()
         for key, _ in result['booking_fee'].items():
-            exchange_rate = ExchangeRate.objects.filter(
-                currency__code=key,
-                is_platforms=True,
-            ).first()
-            exchange_rates[key] = float(exchange_rate.rate) * (1 + float(exchange_rate.spread) / 100)
+            if key != main_currency_code:
+                exchange_rate = ExchangeRate.objects.filter(
+                    currency__code=key,
+                    is_platforms=True,
+                ).first()
+                exchange_rates[key] = float(exchange_rate.rate) * (1 + float(exchange_rate.spread) / 100)
         result['exchange_rates'] = exchange_rates
         booking_fee_in_local_currency = totals.pop('booking_fee_in_local_currency', 0)
 

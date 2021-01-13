@@ -159,7 +159,7 @@ def calculate_freight_rate(totals,
                                                                                            exchange_rate,
                                                                                            subtotal)
         freight['booking_fee'] = booking_fee_value_in_foreign_curr
-        freight['subtotal_pure'] = subtotal
+        freight['subtotal_pure'] = float(subtotal)
         subtotal = float(subtotal) + booking_fee_value_in_foreign_curr
         add_currency_value(totals['booking_fee'], code, booking_fee_value_in_foreign_curr)
         add_currency_value(totals, code, booking_fee_value_in_foreign_curr)

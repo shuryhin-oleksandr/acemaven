@@ -3,14 +3,18 @@ import logging
 import requests
 
 from config.celery import celery_app
-from django.db.models import Q
+from django.db.models import Q, Case, When, Value, CharField
 from django.utils import timezone
 
-from app.booking.models import Quote, Booking, Track
+from app.booking.models import Quote, Booking, Track, CancellationReason
 from app.booking.utils import sea_event_codes
 from app.handling.models import ClientPlatformSetting, AirTrackingSetting, SeaTrackingSetting, GeneralSetting
+from app.location.models import Country
 
 logger = logging.getLogger("acemaven.task.logging")
+
+main_country = Country.objects.filter(is_main=True).first()
+MAIN_COUNTRY_CODE = main_country.code if main_country else 'BR'
 
 
 @celery_app.task(name='archive_quotes')
@@ -36,6 +40,36 @@ def daily_discard_unpaid_client_bookings():
         date_created__lt=now_date - datetime.timedelta(days=settings_days_limit),
         is_paid=False,
     ).update(status=Booking.DISCARDED)
+
+
+@celery_app.task(name='cancel_unconfirmed_bookings')
+def daily_cancel_unconfirmed_agent_bookings():
+    settings = GeneralSetting.load()
+    now_date = timezone.localtime().date()
+    queryset = Booking.objects.filter(
+        status=Booking.ACCEPTED,
+    ).annotate(
+        direction=Case(When(freight_rate__origin__code__startswith=MAIN_COUNTRY_CODE, then=Value('export')),
+                       default=Value('import'),
+                       output_field=CharField(),
+                       )
+    ).filter(Q(
+        Q(
+            direction='export',
+            date_accepted_by_agent__lt=now_date - datetime.timedelta(days=settings.export_deadline_days),
+        ),
+        Q(
+            direction='import',
+            date_accepted_by_agent__lt=now_date - datetime.timedelta(days=settings.import_deadline_days),
+        ),
+        _connector=Q.OR,
+    )).update(status=Booking.CANCELED_BY_SYSTEM)
+    for operation in queryset:
+        CancellationReason.objects.create(
+            reason=CancellationReason.OTHER,
+            comment='Operation cancelled according to expired time for confirming booking by an agent',
+            booking=operation,
+        )
 
 
 @celery_app.task(name='post_awb_number')

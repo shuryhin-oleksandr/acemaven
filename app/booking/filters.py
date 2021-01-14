@@ -173,6 +173,7 @@ class OperationFilterSet(django_filters.FilterSet):
             queryset = queryset.filter(status__in=(
                 Booking.CANCELED_BY_AGENT,
                 Booking.CANCELED_BY_CLIENT,
+                Booking.CANCELED_BY_SYSTEM,
                 Booking.REJECTED,
             ))
         return queryset

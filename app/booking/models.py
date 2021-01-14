@@ -326,6 +326,7 @@ class Booking(models.Model):
     REJECTED = 'rejected'
     CANCELED_BY_AGENT = 'canceled_by_agent'
     CANCELED_BY_CLIENT = 'canceled_by_client'
+    CANCELED_BY_SYSTEM = 'canceled_by_system'
     COMPLETED = 'completed'
     STATUS_CHOICES = (
         (PENDING, 'Booking Fee Pending'),
@@ -335,6 +336,7 @@ class Booking(models.Model):
         (REJECTED, 'Booking Request Rejected'),
         (CANCELED_BY_AGENT, 'Operation Canceled by Agent'),
         (CANCELED_BY_CLIENT, 'Operation Canceled by Client'),
+        (CANCELED_BY_SYSTEM, 'Operation Canceled by the System'),
         (COMPLETED, 'Operation Complete'),
         (DISCARDED, 'Booking Request Unpaid and Discarded'),
     )
@@ -407,6 +409,10 @@ class Booking(models.Model):
     date_created = models.DateField(
         _('Date booking created'),
         auto_now_add=True,
+    )
+    date_accepted_by_agent = models.DateField(
+        _('Date booking accepted by an agent'),
+        null=True,
     )
     freight_rate = models.ForeignKey(
         'FreightRate',

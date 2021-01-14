@@ -1,14 +1,15 @@
 from datetime import datetime
 
-from django.contrib.auth import get_user_model
 from django_filters import rest_framework
 from rest_framework import mixins, viewsets, filters, status, generics, views
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
+from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.db.models import CharField, Case, When, Value, Q, Count
+from django.utils import timezone
 
 from app.booking.filters import SurchargeFilterSet, FreightRateFilterSet, QuoteFilterSet, QuoteOrderingFilterBackend, \
     BookingFilterSet, BookingOrderingFilterBackend, OperationFilterSet, OperationOrderingFilterBackend, \
@@ -666,6 +667,8 @@ class BookingViesSet(PermissionClassByActionMixin,
         booking.agent_contact_person = user
         booking.is_assigned = True
         booking.status = Booking.ACCEPTED
+        now_date = timezone.localtime().date()
+        booking.date_accepted_by_agent = now_date
         booking.save()
         return Response(status=status.HTTP_200_OK)
 

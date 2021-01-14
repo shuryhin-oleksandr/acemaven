@@ -25,7 +25,7 @@ from app.booking.serializers import SurchargeSerializer, SurchargeEditSerializer
     QuoteStatusBaseSerializer, CargoGroupSerializer, BookingListBaseSerializer, BookingRetrieveSerializer, \
     ShipmentDetailsBaseSerializer, OperationSerializer, OperationListBaseSerializer, OperationRetrieveSerializer, \
     OperationRetrieveClientSerializer, OperationRecalculateSerializer, TrackSerializer, TrackStatusSerializer, \
-    TrackRetrieveSerializer
+    TrackRetrieveSerializer, OperationBillingAgentListSerializer
 from app.booking.utils import date_format, wm_calculate, freight_rate_search, calculate_freight_rate_charges, \
     get_fees, surcharge_search, make_copy_of_surcharge, make_copy_of_freight_rate, \
     apply_operation_select_prefetch_related
@@ -732,6 +732,7 @@ class OperationViewSet(PermissionClassByActionMixin,
             CancellationReason.objects.create(**data)
             operation.status = Booking.CANCELED_BY_AGENT
         operation.save()
+        operation.change_requests.all().delete()
         return Response(status=status.HTTP_200_OK)
 
     @action(methods=['post'], detail=True, url_path='confirm_change_request')
@@ -758,6 +759,7 @@ class OperationViewSet(PermissionClassByActionMixin,
         operation = self.get_object()
         operation.status = Booking.COMPLETED
         operation.save()
+        operation.change_requests.all().delete()
         return Response(status=status.HTTP_200_OK)
 
     @action(methods=['post'], detail=True, url_path='recalculate')

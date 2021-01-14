@@ -25,7 +25,7 @@ from app.booking.serializers import SurchargeSerializer, SurchargeEditSerializer
     QuoteStatusBaseSerializer, CargoGroupSerializer, BookingListBaseSerializer, BookingRetrieveSerializer, \
     ShipmentDetailsBaseSerializer, OperationSerializer, OperationListBaseSerializer, OperationRetrieveSerializer, \
     OperationRetrieveClientSerializer, OperationRecalculateSerializer, TrackSerializer, TrackStatusSerializer, \
-    TrackRetrieveSerializer, OperationBillingAgentListSerializer
+    TrackRetrieveSerializer
 from app.booking.utils import date_format, wm_calculate, freight_rate_search, calculate_freight_rate_charges, \
     get_fees, surcharge_search, make_copy_of_surcharge, make_copy_of_freight_rate, \
     apply_operation_select_prefetch_related

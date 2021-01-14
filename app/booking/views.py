@@ -12,7 +12,7 @@ from django.db.models import CharField, Case, When, Value, Q, Count
 
 from app.booking.filters import SurchargeFilterSet, FreightRateFilterSet, QuoteFilterSet, QuoteOrderingFilterBackend, \
     BookingFilterSet, BookingOrderingFilterBackend, OperationFilterSet, OperationOrderingFilterBackend, \
-    TrackStatusFilterSet
+    TrackStatusFilterSet, OperationBillingFilterSet
 from app.booking.mixins import FeeGetQuerysetMixin
 from app.booking.models import Surcharge, UsageFee, Charge, FreightRate, Rate, Quote, Booking, Status, \
     ShipmentDetails, CancellationReason, CargoGroup, Track, TrackStatus, PaymentData
@@ -25,7 +25,7 @@ from app.booking.serializers import SurchargeSerializer, SurchargeEditSerializer
     QuoteStatusBaseSerializer, CargoGroupSerializer, BookingListBaseSerializer, BookingRetrieveSerializer, \
     ShipmentDetailsBaseSerializer, OperationSerializer, OperationListBaseSerializer, OperationRetrieveSerializer, \
     OperationRetrieveClientSerializer, OperationRecalculateSerializer, TrackSerializer, TrackStatusSerializer, \
-    TrackRetrieveSerializer
+    TrackRetrieveSerializer, OperationBillingAgentListSerializer, OperationBillingClientListSerializer
 from app.booking.utils import date_format, wm_calculate, freight_rate_search, calculate_freight_rate_charges, \
     get_fees, surcharge_search, make_copy_of_surcharge, make_copy_of_freight_rate, \
     apply_operation_select_prefetch_related
@@ -790,6 +790,47 @@ class OperationViewSet(PermissionClassByActionMixin,
         operation = self.get_object()
         request.data['operation'] = operation.id
         return self.create(request, *args, **kwargs)
+
+
+class OperationBillingViewSet(mixins.ListModelMixin,
+                              mixins.RetrieveModelMixin,
+                              viewsets.GenericViewSet):
+    queryset = Booking.objects.all()
+    serializer_class = OperationBillingAgentListSerializer
+    permission_classes = (IsAuthenticated, IsMasterOrAgent, )
+    filter_class = OperationBillingFilterSet
+    filter_backends = (OperationOrderingFilterBackend, rest_framework.DjangoFilterBackend,)
+
+    def get_queryset(self):
+        company = self.request.user.get_company()
+        queryset = self.queryset.filter(original_booking__isnull=True)
+        if company.type == Company.CLIENT:
+            queryset = queryset.filter(
+                client_contact_person__companies=company,
+                status__in=(
+                    Booking.PENDING,
+                    Booking.REQUEST_RECEIVED,
+                    Booking.ACCEPTED,
+                    Booking.CONFIRMED,
+                    Booking.COMPLETED,
+                ),
+            )
+        else:
+            queryset = queryset.filter(
+                freight_rate__company=company,
+                status__in=(
+                    Booking.ACCEPTED,
+                    Booking.CONFIRMED,
+                    Booking.COMPLETED,
+                ),
+            )
+        return queryset
+
+    def get_serializer_class(self):
+        company = self.request.user.get_company()
+        if company.type == Company.CLIENT:
+            return OperationBillingClientListSerializer
+        return self.serializer_class
 
 
 class StatusViesSet(mixins.UpdateModelMixin,

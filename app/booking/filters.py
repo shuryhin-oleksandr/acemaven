@@ -179,7 +179,16 @@ class OperationFilterSet(django_filters.FilterSet):
 
 
 class OperationOrderingFilterBackend(filters.BaseFilterBackend):
-    valid_ordering_fields = ('aceid', 'route', 'date', 'carrier', 'status', 'agent', 'shipping_mode')
+    valid_ordering_fields = (
+        'aceid',
+        'route',
+        'date',
+        'carrier',
+        'status',
+        'agent',
+        'shipping_mode',
+        'payment_due_by',
+    )
 
     def filter_queryset(self, request, queryset, view):
 
@@ -211,3 +220,32 @@ class TrackStatusFilterSet(django_filters.FilterSet):
             'shipping_mode',
             'direction',
         )
+
+
+class OperationBillingFilterSet(OperationFilterSet):
+    date_from = django_filters.DateFilter(field_name='date_created', lookup_expr='gte')
+    date_to = django_filters.DateFilter(field_name='date_created', lookup_expr='lt')
+
+    class Meta(OperationFilterSet.Meta):
+        model = Booking
+        fields = OperationFilterSet.Meta.fields + (
+            'date_from',
+            'date_to',
+        )
+
+    def status_filter(self, queryset, _, value):
+        if value == 'pending':
+            queryset = queryset.filter(status=Booking.PENDING)
+        if value == 'active':
+            user = self.request.user
+            if user.get_company().type == Company.CLIENT:
+                queryset = queryset.filter(status__in=(
+                    Booking.REQUEST_RECEIVED,
+                    Booking.ACCEPTED,
+                    Booking.CONFIRMED,
+                ))
+            else:
+                queryset = queryset.filter(status__in=(Booking.ACCEPTED, Booking.CONFIRMED))
+        elif value == 'completed':
+            queryset = queryset.filter(status__in=(Booking.COMPLETED,))
+        return queryset

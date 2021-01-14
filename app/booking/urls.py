@@ -4,7 +4,7 @@ from rest_framework.routers import DefaultRouter
 
 from app.booking.views import SurchargeViesSet, UsageFeeViesSet, ChargeViesSet, FreightRateViesSet, \
     RateViesSet, WMCalculateView, QuoteViesSet, BookingViesSet, StatusViesSet, ShipmentDetailsViesSet, \
-    OperationViewSet, TrackView, TrackViewSet, TrackStatusViewSet, PixApiView
+    OperationViewSet, TrackView, TrackViewSet, TrackStatusViewSet, PixApiView, OperationBillingViewSet
 
 
 app_name = 'booking'
@@ -22,6 +22,7 @@ router.register(r'shipment-details', ShipmentDetailsViesSet, basename='shipment_
 router.register(r'operation', OperationViewSet, basename='operation')
 router.register(r'track', TrackViewSet, basename='track')
 router.register(r'track-status', TrackStatusViewSet, basename='track_status')
+router.register(r'billing', OperationBillingViewSet, basename='billing')
 
 urlpatterns = router.urls
 

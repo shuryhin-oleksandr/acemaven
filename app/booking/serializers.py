@@ -44,6 +44,20 @@ class UserFullNameGetMixin:
             return user.get_full_name()
 
 
+class GetTrackingInitialMixin:
+    """
+    Class, that provides initial tracking data.
+    """
+
+    def get_tracking_initial(self, obj):
+        data = dict()
+        data['shipping_type'] = obj.freight_rate.shipping_mode.shipping_type.title
+        data['direction'] = 'export' if obj.freight_rate.origin.code.startswith(MAIN_COUNTRY_CODE) else 'import'
+        data['origin'] = obj.freight_rate.origin.get_lat_long_coordinates()
+        data['destination'] = obj.freight_rate.destination.get_lat_long_coordinates()
+        return data
+
+
 class AdditionalSurchargesSerializer(serializers.ModelSerializer):
     class Meta:
         model = AdditionalSurcharge
@@ -829,7 +843,7 @@ class OperationSerializer(serializers.ModelSerializer):
         return operation
 
 
-class OperationListBaseSerializer(OperationSerializer):
+class OperationListBaseSerializer(GetTrackingInitialMixin, OperationSerializer):
     freight_rate = FreightRateRetrieveSerializer()
     shipping_type = serializers.CharField(source='freight_rate.shipping_mode.shipping_type.title')
     status = serializers.SerializerMethodField()
@@ -865,14 +879,6 @@ class OperationListBaseSerializer(OperationSerializer):
 
     def get_can_be_patched(self, obj):
         return True if obj.status in (Booking.PENDING, Booking.REQUEST_RECEIVED) else False
-
-    def get_tracking_initial(self, obj):
-        data = dict()
-        data['shipping_type'] = obj.freight_rate.shipping_mode.shipping_type.title
-        data['direction'] = 'export' if obj.freight_rate.origin.code.startswith(MAIN_COUNTRY_CODE) else 'import'
-        data['origin'] = obj.freight_rate.origin.get_lat_long_coordinates()
-        data['destination'] = obj.freight_rate.destination.get_lat_long_coordinates()
-        return data
 
 
 class OperationRetrieveSerializer(OperationListBaseSerializer):
@@ -932,6 +938,52 @@ class OperationRetrieveClientSerializer(OperationRetrieveSerializer):
 
     def get_has_review(self,  obj):
         return True if hasattr(obj, 'review') else False
+
+
+class OperationBillingAgentListSerializer(serializers.ModelSerializer):
+    origin = PortSerializer(source='freight_rate.origin')
+    destination = PortSerializer(source='freight_rate.destination')
+    shipping_type = serializers.CharField(source='freight_rate.shipping_mode.shipping_type.title')
+    shipping_mode = serializers.CharField(source='freight_rate.shipping_mode.title')
+    status = serializers.SerializerMethodField()
+    carrier = serializers.CharField(source='freight_rate.carrier.title')
+
+    class Meta:
+        model = Booking
+        fields = (
+            'id',
+            'aceid',
+            'origin',
+            'destination',
+            'shipping_type',
+            'shipping_mode',
+            'charges',
+            'payment_due_by',
+            'status',
+            'carrier',
+        )
+
+    def get_status(self, obj):
+        if change_request_status := obj.change_request_status:
+            return list(filter(lambda x: x[0] == change_request_status, Booking.CHANGE_REQUESTED_CHOICES))[0][1]
+        return list(filter(lambda x: x[0] == obj.status, Booking.STATUS_CHOICES))[0][1]
+
+
+class OperationBillingClientListSerializer(GetTrackingInitialMixin, OperationBillingAgentListSerializer):
+    tracking_initial = serializers.SerializerMethodField()
+    dates = serializers.SerializerMethodField()
+
+    class Meta(OperationBillingAgentListSerializer.Meta):
+        model = Booking
+        fields = OperationBillingAgentListSerializer.Meta.fields + (
+            'tracking_initial',
+            'dates',
+        )
+
+    def get_dates(self, obj):
+        shipment_details = obj.shipment_details.first()
+        return f'ETD: {shipment_details.date_of_departure.strftime("%d/%m")}, ' \
+               f'ETA: {shipment_details.date_of_arrival.strftime("%d/%m")}'
 
 
 class QuoteStatusBaseSerializer(serializers.ModelSerializer):

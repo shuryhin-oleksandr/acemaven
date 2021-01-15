@@ -13,7 +13,7 @@ from app.booking.utils import rate_surcharges_filter, calculate_freight_rate_cha
 from app.core.models import Shipper
 from app.core.serializers import ShipperSerializer, BankAccountBaseSerializer
 from app.core.utils import get_average_company_rating
-from app.handling.models import ShippingType, ClientPlatformSetting, Currency, GeneralSetting
+from app.handling.models import ShippingType, ClientPlatformSetting, Currency, GeneralSetting, BillingExchangeRate
 from app.handling.serializers import ContainerTypesSerializer, CurrencySerializer, CarrierBaseSerializer, \
     PortSerializer, ShippingModeBaseSerializer, PackagingTypeBaseSerializer, ReleaseTypeSerializer
 from app.location.models import Country
@@ -886,6 +886,7 @@ class OperationRetrieveSerializer(OperationListBaseSerializer):
     week_range = serializers.SerializerMethodField()
     client_contact_person = serializers.CharField(source='client_contact_person.get_full_name')
     client = serializers.CharField(source='client_contact_person.get_company.name')
+    charges_today = serializers.SerializerMethodField()
     shipper = ShipperSerializer()
     change_requests = serializers.SerializerMethodField()
 
@@ -895,6 +896,7 @@ class OperationRetrieveSerializer(OperationListBaseSerializer):
             'week_range',
             'client_contact_person',
             'client',
+            'charges_today',
             'charges',
             'change_requests',
         )
@@ -908,6 +910,24 @@ class OperationRetrieveSerializer(OperationListBaseSerializer):
             'week_from': obj.date_from.isocalendar()[1],
             'week_to': obj.date_to.isocalendar()[1]
         }
+
+    def get_charges_today(self, obj):
+        result = dict()
+        company = obj.agent_contact_person.get_company()
+        totals = obj.charges.get('totals')
+        billing_exchange_rate = BillingExchangeRate.objects.filter(company=company).first()
+        if billing_exchange_rate:
+            main_currency_code = Currency.objects.filter(is_main=True).first().code
+            total_today = 0
+            for key, value in totals.items():
+                rate_today = 1
+                if key != main_currency_code:
+                    rate = billing_exchange_rate.rates.filter(currency__code=key).first()
+                    rate_today = round(float(rate.rate) * (1 + float(rate.spread) / 100), 2)
+                    result[f'{key} exchange rate'] = rate_today
+                total_today += value * rate_today
+            result['total_today'] = total_today
+        return result
 
 
 class OperationRetrieveClientSerializer(OperationRetrieveSerializer):

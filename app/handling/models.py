@@ -662,6 +662,9 @@ class BillingExchangeRate(models.Model):
         related_name='exchange_rates',
     )
 
+    class Meta:
+        ordering = ['-date', ]
+
 
 class ClientPlatformSetting(SingletonModel):
     """

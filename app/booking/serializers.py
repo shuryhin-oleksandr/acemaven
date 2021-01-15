@@ -983,7 +983,7 @@ class OperationBillingClientListSerializer(GetTrackingInitialMixin, OperationBil
     def get_dates(self, obj):
         shipment_details = obj.shipment_details.first()
         return f'ETD: {shipment_details.date_of_departure.strftime("%d/%m")}, ' \
-               f'ETA: {shipment_details.date_of_arrival.strftime("%d/%m")}'
+               f'ETA: {shipment_details.date_of_arrival.strftime("%d/%m")}' if shipment_details else None
 
 
 class QuoteStatusBaseSerializer(serializers.ModelSerializer):

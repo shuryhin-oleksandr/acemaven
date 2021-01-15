@@ -822,7 +822,6 @@ class OperationBillingViewSet(mixins.ListModelMixin,
             queryset = queryset.filter(
                 freight_rate__company=company,
                 status__in=(
-                    Booking.ACCEPTED,
                     Booking.CONFIRMED,
                     Booking.COMPLETED,
                 ),

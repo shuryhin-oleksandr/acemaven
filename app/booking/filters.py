@@ -246,7 +246,7 @@ class OperationBillingFilterSet(OperationFilterSet):
                     Booking.CONFIRMED,
                 ))
             else:
-                queryset = queryset.filter(status__in=(Booking.ACCEPTED, Booking.CONFIRMED))
+                queryset = queryset.filter(status=Booking.CONFIRMED)
         elif value == 'completed':
             queryset = queryset.filter(status__in=(Booking.COMPLETED,))
         return queryset

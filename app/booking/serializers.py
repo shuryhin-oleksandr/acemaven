@@ -940,13 +940,12 @@ class OperationRetrieveClientSerializer(OperationRetrieveSerializer):
         return True if hasattr(obj, 'review') else False
 
 
-class OperationBillingAgentListSerializer(serializers.ModelSerializer):
+class OperationBillingBaseSerializer(serializers.ModelSerializer):
     origin = PortSerializer(source='freight_rate.origin')
     destination = PortSerializer(source='freight_rate.destination')
     shipping_type = serializers.CharField(source='freight_rate.shipping_mode.shipping_type.title')
     shipping_mode = serializers.CharField(source='freight_rate.shipping_mode.title')
     status = serializers.SerializerMethodField()
-    carrier = serializers.CharField(source='freight_rate.carrier.title')
 
     class Meta:
         model = Booking
@@ -958,9 +957,7 @@ class OperationBillingAgentListSerializer(serializers.ModelSerializer):
             'shipping_type',
             'shipping_mode',
             'charges',
-            'payment_due_by',
             'status',
-            'carrier',
         )
 
     def get_status(self, obj):
@@ -969,13 +966,38 @@ class OperationBillingAgentListSerializer(serializers.ModelSerializer):
         return list(filter(lambda x: x[0] == obj.status, Booking.STATUS_CHOICES))[0][1]
 
 
-class OperationBillingClientListSerializer(GetTrackingInitialMixin, OperationBillingAgentListSerializer):
+class OperationBillingAgentListSerializer(OperationBillingBaseSerializer):
+    carrier = serializers.CharField(source='freight_rate.carrier.title')
+    client = serializers.CharField(source='client_contact_person.get_company.name')
+    booking_number = serializers.SerializerMethodField()
+    vessel = serializers.SerializerMethodField()
+
+    class Meta(OperationBillingBaseSerializer.Meta):
+        model = Booking
+        fields = OperationBillingBaseSerializer.Meta.fields + (
+            'payment_due_by',
+            'carrier',
+            'client',
+            'booking_number',
+            'vessel',
+        )
+
+    def get_booking_number(self, obj):
+        shipment_detail = obj.shipment_details.first()
+        return shipment_detail.booking_number if shipment_detail else None
+
+    def get_vessel(self, obj):
+        shipment_detail = obj.shipment_details.first()
+        return shipment_detail.vessel if shipment_detail else None
+
+
+class OperationBillingClientListSerializer(GetTrackingInitialMixin, OperationBillingBaseSerializer):
     tracking_initial = serializers.SerializerMethodField()
     dates = serializers.SerializerMethodField()
 
-    class Meta(OperationBillingAgentListSerializer.Meta):
+    class Meta(OperationBillingBaseSerializer.Meta):
         model = Booking
-        fields = OperationBillingAgentListSerializer.Meta.fields + (
+        fields = OperationBillingBaseSerializer.Meta.fields + (
             'tracking_initial',
             'dates',
         )

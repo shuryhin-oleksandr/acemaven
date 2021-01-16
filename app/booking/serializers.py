@@ -913,20 +913,21 @@ class OperationRetrieveSerializer(OperationListBaseSerializer):
 
     def get_charges_today(self, obj):
         result = dict()
-        company = obj.agent_contact_person.get_company()
-        totals = obj.charges.get('totals')
-        billing_exchange_rate = BillingExchangeRate.objects.filter(company=company).first()
-        if billing_exchange_rate:
-            main_currency_code = Currency.objects.filter(is_main=True).first().code
-            total_today = 0
-            for key, value in totals.items():
-                rate_today = 1
-                if key != main_currency_code:
-                    rate = billing_exchange_rate.rates.filter(currency__code=key).first()
-                    rate_today = round(float(rate.rate) * (1 + float(rate.spread) / 100), 2)
-                    result[f'{key} exchange rate'] = rate_today
-                total_today += value * rate_today
-            result['total_today'] = total_today
+        if obj.agent_contact_person:
+            company = obj.agent_contact_person.get_company()
+            totals = obj.charges.get('totals')
+            billing_exchange_rate = BillingExchangeRate.objects.filter(company=company).first()
+            if billing_exchange_rate:
+                main_currency_code = Currency.objects.filter(is_main=True).first().code
+                total_today = 0
+                for key, value in totals.items():
+                    rate_today = 1
+                    if key != main_currency_code:
+                        rate = billing_exchange_rate.rates.filter(currency__code=key).first()
+                        rate_today = round(float(rate.rate) * (1 + float(rate.spread) / 100), 2)
+                        result[f'{key} exchange rate'] = rate_today
+                    total_today += value * rate_today
+                result['total_today'] = total_today
         return result
 
 

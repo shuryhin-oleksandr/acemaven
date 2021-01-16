@@ -224,8 +224,8 @@ class TrackStatusFilterSet(django_filters.FilterSet):
 
 
 class OperationBillingFilterSet(OperationFilterSet):
-    date_from = django_filters.DateFilter(field_name='date_created', lookup_expr='gte')
-    date_to = django_filters.DateFilter(field_name='date_created', lookup_expr='lt')
+    date_from = django_filters.DateFilter(field_name='date_created', lookup_expr='gte', input_formats=['%d/%m/%Y'])
+    date_to = django_filters.DateFilter(field_name='date_created', lookup_expr='lt', input_formats=['%d/%m/%Y'])
 
     class Meta(OperationFilterSet.Meta):
         model = Booking

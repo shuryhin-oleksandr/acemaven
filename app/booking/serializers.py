@@ -978,6 +978,7 @@ class OperationBillingBaseSerializer(serializers.ModelSerializer):
             'shipping_mode',
             'charges',
             'status',
+            'payment_due_by',
         )
 
     def get_status(self, obj):
@@ -995,7 +996,6 @@ class OperationBillingAgentListSerializer(OperationBillingBaseSerializer):
     class Meta(OperationBillingBaseSerializer.Meta):
         model = Booking
         fields = OperationBillingBaseSerializer.Meta.fields + (
-            'payment_due_by',
             'carrier',
             'client',
             'booking_number',

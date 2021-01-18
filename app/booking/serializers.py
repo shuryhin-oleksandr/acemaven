@@ -654,6 +654,7 @@ class BookingSerializer(serializers.ModelSerializer):
 class BookingListBaseSerializer(BookingSerializer):
     week_range = serializers.SerializerMethodField()
     freight_rate = FreightRateRetrieveSerializer()
+    cargo_groups = CargoGroupRetrieveSerializer(many=True)
     shipping_type = serializers.CharField(source='freight_rate.shipping_mode.shipping_type.title')
     client = serializers.CharField(source='client_contact_person.get_company.name')
     status = serializers.SerializerMethodField()
@@ -682,7 +683,6 @@ class BookingListBaseSerializer(BookingSerializer):
 class BookingRetrieveSerializer(BookingListBaseSerializer):
     release_type = ReleaseTypeSerializer()
     shipper = ShipperSerializer()
-    cargo_groups = CargoGroupRetrieveSerializer(many=True)
     client_contact_person = serializers.CharField(source='client_contact_person.get_full_name')
     agent_contact_person = serializers.CharField(source='agent_contact_person.get_full_name', default=None)
 

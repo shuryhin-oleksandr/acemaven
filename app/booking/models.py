@@ -406,6 +406,10 @@ class Booking(models.Model):
         _('Automatic status tracking'),
         default=False,
     )
+    vessel_arrived = models.BooleanField(
+        _('Vessel arrived status'),
+        default=False,
+    )
     date_created = models.DateField(
         _('Date booking created'),
         auto_now_add=True,

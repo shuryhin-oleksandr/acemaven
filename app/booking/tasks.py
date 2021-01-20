@@ -100,6 +100,7 @@ def track_confirmed_sea_operations():
         status=Booking.CONFIRMED,
         freight_rate__shipping_mode__shipping_type__title='sea',
         automatic_tracking=True,
+        vessel_arrived=False,
         original_booking__isnull=True,
     )
     for operation in operations:
@@ -118,7 +119,17 @@ def track_confirmed_sea_operations():
         if 'containers' in data_json['data']:
             for container in data_json.get('data').get('containers'):
                 for event in container['events']:
-                    event['status'] = sea_event_codes.get(event.get('status', 'UNK'))
+                    status = event.get('status', 'UNK')
+                    event['status'] = sea_event_codes.get(status)
+                    if status == 'VAD':
+                        operation.vessel_arrived = True
+                        operation.save()
+                    event['location'] = next(
+                        filter(lambda x: x.get('id') == event['location'], data_json['data'].get('locations')), {}
+                    )
+                    event['vessel'] = next(
+                        filter(lambda x: x.get('id') == event['vessel'], data_json['data'].get('vessels')), {}
+                    )
         route_response = requests.get(route_url)
         route_json = route_response.json() if (route_status_code := route_response.status_code) == 200 \
             else {

@@ -127,10 +127,10 @@ def track_confirmed_sea_operations():
                         operation.save()
                     event['location'] = next(
                         filter(lambda x: x.get('id') == event['location'], data_json['data'].get('locations')), {}
-                    )
+                    ).get('name', '')
                     event['vessel'] = next(
                         filter(lambda x: x.get('id') == event['vessel'], data_json['data'].get('vessels')), {}
-                    )
+                    ).get('name', '')
         route_response = requests.get(route_url)
         route_json = route_response.json() if (route_status_code := route_response.status_code) == 200 \
             else {

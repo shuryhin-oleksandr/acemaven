@@ -63,7 +63,8 @@ def daily_cancel_unconfirmed_agent_bookings():
             date_accepted_by_agent__lt=now_date - datetime.timedelta(days=settings.import_deadline_days),
         ),
         _connector=Q.OR,
-    )).update(status=Booking.CANCELED_BY_SYSTEM)
+    ))
+    queryset.update(status=Booking.CANCELED_BY_SYSTEM)
     for operation in queryset:
         CancellationReason.objects.create(
             reason=CancellationReason.OTHER,

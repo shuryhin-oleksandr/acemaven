@@ -749,6 +749,14 @@ class ShipmentDetails(models.Model):
     date_of_arrival = models.DateTimeField(
         _('Estimated time of arrival'),
     )
+    actual_date_of_departure = models.DateTimeField(
+        _('Actual time of departure'),
+        null=True,
+    )
+    actual_date_of_arrival = models.DateTimeField(
+        _('Actual time of arrival'),
+        null=True,
+    )
     document_cut_off_date = models.DateTimeField(
         _('Document cut off date'),
         null=True,
@@ -913,6 +921,10 @@ class TrackStatus(models.Model):
     )
     direction = models.ManyToManyField(
         'Direction',
+    )
+    must_update_actual_date_of_departure = models.BooleanField(
+        _('Must update actual date of departure'),
+        default=False,
     )
 
 

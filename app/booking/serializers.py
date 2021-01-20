@@ -713,6 +713,8 @@ class ShipmentDetailsBaseSerializer(serializers.ModelSerializer):
             'mawb',
             'date_of_departure',
             'date_of_arrival',
+            'actual_date_of_departure',
+            'actual_date_of_arrival',
             'document_cut_off_date',
             'cargo_cut_off_date',
             'cargo_pick_up_location',
@@ -755,6 +757,13 @@ class TrackSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data['manual'] = True
         validated_data['created_by'] = self.context['request'].user
+
+        status = validated_data['status']
+        if status.must_update_actual_date_of_departure:
+            shipment_details = validated_data['booking'].shipment_details.first()
+            shipment_details.actual_date_of_departure = timezone.localtime()
+            shipment_details.save()
+
         instance = super().create(validated_data)
         return instance
 

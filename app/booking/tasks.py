@@ -117,20 +117,32 @@ def track_confirmed_sea_operations():
             'status': 'error',
             'message': f'Status code - {data_status_code}',
         }
+        shipment_details = operation.shipment_details.first()
+
         if 'containers' in data_json['data']:
-            for container in data_json.get('data').get('containers'):
+            for container in data_json['data']['containers']:
                 for event in container['events']:
                     status = event.get('status', 'UNK')
                     event['status'] = sea_event_codes.get(status)
                     if status == 'VAD':
                         operation.vessel_arrived = True
                         operation.save()
+                    if status == 'VDL' and not shipment_details.actual_date_of_departure:
+                        shipment_details.actual_date_of_departure = timezone.localtime()
+                        shipment_details.save()
                     event['location'] = next(
                         filter(lambda x: x.get('id') == event['location'], data_json['data'].get('locations')), {}
                     ).get('name', '')
                     event['vessel'] = next(
                         filter(lambda x: x.get('id') == event['vessel'], data_json['data'].get('vessels')), {}
                     ).get('name', '')
+
+        if 'route' in data_json['data']:
+            date = data_json['data']['route'].get('postpod', {}).get('date')
+            if date:
+                shipment_details.actual_date_of_arrival = datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S')
+                shipment_details.save()
+
         route_response = requests.get(route_url)
         route_json = route_response.json() if (route_status_code := route_response.status_code) == 200 \
             else {

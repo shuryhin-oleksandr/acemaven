@@ -740,6 +740,31 @@ class ShipmentDetailsBaseSerializer(serializers.ModelSerializer):
             send_awb_number_to_air_tracking_api.delay(shipment_detail.booking_number)
         return shipment_detail
 
+    def update(self, instance, validated_data):
+        user = self.context['request'].user
+        create_track = False
+        if validated_data.get('actual_date_of_departure') and not instance.actual_date_of_departure:
+            track_status = TrackStatus.objects.filter(
+                shipping_mode=instance.booking.freight_rate.shipping_mode,
+                auto_add_on_actual_date_of_departure=True,
+            ).first()
+            create_track = True
+        elif validated_data.get('actual_date_of_arrival') and not instance.actual_date_of_arrival:
+            track_status = TrackStatus.objects.filter(
+                shipping_mode=instance.booking.freight_rate.shipping_mode,
+                auto_add_on_actual_date_of_arrival=True,
+            ).first()
+            create_track = True
+        if create_track:
+            Track.objects.create(
+                manual=True,
+                created_by=user,
+                status=track_status,
+                booking=instance.booking,
+            )
+        super().update(instance, validated_data)
+        return instance
+
 
 class TrackSerializer(serializers.ModelSerializer):
     class Meta:

@@ -214,12 +214,14 @@ class OperationOrderingFilterBackend(filters.BaseFilterBackend):
 
 class TrackStatusFilterSet(django_filters.FilterSet):
     direction = django_filters.CharFilter(field_name='direction__title')
+    departure_is_set = django_filters.BooleanFilter(field_name='show_after_departure')
 
     class Meta:
         model = TrackStatus
         fields = (
             'shipping_mode',
             'direction',
+            'departure_is_set',
         )
 
 

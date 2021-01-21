@@ -926,6 +926,10 @@ class TrackStatus(models.Model):
         _('Must update actual date of departure'),
         default=False,
     )
+    show_after_departure = models.BooleanField(
+        _('Show status after actual date of departure set'),
+        default=False,
+    )
 
 
 class Direction(models.Model):

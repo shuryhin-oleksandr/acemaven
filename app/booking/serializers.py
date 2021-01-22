@@ -742,14 +742,30 @@ class ShipmentDetailsBaseSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         user = self.context['request'].user
+        departure_track_exists = Track.objects.filter(
+            manual=True,
+            booking=instance.booking,
+            status=TrackStatus.objects.filter(
+                shipping_mode=instance.booking.freight_rate.shipping_mode,
+                auto_add_on_actual_date_of_departure=True,
+            ).first(),
+        ).exists()
+        arrival_track_exists = Track.objects.filter(
+            manual=True,
+            booking=instance.booking,
+            status=TrackStatus.objects.filter(
+                shipping_mode=instance.booking.freight_rate.shipping_mode,
+                auto_add_on_actual_date_of_arrival=True,
+            ).first(),
+        ).exists()
         create_track = False
-        if validated_data.get('actual_date_of_departure') and not instance.actual_date_of_departure:
+        if validated_data.get('actual_date_of_departure') and not departure_track_exists:
             track_status = TrackStatus.objects.filter(
                 shipping_mode=instance.booking.freight_rate.shipping_mode,
                 auto_add_on_actual_date_of_departure=True,
             ).first()
             create_track = True
-        elif validated_data.get('actual_date_of_arrival') and not instance.actual_date_of_arrival:
+        elif validated_data.get('actual_date_of_arrival') and not arrival_track_exists:
             track_status = TrackStatus.objects.filter(
                 shipping_mode=instance.booking.freight_rate.shipping_mode,
                 auto_add_on_actual_date_of_arrival=True,
@@ -923,6 +939,7 @@ class OperationRetrieveSerializer(OperationListBaseSerializer):
     charges_today = serializers.SerializerMethodField()
     shipper = ShipperSerializer()
     change_requests = serializers.SerializerMethodField()
+    chat = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta(OperationListBaseSerializer.Meta):
         model = Booking
@@ -933,6 +950,7 @@ class OperationRetrieveSerializer(OperationListBaseSerializer):
             'charges_today',
             'charges',
             'change_requests',
+            'chat',
         )
 
     def get_change_requests(self, obj):

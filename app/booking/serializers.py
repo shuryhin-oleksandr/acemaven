@@ -13,7 +13,6 @@ from app.booking.utils import rate_surcharges_filter, calculate_freight_rate_cha
 from app.core.models import Shipper
 from app.core.serializers import ShipperSerializer, BankAccountBaseSerializer
 from app.core.utils import get_average_company_rating
-from app.chat.tasks import create_chat_for_operation
 from app.handling.models import ShippingType, ClientPlatformSetting, Currency, GeneralSetting, BillingExchangeRate
 from app.handling.serializers import ContainerTypesSerializer, CurrencySerializer, CarrierBaseSerializer, \
     PortSerializer, ShippingModeBaseSerializer, PackagingTypeBaseSerializer, ReleaseTypeSerializer
@@ -739,7 +738,6 @@ class ShipmentDetailsBaseSerializer(serializers.ModelSerializer):
         booking.save()
         if booking.shipping_type == 'air' and booking.automatic_tracking:
             send_awb_number_to_air_tracking_api.delay(shipment_detail.booking_number)
-        create_chat_for_operation.delay(booking.id)
         return shipment_detail
 
     def update(self, instance, validated_data):

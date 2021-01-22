@@ -883,6 +883,17 @@ class TrackViewSet(mixins.ListModelMixin,
     serializer_class = TrackSerializer
     permission_classes = (IsAuthenticated, )
 
+    def perform_destroy(self, instance):
+        shipment_details = instance.booking.shipment_details.first()
+        track_status = instance.status
+        if track_status.auto_add_on_actual_date_of_departure:
+            shipment_details.actual_date_of_departure = None
+        elif track_status.auto_add_on_actual_date_of_arrival:
+            shipment_details.actual_date_of_arrival = None
+        shipment_details.save()
+
+        instance.delete()
+
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)

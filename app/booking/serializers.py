@@ -13,6 +13,7 @@ from app.booking.utils import rate_surcharges_filter, calculate_freight_rate_cha
 from app.core.models import Shipper
 from app.core.serializers import ShipperSerializer, BankAccountBaseSerializer
 from app.core.utils import get_average_company_rating
+from app.chat.tasks import create_chat_for_operation
 from app.handling.models import ShippingType, ClientPlatformSetting, Currency, GeneralSetting, BillingExchangeRate
 from app.handling.serializers import ContainerTypesSerializer, CurrencySerializer, CarrierBaseSerializer, \
     PortSerializer, ShippingModeBaseSerializer, PackagingTypeBaseSerializer, ReleaseTypeSerializer
@@ -738,6 +739,7 @@ class ShipmentDetailsBaseSerializer(serializers.ModelSerializer):
         booking.save()
         if booking.shipping_type == 'air' and booking.automatic_tracking:
             send_awb_number_to_air_tracking_api.delay(shipment_detail.booking_number)
+        create_chat_for_operation.delay(booking.id)
         return shipment_detail
 
     def update(self, instance, validated_data):
@@ -783,6 +785,9 @@ class ShipmentDetailsBaseSerializer(serializers.ModelSerializer):
 
 
 class TrackSerializer(serializers.ModelSerializer):
+    actual_date_of_departure = serializers.DateTimeField(write_only=True, required=False)
+    actual_date_of_arrival = serializers.DateTimeField(write_only=True, required=False)
+
     class Meta:
         model = Track
         fields = (
@@ -793,17 +798,29 @@ class TrackSerializer(serializers.ModelSerializer):
             'comment',
             'status',
             'booking',
+            'actual_date_of_departure',
+            'actual_date_of_arrival',
         )
 
     def create(self, validated_data):
         validated_data['manual'] = True
         validated_data['created_by'] = self.context['request'].user
+        actual_date_of_departure = validated_data.pop('actual_date_of_departure', None)
+        actual_date_of_arrival = validated_data.pop('actual_date_of_arrival', None)
 
         status = validated_data['status']
+        shipment_details = validated_data['booking'].shipment_details.first()
+
         if status.must_update_actual_date_of_departure:
-            shipment_details = validated_data['booking'].shipment_details.first()
             shipment_details.actual_date_of_departure = timezone.localtime()
-            shipment_details.save()
+
+        elif status.auto_add_on_actual_date_of_departure and actual_date_of_departure:
+            shipment_details.actual_date_of_departure = actual_date_of_departure
+
+        elif status.auto_add_on_actual_date_of_arrival and actual_date_of_arrival:
+            shipment_details.actual_date_of_arrival = actual_date_of_arrival
+
+        shipment_details.save()
 
         instance = super().create(validated_data)
         return instance

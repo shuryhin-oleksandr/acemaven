@@ -26,7 +26,8 @@ from app.booking.serializers import SurchargeSerializer, SurchargeEditSerializer
     QuoteStatusBaseSerializer, CargoGroupSerializer, BookingListBaseSerializer, BookingRetrieveSerializer, \
     ShipmentDetailsBaseSerializer, OperationSerializer, OperationListBaseSerializer, OperationRetrieveSerializer, \
     OperationRetrieveClientSerializer, OperationRecalculateSerializer, TrackSerializer, TrackStatusSerializer, \
-    TrackRetrieveSerializer, OperationBillingAgentListSerializer, OperationBillingClientListSerializer
+    TrackRetrieveSerializer, OperationBillingAgentListSerializer, OperationBillingClientListSerializer, \
+    TrackWidgetListSerializer
 from app.booking.utils import date_format, wm_calculate, freight_rate_search, calculate_freight_rate_charges, \
     get_fees, surcharge_search, make_copy_of_surcharge, make_copy_of_freight_rate, \
     apply_operation_select_prefetch_related
@@ -883,6 +884,11 @@ class TrackViewSet(mixins.ListModelMixin,
     serializer_class = TrackSerializer
     permission_classes = (IsAuthenticated, )
 
+    def get_serializer_class(self):
+        if self.action == 'get_widget_latest_tracking':
+            return TrackWidgetListSerializer
+        return self.serializer_class
+
     def perform_destroy(self, instance):
         shipment_details = instance.booking.shipment_details.first()
         track_status = instance.status
@@ -903,6 +909,13 @@ class TrackViewSet(mixins.ListModelMixin,
         track = Track.objects.get(id=new_track_id)
         data = TrackRetrieveSerializer(track).data
         return Response(data=data, status=status.HTTP_201_CREATED, headers=headers)
+
+    @action(methods=['get'], detail=False, url_path='widget')
+    def get_widget_latest_tracking(self, request, *args, **kwargs):
+        company = request.user.get_company()
+        queryset = self.get_queryset().filter(booking__client_contact_person__companies=company)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class TrackStatusViewSet(mixins.ListModelMixin,

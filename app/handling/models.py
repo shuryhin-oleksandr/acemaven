@@ -663,7 +663,7 @@ class BillingExchangeRate(models.Model):
     )
 
     class Meta:
-        ordering = ['-date', ]
+        ordering = ['date', ]
 
 
 class ClientPlatformSetting(SingletonModel):

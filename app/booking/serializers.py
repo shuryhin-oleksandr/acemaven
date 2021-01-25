@@ -840,6 +840,30 @@ class TrackRetrieveSerializer(TrackSerializer):
         )
 
 
+class TrackWidgetListSerializer(serializers.ModelSerializer):
+    shipping_type = serializers.CharField(source='booking.freight_rate.shipping_mode.shipping_type', default=None)
+    booking_number = serializers.SerializerMethodField()
+    route = serializers.SerializerMethodField()
+    status = serializers.CharField(source='status.title', default=None)
+
+    class Meta:
+        model = Track
+        fields = (
+            'shipping_type',
+            'booking_number',
+            'route',
+            'date_created',
+            'status',
+        )
+
+    def get_booking_number(self, obj):
+        return obj.booking.shipment_details.first().booking_number if obj.booking else None
+
+    def get_route(self, obj):
+        return f'{booking.freight_rate.origin.code}-' \
+               f'{booking.freight_rate.destination.code}' if (booking := obj.booking) else None
+
+
 class TrackStatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = TrackStatus

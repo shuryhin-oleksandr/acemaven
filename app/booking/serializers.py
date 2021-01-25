@@ -1071,6 +1071,7 @@ class OperationBillingBaseSerializer(serializers.ModelSerializer):
             'charges',
             'status',
             'payment_due_by',
+            'automatic_tracking',
         )
 
     def get_status(self, obj):

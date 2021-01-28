@@ -1108,6 +1108,7 @@ class OperationBillingClientListSerializer(GetTrackingInitialMixin, OperationBil
     tracking_initial = serializers.SerializerMethodField()
     tracking = TrackRetrieveSerializer(many=True)
     dates = serializers.SerializerMethodField()
+    shipment_details = ShipmentDetailsBaseSerializer(many=True)
 
     class Meta(OperationBillingBaseSerializer.Meta):
         model = Booking
@@ -1116,6 +1117,7 @@ class OperationBillingClientListSerializer(GetTrackingInitialMixin, OperationBil
             'tracking',
             'dates',
             'date_created',
+            'shipment_details',
         )
 
     def get_dates(self, obj):

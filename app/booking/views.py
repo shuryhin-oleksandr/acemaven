@@ -674,8 +674,8 @@ class BookingViesSet(PermissionClassByActionMixin,
         booking.date_accepted_by_agent = now_date
         booking.save()
 
-        if chat := booking.chat:
-            chat.users.add(users.first())
+        if hasattr(booking, 'chat'):
+            booking.chat.users.add(users.first())
 
         users_ids = list(users.values_list('id', flat=True))
         create_and_assign_notification.delay(

@@ -37,6 +37,8 @@ from app.core.permissions import IsMasterOrAgent, IsClientCompany, IsAgentCompan
 from app.core.serializers import ReviewBaseSerializer
 from app.handling.models import Port, Currency, ClientPlatformSetting
 from app.location.models import Country
+from app.websockets.models import Notification
+from app.websockets.tasks import create_and_assign_notification
 
 
 main_country = Country.objects.filter(is_main=True).first()
@@ -664,13 +666,24 @@ class BookingViesSet(PermissionClassByActionMixin,
     def assign_booking_to_agent(self, request, *args, **kwargs):
         booking = self.get_object()
         data = request.data
-        user = get_user_model().objects.filter(id=data.get('user')).first()
-        booking.agent_contact_person = user
+        users = get_user_model().objects.filter(id=data.get('user'))
+        booking.agent_contact_person = users.first()
         booking.is_assigned = True
         booking.status = Booking.ACCEPTED
         now_date = timezone.localtime().date()
         booking.date_accepted_by_agent = now_date
         booking.save()
+
+        if chat := booking.chat:
+            chat.users.add(users.first())
+
+        create_and_assign_notification.delay(
+            Notification.REQUESTS,
+            f'{request.user.get_full_name()} has assigned an operation to you. Operation id [{booking.id}].',
+            users,
+            object_id=booking.id,
+        )
+
         return Response(status=status.HTTP_200_OK)
 
     @action(methods=['post'], detail=True, url_path='reject')

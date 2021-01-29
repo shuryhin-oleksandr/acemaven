@@ -1,9 +1,6 @@
 from decimal import Decimal
 
-from django.contrib.auth import get_user_model
 from django.db import models
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 from django.contrib.gis.db import models as gis_models
 from django.core.validators import MinValueValidator, RegexValidator
 from django.utils.translation import gettext_lazy as _
@@ -809,64 +806,3 @@ class PixApiSetting(models.Model):
         on_delete=models.CASCADE,
         related_name='pix_api',
     )
-
-
-class Notification(models.Model):
-    """
-    Model for system notifications.
-    """
-
-    REQUESTS = 'requests'
-    OPERATIONS = 'operations'
-    RATES = 'rates'
-    SURCHARGES = 'surcharges'
-    SECTION_CHOICES = (
-        (REQUESTS, 'Requests'),
-        (OPERATIONS, 'Operations'),
-        (RATES, 'Rates'),
-        (SURCHARGES, 'Surcharges'),
-    )
-
-    users = models.ManyToManyField(
-        get_user_model(),
-        related_name='notifications',
-        through='NotificationSeen',
-    )
-    date = models.DateTimeField(
-        _('Date the notification created'),
-        auto_now_add=True,
-    )
-    section = models.CharField(
-        _('Section of the notification'),
-        max_length=20,
-        choices=SECTION_CHOICES,
-    )
-    text = models.TextField(
-        _('Notification text'),
-    )
-
-
-class NotificationSeen(models.Model):
-    """
-    Through model for notification and user.
-    """
-
-    notification = models.ForeignKey(
-        'Notification',
-        on_delete=models.CASCADE,
-    )
-    user = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        related_name='notifications_seen',
-    )
-    is_seen = models.BooleanField(
-        _('Is seen by user'),
-        default=False,
-    )
-
-
-# Notification
-@receiver(post_save, sender=Notification)
-def send_notification_to_user(sender, instance, *args, **kwargs):
-    pass

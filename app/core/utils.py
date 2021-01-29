@@ -4,7 +4,7 @@ import string
 from django.contrib.auth import get_user_model
 from django.db.models import Avg
 
-from app.core.models import Role, SignUpToken, Review
+from app.core.models import Role, SignUpToken, EmailNotificationSetting
 from app.core.tasks import send_registration_email
 
 
@@ -21,6 +21,7 @@ def master_account_processing(company, master_account_info):
     user = get_user_model().objects.create(**master_account_info)
     Role.objects.create(company=company, user=user)
     user.set_roles(['master'])
+    EmailNotificationSetting.objects.create(user=user)
     process_sign_up_token(user)
 
 

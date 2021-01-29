@@ -5,7 +5,7 @@ from rest_auth.views import PasswordChangeView
 from django.urls import path
 
 from app.core.views import CompanyEditViewSet, SignUpRequestViewSet, SignUpCheckView, UserSignUpView, \
-    UserViewSet, UserProfileView, BankAccountViewSet, SelectChoiceView
+    UserViewSet, UserProfileView, BankAccountViewSet, SelectChoiceView, EmailNotificationSettingViewSet
 
 
 app_name = 'core'
@@ -16,6 +16,7 @@ router.register(r'company-sign-up', SignUpRequestViewSet, basename='company-sign
 router.register(r'company', CompanyEditViewSet, basename='company-edit')
 router.register(r'user', UserViewSet, basename='user-create')
 router.register(r'bank-account', BankAccountViewSet, basename='bank-account')
+router.register(r'email-settings', EmailNotificationSettingViewSet, basename='email-settings')
 
 urlpatterns = router.urls
 

@@ -17,6 +17,9 @@ from app.handling.models import ShippingType, ClientPlatformSetting, Currency, G
 from app.handling.serializers import ContainerTypesSerializer, CurrencySerializer, CarrierBaseSerializer, \
     PortSerializer, ShippingModeBaseSerializer, PackagingTypeBaseSerializer, ReleaseTypeSerializer
 from app.location.models import Country
+from app.websockets.models import Notification
+from app.websockets.tasks import create_chat_for_operation
+from app.websockets.tasks import create_and_assign_notification
 
 
 main_country = Country.objects.filter(is_main=True).first()
@@ -648,6 +651,16 @@ class BookingSerializer(serializers.ModelSerializer):
                 CargoGroup.objects.bulk_create(new_cargo_groups)
         except Exception as error:
             raise serializers.ValidationError({'error': error})
+        if booking.is_paid:
+            text = 'A new booking request has been received.'
+            ff_company = booking.freight_rate.company
+            users = ff_company.users.filter(role__groups__name__in=('master', 'agent'))
+            create_and_assign_notification.delay(
+                Notification.REQUESTS,
+                text,
+                users,
+                object_id=booking.id,
+            )
         return booking
 
 
@@ -738,6 +751,7 @@ class ShipmentDetailsBaseSerializer(serializers.ModelSerializer):
         booking.save()
         if booking.shipping_type == 'air' and booking.automatic_tracking:
             send_awb_number_to_air_tracking_api.delay(shipment_detail.booking_number)
+        create_chat_for_operation.delay(booking.id)
         return shipment_detail
 
     def update(self, instance, validated_data):

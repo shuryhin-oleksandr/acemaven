@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 from django.utils import timezone
 
 from app.booking.models import Booking
-from app.core.models import BankAccount, Company, SignUpRequest, Role, Shipper, Review
+from app.core.models import BankAccount, Company, SignUpRequest, Role, Shipper, Review, EmailNotificationSetting
 from app.core.utils import process_sign_up_token, get_average_company_rating
 from app.core.validators import PasswordValidator
 from app.handling.models import GeneralSetting
@@ -191,6 +191,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
         company = self.context['request'].user.get_company()
         Role.objects.create(user=user, company=company)
         user.set_roles(roles)
+        EmailNotificationSetting.objects.create(user=user)
         process_sign_up_token(user)
         return user
 
@@ -225,12 +226,14 @@ class UserBaseSerializerWithPhoto(UserBaseSerializer):
 
 class UserSerializer(UserBaseSerializer):
     password = serializers.CharField(min_length=8, max_length=25, write_only=True, validators=(PasswordValidator(), ))
+    email_settings = serializers.PrimaryKeyRelatedField(source='emailnotificationsetting', read_only=True)
 
     class Meta(UserBaseSerializer.Meta):
         fields = UserBaseSerializer.Meta.fields + (
             'phone',
             'photo',
             'password',
+            'email_settings',
         )
 
     def update(self, instance, validated_data):
@@ -339,4 +342,21 @@ class ShipperSerializer(serializers.ModelSerializer):
             'phone',
             'phone_additional',
             'email',
+        )
+
+
+class EmailNotificationSettingBaseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EmailNotificationSetting
+        fields = (
+            'id',
+            'sea_import_shipment_arrival_alert',
+            'sea_import_shipment_arrival_alert_days',
+            'import_shipment_departure_alert',
+            'export_shipment_arrival_alert',
+            'operation_details_change',
+            'surcharge_expiration',
+            'surcharge_expiration_days',
+            'freight_rate_expiration',
+            'freight_rate_expiration_days',
         )

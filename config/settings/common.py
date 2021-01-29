@@ -51,12 +51,13 @@ INSTALLED_APPS = [
     'rest_auth',
     'tabbed_admin',
     'debug_toolbar',
-    # 'channels',
+    'channels',
 
     'app.core',
     'app.booking',
     'app.handling',
     'app.location',
+    'app.websockets',
 ]
 
 REST_FRAMEWORK = {
@@ -117,7 +118,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-# ASGI_APPLICATION = 'app.booking.routing.application'
+ASGI_APPLICATION = 'config.asgi.application'
 
 
 # Database
@@ -210,11 +211,11 @@ OLD_PASSWORD_FIELD_ENABLED = True
 TABBED_ADMIN_USE_JQUERY_UI = True
 
 # Channels config
-# CHANNEL_LAYERS = {
-#     'default': {
-#         'BACKEND': 'channels_redis.core.RedisChannelLayer',
-#         'CONFIG': {
-#             'hosts': [('0.0.0.0', 6379)]
-#         }
-#     }
-# }
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [('0.0.0.0', 6379)]
+        }
+    }
+}

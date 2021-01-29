@@ -22,16 +22,17 @@
             + window.location.host
             + '/ws/operation-chat/'
             + roomName
-            + '/'
+            + '/?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6Im5zb2Z0QG5zb2Z0LmNvbSIsImV4cCI6MTYxMjE2NTI0NiwiZW1haWwiOiJuc29mdEBuc29mdC5jb20iLCJvcmlnX2lhdCI6MTYxMTkwNjA0Nn0.f9gN4JVYeELM649MhW4lA5kFKXZtwL0RUl-EGVRLZyU'
         );
 
-        chatSocket.onopen = function (e) {
-            fetchMessages();
-            console.log(            'ws://'
+                    console.log(            'ws://'
             + window.location.host
             + '/ws/operation-chat/'
             + roomName
-            + '/')
+            + '/?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6Im5zb2Z0QG5zb2Z0LmNvbSIsImV4cCI6MTYxMjEwNTQyMiwiZW1haWwiOiJuc29mdEBuc29mdC5jb20iLCJvcmlnX2lhdCI6MTYxMTg0NjIyMn0.vcnh6Ep2oheS2Puk_R2q4vRYIUx4ozxoXyLpPnQMtnM')
+
+        chatSocket.onopen = function (e) {
+            {#fetchMessages();#}
         }
 
         chatSocket.onmessage = function(e) {
@@ -72,7 +73,7 @@
         }
 
         function createMessage(data) {
-            document.querySelector('#chat-log').value += (data.author + ': ' + data.content + '\n');
+            document.querySelector('#chat-log').value += (data.user + ': ' + data.content + '\n');
         }
     </script>
 </body>

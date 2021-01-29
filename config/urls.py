@@ -30,10 +30,10 @@ admin.site.index_title = 'Acemaven system management'
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/v1/websockets/', include('app.websockets.urls', namespace='websockets')),
     path('api/v1/core/', include('app.core.urls', namespace='core')),
     path('api/v1/handling/', include('app.handling.urls', namespace='handling')),
     path('api/v1/booking/', include('app.booking.urls', namespace='booking')),
-
 ]
 
 if settings.DEBUG:

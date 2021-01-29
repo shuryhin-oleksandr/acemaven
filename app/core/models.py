@@ -217,6 +217,56 @@ class Company(models.Model):
         )
 
 
+class EmailNotificationSetting(models.Model):
+    """
+    Model for user email notification settings.
+    """
+
+    sea_import_shipment_arrival_alert = models.BooleanField(
+        _('Sea import shipment alerts'),
+        default=False,
+    )
+    sea_import_shipment_arrival_alert_days = models.PositiveIntegerField(
+        _('Sea import shipment alerts in days'),
+        default=0,
+    )
+    import_shipment_departure_alert = models.BooleanField(
+        _('Import shipment departure alerts'),
+        default=False,
+    )
+    export_shipment_arrival_alert = models.BooleanField(
+        _('Export shipment arrival alerts'),
+        default=False,
+    )
+    operation_details_change = models.BooleanField(
+        _('Operation details change'),
+        default=False,
+    )
+    surcharge_expiration = models.BooleanField(
+        _('Surcharge expiration'),
+        default=False,
+    )
+    surcharge_expiration_days = models.PositiveIntegerField(
+        _('Surcharge expiration in days'),
+        default=0,
+    )
+    freight_rate_expiration = models.BooleanField(
+        _('Freight rate expiration'),
+        default=False,
+    )
+    freight_rate_expiration_days = models.PositiveIntegerField(
+        _('Freight rate expiration in days'),
+        default=0,
+    )
+    user = models.OneToOneField(
+        get_user_model(),
+        on_delete=models.CASCADE,
+    )
+
+    def __str__(self):
+        return f'Email notification settings for user [{self.user.id}]'
+
+
 class SignUpRequest(models.Model):
     """
     Model for sing up request info.

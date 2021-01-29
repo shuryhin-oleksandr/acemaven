@@ -7,11 +7,11 @@ from rest_framework_jwt.settings import api_settings
 from django.contrib.auth import get_user_model, authenticate
 
 from app.core.mixins import PermissionClassByActionMixin, CheckTokenMixin, CreateMixin
-from app.core.models import BankAccount, Company, SignUpRequest, Shipper
+from app.core.models import BankAccount, Company, SignUpRequest, Shipper, EmailNotificationSetting
 from app.core.permissions import IsMaster, IsMasterOrBilling, IsAgentCompany, IsClientCompany
 from app.core.serializers import CompanySerializer, SignUpRequestSerializer, UserBaseSerializer, UserCreateSerializer, \
     UserSignUpSerializer, BankAccountSerializer, UserMasterSerializer, UserSerializer, SelectChoiceSerializer, \
-    UserBaseSerializerWithPhoto, CompanyReviewSerializer, ShipperSerializer
+    UserBaseSerializerWithPhoto, CompanyReviewSerializer, ShipperSerializer, EmailNotificationSettingBaseSerializer
 from app.core.utils import choice_to_value_name
 from app.booking.models import CargoGroup, CancellationReason
 from app.handling.models import ReleaseType, PackagingType, ContainerType
@@ -222,3 +222,15 @@ class SelectChoiceView(generics.GenericAPIView):
             serializer = self.get_serializer(data)
             return Response(data=serializer.data, status=status.HTTP_200_OK)
         return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class EmailNotificationSettingViewSet(mixins.RetrieveModelMixin,
+                                      mixins.UpdateModelMixin,
+                                      viewsets.GenericViewSet):
+    queryset = EmailNotificationSetting.objects.all()
+    serializer_class = EmailNotificationSettingBaseSerializer
+    permission_classes = (IsAuthenticated, )
+
+    def get_queryset(self):
+        user = self.request.user
+        return self.queryset.filter(user=user)

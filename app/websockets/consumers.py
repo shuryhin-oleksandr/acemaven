@@ -155,7 +155,7 @@ class NotificationConsumer(WebsocketConsumer):
             'id': notification.id,
             'section': notification.section,
             'text': notification.text,
-            'is_viewed': str(notification_seen.is_viewed),
+            'is_viewed': notification_seen.is_viewed,
             'date_created': str(notification.date_created),
             'object_id': f'{notification.object_id if notification.object_id else ""}'
         }

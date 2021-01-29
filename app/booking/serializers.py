@@ -654,11 +654,13 @@ class BookingSerializer(serializers.ModelSerializer):
         if booking.is_paid:
             text = 'A new booking request has been received.'
             ff_company = booking.freight_rate.company
-            users = ff_company.users.filter(role__groups__name__in=('master', 'agent'))
+            users_ids = list(
+                ff_company.users.filter(role__groups__name__in=('master', 'agent')).values_list('id', flat=True)
+            )
             create_and_assign_notification.delay(
                 Notification.REQUESTS,
                 text,
-                users,
+                users_ids,
                 object_id=booking.id,
             )
         return booking

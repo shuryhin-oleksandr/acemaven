@@ -16,7 +16,6 @@ def get_user(token_key):
         token = {'token': token_key}
         valid_data = VerifyJSONWebTokenSerializer().validate(token)
         user = valid_data['user']
-        print(str(user))
         return user
     except Exception as e:
         return AnonymousUser()
@@ -30,9 +29,7 @@ class TokenAuthMiddlewareInstance:
         query = parse.parse_qs(self.scope['query_string'].decode())
         try:
             token_key = query['token'][0]
-            print(token_key)
         except Exception as e:
-            print(e)
             token_key = None
 
         self.scope['user'] = await get_user(token_key)
@@ -44,7 +41,7 @@ class TokenAuthMiddleware:
 
     async def __call__(self, scope, receive, send):
         wrapper = TokenAuthMiddlewareInstance(scope)
-        print(scope, receive, send)
+
         await wrapper.resolve_user()
 
         return await self.inner(wrapper.scope, receive, send)

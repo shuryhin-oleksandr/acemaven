@@ -677,10 +677,11 @@ class BookingViesSet(PermissionClassByActionMixin,
         if chat := booking.chat:
             chat.users.add(users.first())
 
+        users_ids = list(users.values_list('id', flat=True))
         create_and_assign_notification.delay(
             Notification.REQUESTS,
             f'{request.user.get_full_name()} has assigned an operation to you. Operation id [{booking.id}].',
-            users,
+            users_ids,
             object_id=booking.id,
         )
 

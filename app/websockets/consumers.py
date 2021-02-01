@@ -28,7 +28,7 @@ class ChatConsumer(WebsocketConsumer):
         messages = Message.objects.filter(chat_id=self.chat_id)
         content = {
             'command': 'messages',
-            'messages': self.messages_to_json(messages)
+            'messages': self.messages_to_json(messages),
         }
         self.send_message(content)
 
@@ -40,7 +40,7 @@ class ChatConsumer(WebsocketConsumer):
             text=data['message'])
         content = {
             'command': 'new_message',
-            'message': self.message_to_json(message)
+            'message': self.message_to_json(message),
         }
         return self.send_chat_message(content)
 
@@ -55,7 +55,11 @@ class ChatConsumer(WebsocketConsumer):
     def delete_message(self, data):
         message_id = data['message_id']
         Message.objects.filter(id=message_id).delete()
-        self.fetch_messages()
+        content = {
+            'command': 'delete_message',
+            'message_id': message_id,
+        }
+        return self.send_chat_message(content)
 
     def messages_to_json(self, messages):
         result = []
@@ -188,7 +192,7 @@ class NotificationConsumer(WebsocketConsumer):
         self.commands[data['command']](self, data)
 
     def notify(self, event):
-        self.send(text_data=json.dumps(event["text"]))
+        self.send(text_data=json.dumps(event['data']))
 
     def send_message(self, message):
         self.send(text_data=json.dumps(message))

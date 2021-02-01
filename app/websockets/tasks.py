@@ -56,7 +56,10 @@ def send_notification(notification_id):
                 f'{user.id}',
                 {
                     'type': 'notify',
-                    'text': data,
+                    'data': {
+                        'command': 'notification',
+                        'notification': data,
+                    },
                 },
             )
 

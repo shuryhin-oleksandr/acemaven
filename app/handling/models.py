@@ -362,11 +362,6 @@ class Airline(models.Model):
         max_length=50,
         null=True,
     )
-    state = models.ForeignKey(
-        'location.State',
-        null=True,
-        on_delete=models.CASCADE,
-    )
     postcode = models.CharField(
         _('Airline postcode'),
         max_length=20,
@@ -493,6 +488,13 @@ class Port(gis_models.Model):
     Ports and Airports model.
     """
 
+    PORT = 'port'
+    AIRPORT = 'airport'
+    PORT_AIRPORT_CHOICES = (
+        (PORT, 'Port'),
+        (AIRPORT, 'Airport'),
+    )
+
     code = models.CharField(
         _('Port Code'),
         max_length=5,
@@ -513,78 +515,22 @@ class Port(gis_models.Model):
     timezone = models.CharField(
         _('Port timezone'),
         max_length=6,
-    )
-    dst = models.BooleanField(
-        _('Daylight saving time'),
-    )
-    in_current_country = models.BooleanField(
-        _('Is in current country'),
-    )
-    in_eu = models.BooleanField(
-        _('Is in EU'),
-    )
-    economic_group = models.CharField(
-        _('Economic group'),
-        max_length=100,
         null=True,
-    )
-    state = models.ForeignKey(
-        'location.State',
-        null=True,
-        on_delete=models.CASCADE,
-    )
-    has_airport = models.BooleanField(
-        _('Has airport?'),
-    )
-    has_border_crossing = models.BooleanField(
-        _('Has border crossing?'),
-        default=False,
-    )
-    has_customs_lodge = models.BooleanField(
-        _('Has customs lodge?'),
-        default=False,
-    )
-    discharge = models.BooleanField(
-        _('Discharge'),
-        default=False,
-    )
-    has_outport = models.BooleanField(
-        _('Has outport?'),
-        default=False,
-    )
-    has_post = models.BooleanField(
-        _('Has post?'),
-        default=False,
-    )
-    has_rail = models.BooleanField(
-        _('Has rail?'),
-        default=False,
-    )
-    has_road = models.BooleanField(
-        _('Has road?'),
-    )
-    has_seaport = models.BooleanField(
-        _('Has seaport?'),
-    )
-    has_store = models.BooleanField(
-        _('Has store?'),
-        default=False,
-    )
-    has_terminal = models.BooleanField(
-        _('Has terminal?'),
-        default=False,
-    )
-    has_unload = models.BooleanField(
-        _('Has unload?'),
-        default=False,
-    )
-    name_with_diacriticals = models.CharField(
-        _('Name with diacriticals'),
-        max_length=100,
     )
     is_active = models.BooleanField(
         _('Port is active'),
         default=True,
+    )
+    port_or_airport = models.CharField(
+        _('Port or airport'),
+        max_length=10,
+        choices=PORT_AIRPORT_CHOICES,
+        default=PORT,
+    )
+    country = models.ForeignKey(
+        'location.Country',
+        null=True,
+        on_delete=models.CASCADE,
     )
 
     class Meta:

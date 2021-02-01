@@ -27,10 +27,10 @@ class PortFilterSet(django_filters.FilterSet):
     def shipping_type_filter(self, queryset, _, value):
         filter_fields = {
             'sea': {
-                'has_seaport': True,
+                'port_or_airport': Port.PORT,
             },
             'air': {
-                'has_airport': True,
+                'port_or_airport': Port.AIRPORT,
             },
         }
         return queryset.filter(**filter_fields.get(value, {}))

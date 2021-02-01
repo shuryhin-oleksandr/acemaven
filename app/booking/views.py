@@ -682,6 +682,7 @@ class BookingViesSet(PermissionClassByActionMixin,
             Notification.REQUESTS,
             f'{request.user.get_full_name()} has assigned an operation to you. Operation id [{booking.id}].',
             users_ids,
+            Notification.BILLING,
             object_id=booking.id,
         )
 

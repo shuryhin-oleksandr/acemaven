@@ -24,6 +24,9 @@ class ChatConsumer(WebsocketConsumer):
 
         return f"{scheme if scheme else 'http'}://{':'.join(list(map(str, server)))}" if server else ''
 
+    def get_full_file_url(self, file_url):
+        return f'{self.get_origin_url()}{file_url}'
+
     def fetch_messages(self):
         messages = Message.objects.filter(chat_id=self.chat_id)
         content = {
@@ -46,11 +49,14 @@ class ChatConsumer(WebsocketConsumer):
 
     def typing_message(self, data):
         user_id = data['user_id']
-        content = {
-            'command': 'typing_message',
-            'user_id': user_id,
-        }
-        return self.send_chat_message(content)
+        user = User.objects.filter(id=user_id).first()
+        if user:
+            content = {
+                'command': 'typing_message',
+                'user_id': user_id,
+                'photo': f'{self.get_origin_url()}{photo.url}' if (photo := user.photo) else None,
+            }
+            return self.send_chat_message(content)
 
     def delete_message(self, data):
         message_id = data['message_id']
@@ -72,9 +78,9 @@ class ChatConsumer(WebsocketConsumer):
             'id': message.id,
             'user': message.user.get_full_name(),
             'user_id': message.user.id,
-            'photo': f'{self.get_origin_url()}{photo.url}' if (photo := message.user.photo) else None,
+            'photo': f'{self.get_full_file_url(photo.url)}' if (photo := message.user.photo) else None,
             'content': message.text,
-            'files': str(list(message.files.values_list('file', flat=True))),
+            'files': list(map(self.get_full_file_url, message.files.values_list('file', flat=True))),
             'date_created': str(message.date_created)
         }
 
@@ -161,7 +167,8 @@ class NotificationConsumer(WebsocketConsumer):
             'text': notification.text,
             'is_viewed': notification_seen.is_viewed,
             'date_created': str(notification.date_created),
-            'object_id': f'{notification.object_id if notification.object_id else ""}'
+            'object_id': f'{notification.object_id if notification.object_id else ""}',
+            'action_path': notification.action_path,
         }
 
     commands = {

@@ -34,10 +34,11 @@ def create_chat_for_operation(operation_id):
 
 
 @celery_app.task(name='create_and_assign_notification')
-def create_and_assign_notification(section, text, users_ids, object_id=None):
+def create_and_assign_notification(section, text, users_ids, action_path, object_id=None):
     notification = Notification.objects.create(
         section=section,
         text=text,
+        action_path=action_path,
         object_id=object_id,
     )
     users = User.objects.filter(id__in=users_ids)

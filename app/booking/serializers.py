@@ -661,6 +661,7 @@ class BookingSerializer(serializers.ModelSerializer):
                 Notification.REQUESTS,
                 text,
                 users_ids,
+                Notification.BOOKING,
                 object_id=booking.id,
             )
         return booking

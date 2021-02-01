@@ -100,6 +100,19 @@ class Notification(models.Model):
         (OPERATIONS_EXPORT, 'Operations (Exports)'),
     )
 
+    BOOKING = 'booking'
+    BILLING = 'billing'
+    OPERATION = 'operation'
+    SURCHARGE = 'surcharge'
+    FREIGHT_RATE = 'freight_rate'
+    ACTION_CHOICES = (
+        (BOOKING, 'Booking'),
+        (BILLING, 'Billing'),
+        (OPERATION, 'Operation'),
+        (SURCHARGE, 'Surcharge'),
+        (FREIGHT_RATE, 'Freight Rate'),
+    )
+
     section = models.CharField(
         _('Section'),
         max_length=17,
@@ -121,9 +134,15 @@ class Notification(models.Model):
         _('Id of described object'),
         null=True,
     )
+    action_path = models.CharField(
+        _('Action path'),
+        max_length=20,
+        choices=ACTION_CHOICES,
+        default=BOOKING,
+    )
 
     class Meta:
-        ordering = ['date_created', ]
+        ordering = ['-date_created', ]
 
     def __str__(self):
         return f'Notification [{self.id}] to users {list(self.users.values_list("id", flat=True))}'

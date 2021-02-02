@@ -4,6 +4,7 @@ from urllib import parse
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 
 from app.websockets.models import Message, Chat, Notification
@@ -91,7 +92,7 @@ class ChatConsumer(WebsocketConsumer):
             'photo': f'{self.get_full_file_url(photo.url)}' if (photo := message.user.photo) else None,
             'content': message.text,
             'files': list(
-                map(self.get_full_file_url, map(lambda file: file.url, message.files.values_list('file', flat=True)))
+                map(self.get_full_file_url, map(lambda url: f'{settings.MEDIA_URL}{url}', message.files.values_list('file', flat=True)))
             ),
             'date_created': str(message.date_created)
         }

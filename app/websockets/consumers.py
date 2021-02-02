@@ -78,6 +78,22 @@ class ChatConsumer(WebsocketConsumer):
         }
         return self.send_chat_message(content)
 
+    def file_uploading(self, data):
+        message_id = data['message_id']
+        content = {
+            'command': 'file_uploading',
+            'message_id': message_id,
+        }
+        return self.send_chat_message(content)
+
+    def file_uploaded(self, data):
+        message_id = data['message_id']
+        content = {
+            'command': 'file_uploaded',
+            'message_id': message_id,
+        }
+        return self.send_chat_message(content)
+
     def messages_to_json(self, messages):
         result = []
         for message in messages:
@@ -103,6 +119,8 @@ class ChatConsumer(WebsocketConsumer):
         'typing_message': typing_message,
         'delete_message': delete_message,
         'stop_typing_message': stop_typing_message,
+        'file_uploading': file_uploading,
+        'file_uploaded': file_uploaded,
     }
 
     def connect(self):

@@ -54,7 +54,7 @@ class ChatConsumer(WebsocketConsumer):
             content = {
                 'command': 'typing_message',
                 'user_id': user_id,
-                'photo': f'{self.get_origin_url()}{photo.url}' if (photo := user.photo) else None,
+                'photo': f'{self.get_full_file_url(photo.url)}' if (photo := user.photo) else None,
             }
             return self.send_chat_message(content)
 
@@ -90,7 +90,9 @@ class ChatConsumer(WebsocketConsumer):
             'user_id': message.user.id,
             'photo': f'{self.get_full_file_url(photo.url)}' if (photo := message.user.photo) else None,
             'content': message.text,
-            'files': list(map(self.get_full_file_url, message.files.values_list('file', flat=True))),
+            'files': list(
+                map(self.get_full_file_url, map(lambda file: file.url, message.files.values_list('file', flat=True)))
+            ),
             'date_created': str(message.date_created)
         }
 

@@ -39,6 +39,7 @@ class Message(models.Model):
 
     text = models.TextField(
         'Message',
+        blank=True,
     )
     date_created = models.DateTimeField(
         'Date created',

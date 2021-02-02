@@ -58,6 +58,16 @@ class ChatConsumer(WebsocketConsumer):
             }
             return self.send_chat_message(content)
 
+    def stop_typing_message(self, data):
+        user_id = data['user_id']
+        user = User.objects.filter(id=user_id).first()
+        if user:
+            content = {
+                'command': 'stop_typing_message',
+                'user_id': user_id,
+            }
+            return self.send_chat_message(content)
+
     def delete_message(self, data):
         message_id = data['message_id']
         Message.objects.filter(id=message_id).delete()
@@ -89,6 +99,7 @@ class ChatConsumer(WebsocketConsumer):
         'new_message': new_message,
         'typing_message': typing_message,
         'delete_message': delete_message,
+        'stop_typing_message': stop_typing_message,
     }
 
     def connect(self):

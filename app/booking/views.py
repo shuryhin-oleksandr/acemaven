@@ -754,6 +754,7 @@ class OperationViewSet(PermissionClassByActionMixin,
         operation.change_requests.all().delete()
         return Response(status=status.HTTP_200_OK)
 
+    @transaction.atomic
     @action(methods=['post'], detail=True, url_path='confirm_change_request')
     def confirm_change_request(self, request, *args, **kwargs):
         operation = self.get_object()

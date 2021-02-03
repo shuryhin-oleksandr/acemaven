@@ -716,6 +716,13 @@ class BookingRetrieveSerializer(BookingListBaseSerializer):
 
 
 class ShipmentDetailsBaseSerializer(serializers.ModelSerializer):
+    date_of_departure = serializers.DateTimeField(format='%d/%m/%Y %H:%M')
+    date_of_arrival = serializers.DateTimeField(format='%d/%m/%Y %H:%M')
+    actual_date_of_departure = serializers.DateTimeField(format='%d/%m/%Y %H:%M')
+    actual_date_of_arrival = serializers.DateTimeField(format='%d/%m/%Y %H:%M')
+    document_cut_off_date = serializers.DateTimeField(format='%d/%m/%Y %H:%M')
+    cargo_cut_off_date = serializers.DateTimeField(format='%d/%m/%Y %H:%M')
+
     class Meta:
         model = ShipmentDetails
         fields = (

@@ -1051,7 +1051,7 @@ class OperationSerializer(serializers.ModelSerializer):
             Notification.OPERATIONS,
             f'The Client has requested a change in the shipment {original_booking.aceid}, '
             f'from {original_booking.freight_rate.origin} to {original_booking.freight_rate.destination}',
-            [original_booking.freight_rate.agent_contact_person.id, ],
+            [original_booking.agent_contact_person.id, ],
             Notification.OPERATION,
             object_id=original_booking.id,
         )

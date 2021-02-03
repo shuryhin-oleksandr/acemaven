@@ -938,6 +938,10 @@ class TrackStatus(models.Model):
         _('Add the status after adding actual date of arrival'),
         default=False,
     )
+    auto_add_on_shipment_details_change = models.BooleanField(
+        _('Add the status after changing shipment details'),
+        default=False,
+    )
 
 
 class Direction(models.Model):

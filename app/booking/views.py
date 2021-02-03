@@ -758,10 +758,27 @@ class OperationViewSet(PermissionClassByActionMixin,
     def confirm_change_request(self, request, *args, **kwargs):
         operation = self.get_object()
         change_request = operation.change_requests.first()
+
+        chat = operation.chat
+        chat.operation = change_request
+        chat.save()
+
         operation.shipment_details.update(booking=change_request)
         operation.delete()
+
         change_request.change_request_status = Booking.CHANGE_CONFIRMED
+        change_request.original_booking = None
         change_request.save()
+
+        create_and_assign_notification.delay(
+            Notification.OPERATIONS,
+            f'The Agent has confirmed your changes in the shipment {change_request.aceid} '
+            f'from {change_request.freight_rate.origin} to {change_request.freight_rate.destination}.',
+            [change_request.client_contact_person_id, ],
+            Notification.OPERATION,
+            object_id=change_request.id,
+        )
+
         return Response(data={'id': change_request.id}, status=status.HTTP_200_OK)
 
     @action(methods=['post'], detail=True, url_path='cancel_change_request')
@@ -871,6 +888,40 @@ class TrackView(views.APIView):
         data = request.data
         booking_number = data.get('airWaybillNumber')
         booking = Booking.objects.filter(shipment_details__booking_number=booking_number).first()
+        if booking:
+            direction = 'export' if booking.freight_rate.origin.code.startswith(MAIN_COUNTRY_CODE) else 'import'
+            shipment_details = booking.shipment_details.first()
+            origin_and_destination = data.get('originAndDestination')
+            event = data.get('events')[0]
+            destination = event.get('destination', '')
+            origin = event.get('origin', '')
+            time_of_event = datetime.strptime(event.get('timeOfEvent'), '%Y-%m-%dT%H:%M:%S')
+
+            if event.get('type') == 'departed' and origin == origin_and_destination.get('origin'):
+                shipment_details.actual_date_of_departure = time_of_event
+                shipment_details.save()
+
+                if direction == 'import':
+                    create_and_assign_notification.delay(
+                        Notification.OPERATIONS_IMPORT,
+                        f'The shipment {booking.aceid} has departed from {booking.freight_rate.origin}.',
+                        [booking.agent_contact_person_id, booking.client_contact_person_id, ],
+                        Notification.OPERATION,
+                        object_id=booking.id,
+                    )
+
+            if event.get('type') == 'arrived' and destination == origin_and_destination.get('destination'):
+                shipment_details.actual_date_of_arrival = time_of_event
+                shipment_details.save()
+
+                if direction == 'export':
+                    create_and_assign_notification.delay(
+                        Notification.OPERATIONS_EXPORT,
+                        f'The shipment {booking.aceid} has arrived at {booking.freight_rate.destination}.',
+                        [booking.agent_contact_person_id, booking.client_contact_person_id, ],
+                        Notification.OPERATION,
+                        object_id=booking.id,
+                    )
         try:
             Track.objects.create(data=data, booking=booking)
         except Exception:

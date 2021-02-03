@@ -6,10 +6,12 @@ from config.celery import celery_app
 from django.db.models import Q, Case, When, Value, CharField
 from django.utils import timezone
 
-from app.booking.models import Quote, Booking, Track, CancellationReason
+from app.booking.models import Quote, Booking, Track, CancellationReason, Surcharge, FreightRate, ShipmentDetails
 from app.booking.utils import sea_event_codes
 from app.handling.models import ClientPlatformSetting, AirTrackingSetting, SeaTrackingSetting, GeneralSetting
 from app.location.models import Country
+from app.websockets.tasks import create_and_assign_notification
+from app.websockets.models import Notification
 
 logger = logging.getLogger("acemaven.task.logging")
 
@@ -105,6 +107,7 @@ def track_confirmed_sea_operations():
         original_booking__isnull=True,
     )
     for operation in operations:
+        direction = 'export' if operation.freight_rate.origin.code.startswith(MAIN_COUNTRY_CODE) else 'import'
         booking_number = operation.shipment_details.first().booking_number
         scac = operation.freight_rate.carrier.scac
         base_url = f'?type=BK&number={booking_number}&sealine={scac}&api_key={api_key}'
@@ -130,6 +133,14 @@ def track_confirmed_sea_operations():
                     if status == 'VDL' and not shipment_details.actual_date_of_departure:
                         shipment_details.actual_date_of_departure = timezone.localtime()
                         shipment_details.save()
+                        if direction == 'import':
+                            create_and_assign_notification.delay(
+                                Notification.OPERATIONS_IMPORT,
+                                f'The shipment {operation.aceid} has departed from {operation.freight_rate.origin}.',
+                                [operation.agent_contact_person_id, operation.client_contact_person_id, ],
+                                Notification.OPERATION,
+                                object_id=operation.id,
+                            )
                     event['location'] = next(
                         filter(lambda x: x.get('id') == event['location'], data_json['data'].get('locations')), {}
                     ).get('name', '')
@@ -139,9 +150,17 @@ def track_confirmed_sea_operations():
 
         if 'route' in data_json['data']:
             date = data_json['data']['route'].get('postpod', {}).get('date')
-            if date:
+            if date and not shipment_details.actual_date_of_arrival:
                 shipment_details.actual_date_of_arrival = datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S')
                 shipment_details.save()
+                if direction == 'export':
+                    create_and_assign_notification.delay(
+                        Notification.OPERATIONS_EXPORT,
+                        f'The shipment {operation.aceid} has arrived at {operation.freight_rate.destination}.',
+                        [operation.agent_contact_person_id, operation.client_contact_person_id, ],
+                        Notification.OPERATION,
+                        object_id=operation.id,
+                    )
 
         route_response = requests.get(route_url)
         route_json = route_response.json() if (route_status_code := route_response.status_code) == 200 \
@@ -158,3 +177,72 @@ def track_confirmed_sea_operations():
         track.data = data_json
         track.route = route_json
         track.save()
+
+
+@celery_app.task(name='notify_users_of_expiring_surcharges')
+def daily_notify_users_of_expiring_surcharges():
+    now_date = timezone.localtime().date()
+    surcharges = Surcharge.objects.filter(
+        temporary=False,
+        is_archived=False,
+        expiration_date=now_date + datetime.timedelta(days=5),
+    )
+    for surcharge in surcharges:
+        users_ids = list(surcharge.company.role_set.filter(
+            groups__name__in=('master', 'agent')
+        ).values_list('user__id', flat=True))
+        create_and_assign_notification.delay(
+            Notification.SURCHARGES,
+            'Surcharges are about to expire. '
+            'Please, extend its expiration rate or create a new one with the updated costs.',
+            users_ids,
+            Notification.SURCHARGE,
+            object_id=surcharge.id,
+        )
+
+
+@celery_app.task(name='notify_users_of_expiring_freight_rates')
+def daily_notify_users_of_expiring_freight_rates():
+    now_date = timezone.localtime().date()
+    freight_rates = FreightRate.objects.filter(
+        is_active=True,
+        temporary=False,
+        is_archived=False,
+        rates__expiration_date=now_date + datetime.timedelta(days=5),
+    ).distinct()
+    for freight_rate in freight_rates:
+        users_ids = list(freight_rate.company.role_set.filter(
+            groups__name__in=('master', 'agent')
+        ).values_list('user__id', flat=True))
+        create_and_assign_notification.delay(
+            Notification.FREIGHT_RATES,
+            'Rates are about to expire. '
+            'Please, extend its expiration rate or create a new one with the updated costs.',
+            users_ids,
+            Notification.FREIGHT_RATE,
+            object_id=freight_rate.id,
+        )
+
+
+@celery_app.task(name='notify_users_of_import_sea_shipment_arrival')
+def daily_notify_users_of_import_sea_shipment_arrival():
+    now_date = timezone.localtime().date()
+    shipment_details = ShipmentDetails.objects.annotate(
+        direction=Case(When(booking__freight_rate__origin__code__startswith=MAIN_COUNTRY_CODE, then=Value('export')),
+                       default=Value('import'),
+                       output_field=CharField(),
+                       )
+    ).filter(
+        direction='import',
+        date_of_arrival__date=now_date + datetime.timedelta(days=3),
+        booking__freight_rate__shipping_mode__shipping_type__title='sea',
+    )
+    for shipment_detail in shipment_details:
+        booking = shipment_detail.booking
+        create_and_assign_notification.delay(
+            Notification.OPERATIONS_IMPORT,
+            f'The shipment {booking.aceid} is set to arrive in 3 days at {booking.freight_rate.destination}.',
+            [booking.agent_contact_person_id, booking.client_contact_person_id, ],
+            Notification.OPERATION,
+            object_id=booking.id,
+        )

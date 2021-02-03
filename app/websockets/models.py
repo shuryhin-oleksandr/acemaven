@@ -148,6 +148,10 @@ class Notification(models.Model):
     def __str__(self):
         return f'Notification [{self.id}] to users {list(self.users.values_list("id", flat=True))}'
 
+    @classmethod
+    def get_section_choices_label_value(cls, value):
+        return next(filter(lambda x: x[0] == value, cls.ACTION_CHOICES), cls.ACTION_CHOICES[0])[1]
+
 
 class NotificationSeen(models.Model):
     """

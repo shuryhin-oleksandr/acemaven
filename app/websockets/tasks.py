@@ -66,7 +66,7 @@ def send_notification(notification_id):
 
 
 @celery_app.task(name='delete_old_notifications')
-def delete_old_notifications():
+def daily_delete_old_notifications():
     now_date = timezone.localtime()
     Notification.objects.filter(
         date_created__lt=now_date - datetime.timedelta(days=30),

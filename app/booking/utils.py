@@ -1,3 +1,4 @@
+import datetime
 import random
 import string
 from decimal import Decimal
@@ -14,6 +15,21 @@ MAIN_COUNTRY_CODE = main_country.code if main_country else 'BR'
 
 def date_format(date):
     return '-'.join(date.split('/')[::-1])
+
+
+def str_from_datetime(date):
+    return datetime.datetime.strftime(date, '%H:%M %d %B %Y')
+
+
+def field_name_to_repr(field_name):
+    return ' '.join(map(lambda x: x.capitalize(), field_name.split('_')))
+
+
+def create_message_for_track(changed_fields):
+    result = ''
+    for key, value in changed_fields.items():
+        result += f'{field_name_to_repr(key)} is now {value if not isinstance(value, datetime.datetime) else str_from_datetime(value)}. '
+    return result
 
 
 def rate_surcharges_filter(rate, company, temporary=False):

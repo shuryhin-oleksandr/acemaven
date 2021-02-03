@@ -194,7 +194,23 @@ CELERY_BEAT_SCHEDULE = {
     'update-sea-operations-tracking': {
         'task': 'track_sea_operations',
         'schedule': crontab(hour='*/3', minute=0),
-    }
+    },
+    'delete-old-notifications': {
+        'task': 'delete_old_notifications',
+        'schedule': crontab(hour=0, minute=0),
+    },
+    'notify-users-of-expiring-surcharges': {
+        'task': 'notify_users_of_expiring_surcharges',
+        'schedule': crontab(hour=0, minute=0),
+    },
+    'notify-users-of-expiring-freight-rates': {
+        'task': 'notify_users_of_expiring_freight_rates',
+        'schedule': crontab(hour=0, minute=0),
+    },
+    'notify-users-of-import-sea-shipment-arrival': {
+        'task': 'notify_users_of_import_sea_shipment_arrival',
+        'schedule': crontab(hour=0, minute=0),
+    },
 }
 
 # JWT

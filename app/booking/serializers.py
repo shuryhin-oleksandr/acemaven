@@ -1,4 +1,4 @@
-from datetime import timedelta
+import datetime
 
 from rest_framework import serializers
 
@@ -9,7 +9,8 @@ from django.utils import timezone
 from app.booking.models import Surcharge, UsageFee, Charge, AdditionalSurcharge, FreightRate, Rate, CargoGroup, Quote, \
     Booking, Status, ShipmentDetails, CancellationReason, Track, TrackStatus
 from app.booking.tasks import send_awb_number_to_air_tracking_api
-from app.booking.utils import rate_surcharges_filter, calculate_freight_rate_charges, get_fees, generate_aceid
+from app.booking.utils import rate_surcharges_filter, calculate_freight_rate_charges, get_fees, generate_aceid, \
+    create_message_for_track
 from app.core.models import Shipper
 from app.core.serializers import ShipperSerializer, BankAccountBaseSerializer
 from app.core.utils import get_average_company_rating
@@ -652,16 +653,38 @@ class BookingSerializer(serializers.ModelSerializer):
         except Exception as error:
             raise serializers.ValidationError({'error': error})
         if booking.is_paid:
-            text = 'A new booking request has been received.'
+            agent_text = 'A new booking request has been received.'
             ff_company = booking.freight_rate.company
             users_ids = list(
                 ff_company.users.filter(role__groups__name__in=('master', 'agent')).values_list('id', flat=True)
             )
             create_and_assign_notification.delay(
                 Notification.REQUESTS,
-                text,
+                agent_text,
                 users_ids,
                 Notification.BOOKING,
+                object_id=booking.id,
+            )
+
+            client_text = f'The booking request has been sent to "{ff_company.name}" company.'
+            create_and_assign_notification.delay(
+                Notification.REQUESTS,
+                client_text,
+                [user.id, ],
+                Notification.OPERATION,
+                object_id=booking.id,
+            )
+
+        else:
+            text = 'A new Booking Request is pending of Booking Fee payment to be sent.'
+            users_ids = list(
+                company.users.filter(role__groups__name__in=('master', 'billing')).values_list('id', flat=True)
+            )
+            create_and_assign_notification.delay(
+                Notification.REQUESTS,
+                text,
+                users_ids,
+                Notification.BILLING,
                 object_id=booking.id,
             )
         return booking
@@ -766,43 +789,93 @@ class ShipmentDetailsBaseSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         user = self.context['request'].user
+        booking = instance.booking
+        direction = 'export' if booking.freight_rate.origin.code.startswith(MAIN_COUNTRY_CODE) else 'import'
+
         departure_track_exists = Track.objects.filter(
             manual=True,
-            booking=instance.booking,
+            booking=booking,
             status=TrackStatus.objects.filter(
-                shipping_mode=instance.booking.freight_rate.shipping_mode,
+                shipping_mode=booking.freight_rate.shipping_mode,
                 auto_add_on_actual_date_of_departure=True,
             ).first(),
         ).exists()
         arrival_track_exists = Track.objects.filter(
             manual=True,
-            booking=instance.booking,
+            booking=booking,
             status=TrackStatus.objects.filter(
-                shipping_mode=instance.booking.freight_rate.shipping_mode,
+                shipping_mode=booking.freight_rate.shipping_mode,
                 auto_add_on_actual_date_of_arrival=True,
             ).first(),
         ).exists()
         create_track = False
         if validated_data.get('actual_date_of_departure') and not departure_track_exists:
             track_status = TrackStatus.objects.filter(
-                shipping_mode=instance.booking.freight_rate.shipping_mode,
+                shipping_mode=booking.freight_rate.shipping_mode,
                 auto_add_on_actual_date_of_departure=True,
             ).first()
             create_track = True
+
+            if direction == 'import':
+                create_and_assign_notification.delay(
+                    Notification.OPERATIONS_IMPORT,
+                    f'The shipment {booking.aceid} has departed from {booking.freight_rate.origin}.',
+                    [booking.agent_contact_person_id, booking.client_contact_person_id, ],
+                    Notification.OPERATION,
+                    object_id=booking.id,
+                )
+
         elif validated_data.get('actual_date_of_arrival') and not arrival_track_exists:
             track_status = TrackStatus.objects.filter(
-                shipping_mode=instance.booking.freight_rate.shipping_mode,
+                shipping_mode=booking.freight_rate.shipping_mode,
                 auto_add_on_actual_date_of_arrival=True,
             ).first()
             create_track = True
+
+            if direction == 'export':
+                create_and_assign_notification.delay(
+                    Notification.OPERATIONS_EXPORT,
+                    f'The shipment {booking.aceid} has arrived at {booking.freight_rate.destination}.',
+                    [booking.agent_contact_person_id, booking.client_contact_person_id, ],
+                    Notification.OPERATION,
+                    object_id=booking.id,
+                )
+
         if create_track:
             Track.objects.create(
                 manual=True,
                 created_by=user,
                 status=track_status,
-                booking=instance.booking,
+                booking=booking,
             )
+
         super().update(instance, validated_data)
+
+        changed_fields = {
+            key: value for key, value in validated_data.items()
+            if key not in ('actual_date_of_arrival', 'actual_date_of_departure', 'booking_notes', )
+        }
+        if changed_fields:
+            track_message = create_message_for_track(changed_fields)
+            track_status = TrackStatus.objects.filter(
+                shipping_mode=booking.freight_rate.shipping_mode,
+                auto_add_on_shipment_details_change=True,
+            ).first()
+            Track.objects.create(
+                comment=track_message,
+                manual=True,
+                created_by=user,
+                status=track_status,
+                booking=booking,
+            )
+            create_and_assign_notification.delay(
+                Notification.OPERATIONS,
+                f' Shipment details in {booking.aceid} have changed.',
+                [booking.agent_contact_person_id, booking.client_contact_person_id, ],
+                Notification.OPERATION,
+                object_id=booking.id,
+            )
+
         return instance
 
 
@@ -831,7 +904,9 @@ class TrackSerializer(serializers.ModelSerializer):
         actual_date_of_arrival = validated_data.pop('actual_date_of_arrival', None)
 
         status = validated_data['status']
-        shipment_details = validated_data['booking'].shipment_details.first()
+        booking = validated_data['booking']
+        direction = 'export' if booking.freight_rate.origin.code.startswith(MAIN_COUNTRY_CODE) else 'import'
+        shipment_details = booking.shipment_details.first()
 
         if status.must_update_actual_date_of_departure:
             shipment_details.actual_date_of_departure = timezone.localtime()
@@ -839,8 +914,26 @@ class TrackSerializer(serializers.ModelSerializer):
         elif status.auto_add_on_actual_date_of_departure and actual_date_of_departure:
             shipment_details.actual_date_of_departure = actual_date_of_departure
 
+            if direction == 'import':
+                create_and_assign_notification.delay(
+                    Notification.OPERATIONS_IMPORT,
+                    f'The shipment {booking.aceid} has departed from {booking.freight_rate.origin}.',
+                    [booking.agent_contact_person_id, booking.client_contact_person_id, ],
+                    Notification.OPERATION,
+                    object_id=booking.id,
+                )
+
         elif status.auto_add_on_actual_date_of_arrival and actual_date_of_arrival:
             shipment_details.actual_date_of_arrival = actual_date_of_arrival
+
+            if direction == 'export':
+                create_and_assign_notification.delay(
+                    Notification.OPERATIONS_EXPORT,
+                    f'The shipment {booking.aceid} has arrived at {booking.freight_rate.destination}.',
+                    [booking.agent_contact_person_id, booking.client_contact_person_id, ],
+                    Notification.OPERATION,
+                    object_id=booking.id,
+                )
 
         shipment_details.save()
 
@@ -953,7 +1046,29 @@ class OperationSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({'error': error})
         original_booking.change_request_status = Booking.CHANGE_REQUESTED
         original_booking.save()
+
+        create_and_assign_notification.delay(
+            Notification.OPERATIONS,
+            f'The Client has requested a change in the shipment {original_booking.aceid}, '
+            f'from {original_booking.freight_rate.origin} to {original_booking.freight_rate.destination}',
+            [original_booking.freight_rate.agent_contact_person.id, ],
+            Notification.OPERATION,
+            object_id=original_booking.id,
+        )
+
         return operation
+
+    def update(self, instance, validated_data):
+        super().update(instance, validated_data)
+        if 'payment_due_by' in validated_data:
+            create_and_assign_notification.delay(
+                Notification.OPERATIONS,
+                f'Payment due date for the operation {instance.aceid} '
+                f'has been updated to {datetime.datetime.strftime(validated_data["payment_due_by"], "%d %B %Y")}.',
+                [instance.client_contact_person.id, ],
+                Notification.OPERATION,
+                object_id=instance.id,
+            )
 
 
 class OperationListBaseSerializer(GetTrackingInitialMixin, OperationSerializer):
@@ -983,7 +1098,7 @@ class OperationListBaseSerializer(GetTrackingInitialMixin, OperationSerializer):
         )
 
     def get_status(self, obj):
-        if change_request_status := obj.change_request_status:
+        if (change_request_status := obj.change_request_status) and change_request_status != Booking.CHANGE_CONFIRMED:
             return list(filter(lambda x: x[0] == change_request_status, Booking.CHANGE_REQUESTED_CHOICES))[0][1]
         return list(filter(lambda x: x[0] == obj.status, Booking.STATUS_CHOICES))[0][1]
 
@@ -1067,7 +1182,7 @@ class OperationRetrieveClientSerializer(OperationRetrieveSerializer):
 
     def get_tracking(self, obj):
         serializer = TrackRetrieveSerializer(
-            obj.tracking.filter(date_created__lt=timezone.localtime()-timedelta(minutes=5)),
+            obj.tracking.filter(date_created__lt=timezone.localtime()-datetime.timedelta(minutes=5)),
             many=True
         )
         return serializer.data

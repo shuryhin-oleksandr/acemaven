@@ -666,7 +666,7 @@ class BookingSerializer(serializers.ModelSerializer):
                 object_id=booking.id,
             )
 
-            client_text = f'The booking request has been sent to "{ff_company.name}" company.'
+            client_text = f'The booking request has been sent to "{ff_company.name}".'
             create_and_assign_notification.delay(
                 Notification.REQUESTS,
                 client_text,

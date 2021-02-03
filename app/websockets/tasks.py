@@ -63,6 +63,7 @@ def send_notification(notification_id):
                     },
                 },
             )
+        logger.info(f'Notification [{notification_id}] with text "{notification.text}" was sent.')
 
 
 @celery_app.task(name='delete_old_notifications')

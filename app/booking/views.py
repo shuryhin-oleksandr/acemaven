@@ -666,8 +666,8 @@ class BookingViesSet(PermissionClassByActionMixin,
     def assign_booking_to_agent(self, request, *args, **kwargs):
         booking = self.get_object()
         data = request.data
-        users = get_user_model().objects.filter(id=data.get('user'))
-        booking.agent_contact_person = users.first()
+        assigned_user = get_user_model().objects.filter(id=data.get('user')).first()
+        booking.agent_contact_person = assigned_user
         booking.is_assigned = True
         booking.status = Booking.ACCEPTED
         now_date = timezone.localtime().date()
@@ -675,16 +675,16 @@ class BookingViesSet(PermissionClassByActionMixin,
         booking.save()
 
         if hasattr(booking, 'chat'):
-            booking.chat.users.add(users.first())
+            booking.chat.users.add(assigned_user)
 
-        users_ids = list(users.values_list('id', flat=True))
-        create_and_assign_notification.delay(
-            Notification.REQUESTS,
-            f'{request.user.get_full_name()} has assigned an operation to you. Operation id [{booking.id}].',
-            users_ids,
-            Notification.BILLING,
-            object_id=booking.id,
-        )
+        if request.user != assigned_user:
+            create_and_assign_notification.delay(
+                Notification.REQUESTS,
+                f'{request.user.get_full_name()} has assigned an operation to you. Operation id [{booking.id}].',
+                [assigned_user.id, ],
+                Notification.BILLING,
+                object_id=booking.id,
+            )
 
         return Response(status=status.HTTP_200_OK)
 

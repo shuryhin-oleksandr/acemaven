@@ -83,7 +83,7 @@ def reassign_confirmed_operation_notifications(old_operation_id, new_operation_i
     notifications.update(object_id=new_operation_id)
 
     channel_layer = get_channel_layer()
-    users_ids = list(notifications.users.values_list('id', flat=True))
+    users_ids = list(set(notifications.values_list('users__id', flat=True)))
     for user_id in users_ids:
         async_to_sync(channel_layer.group_send)(
             f'{user_id}',

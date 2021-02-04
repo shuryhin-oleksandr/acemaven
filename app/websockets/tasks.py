@@ -76,8 +76,18 @@ def daily_delete_old_notifications():
 
 @celery_app.task(name='reassign_notifications_after_change_request_confirm')
 def reassign_confirmed_operation_notifications(old_operation_id, new_operation_id):
-    Notification.objects.filter(
+    notifications = Notification.objects.filter(
         section=Notification.OPERATIONS,
         object_id=old_operation_id,
-    ).update(object_id=new_operation_id)
+    )
+    notifications.update(object_id=new_operation_id)
 
+    channel_layer = get_channel_layer()
+    users_ids = list(notifications.users.values_list('id', flat=True))
+    for user_id in users_ids:
+        async_to_sync(channel_layer.group_send)(
+            f'{user_id}',
+            {
+                'type': 'fetch_notifications',
+            },
+        )

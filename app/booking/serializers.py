@@ -783,7 +783,11 @@ class ShipmentDetailsBaseSerializer(serializers.ModelSerializer):
             booking.automatic_tracking = True
         booking.save()
         if booking.shipping_type == 'air' and booking.automatic_tracking:
-            send_awb_number_to_air_tracking_api.delay(shipment_detail.booking_number)
+            send_awb_number_to_air_tracking_api.delay(
+                shipment_detail.booking_number,
+                booking.id,
+                booking.agent_contact_person_id,
+            )
         create_chat_for_operation.delay(booking.id)
         return shipment_detail
 

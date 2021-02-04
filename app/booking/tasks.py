@@ -76,7 +76,7 @@ def daily_cancel_unconfirmed_agent_bookings():
 
 
 @celery_app.task(name='post_awb_number')
-def send_awb_number_to_air_tracking_api(booking_number):
+def send_awb_number_to_air_tracking_api(booking_number, booking_id, agent_contact_person_id):
     logger.info(f'Sending new airway bill number to track [{booking_number}]')
     settings = AirTrackingSetting.load()
     url = settings.url
@@ -89,7 +89,25 @@ def send_awb_number_to_air_tracking_api(booking_number):
         "notifyAddressType": "PIMA",
         "notifyAddress": settings.pima,
     }
+
     response = requests.post(url, json=data, headers=headers)
+    if response.status_code == 200:
+        confirmation = response.json().get('confirmations')[0]
+        if (error := confirmation.get('error')) == 'Wrong format of waybill number':
+            create_and_assign_notification.delay(
+                Notification.OPERATIONS,
+                f'The shipment {booking_number} cannot be tracked because of wrong booking number.',
+                [agent_contact_person_id, ],
+                Notification.OPERATION,
+                object_id=booking_id,
+            )
+        else:
+            pass
+            # Add notification to acemaven platform
+    else:
+        pass
+        # Add notification to acemaven platform
+
     logger.info(f'Response text for airway bill number [{booking_number}] - {response.text}')
 
 

@@ -120,6 +120,21 @@ def track_confirmed_sea_operations():
             'status': 'error',
             'message': f'Status code - {data_status_code}',
         }
+
+        if data_json.get('status') == 'error':
+            if (message := data_json.get('message')) == 'WRONG_NUMBER':
+                create_and_assign_notification.delay(
+                    Notification.OPERATIONS,
+                    f'The shipment {operation.aceid} cannot be tracked because of wrong booking number.',
+                    [operation.agent_contact_person_id, ],
+                    Notification.OPERATION,
+                    object_id=operation.id,
+                )
+            else:
+                pass
+                # Add notification to acemaven platform
+            break
+
         shipment_details = operation.shipment_details.first()
 
         if 'containers' in data_json['data']:

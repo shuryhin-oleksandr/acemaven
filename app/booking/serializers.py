@@ -1073,6 +1073,7 @@ class OperationSerializer(serializers.ModelSerializer):
                 Notification.OPERATION,
                 object_id=instance.id,
             )
+        return instance
 
 
 class OperationListBaseSerializer(GetTrackingInitialMixin, OperationSerializer):

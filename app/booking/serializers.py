@@ -1104,7 +1104,7 @@ class OperationListBaseSerializer(GetTrackingInitialMixin, OperationSerializer):
     def get_status(self, obj):
         if obj.payment_due_by:
             return 'Awaiting Payment'
-        elif obj.shipment_details.first().actual_date_of_departure:
+        elif (shipment_details := obj.shipment_details.first()) and shipment_details.actual_date_of_departure:
             return 'Shipment in progress'
         elif (change_request_status := obj.change_request_status) and change_request_status != Booking.CHANGE_CONFIRMED:
             return next(filter(lambda x: x[0] == change_request_status, Booking.CHANGE_REQUESTED_CHOICES),

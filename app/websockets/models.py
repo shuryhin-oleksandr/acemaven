@@ -151,6 +151,10 @@ class Notification(models.Model):
 
     @classmethod
     def get_section_choices_label_value(cls, value):
+        return next(filter(lambda x: x[0] == value, cls.SECTION_CHOICES), cls.SECTION_CHOICES[0])[1]
+
+    @classmethod
+    def get_action_choices_label_value(cls, value):
         return next(filter(lambda x: x[0] == value, cls.ACTION_CHOICES), cls.ACTION_CHOICES[0])[1]
 
 

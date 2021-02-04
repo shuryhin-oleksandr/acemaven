@@ -200,12 +200,12 @@ class NotificationConsumer(WebsocketConsumer):
         notification_seen = notification.users_seen.filter(user=user).first()
         return {
             'id': notification.id,
-            'section': notification.section,
+            'section': Notification.get_section_choices_label_value(notification.section),
             'text': notification.text,
             'is_viewed': notification_seen.is_viewed,
             'date_created': str(notification.date_created),
             'object_id': f'{notification.object_id if notification.object_id else ""}',
-            'action_path': notification.action_path,
+            'action_path': Notification.get_action_choices_label_value(notification.action_path),
         }
 
     commands = {

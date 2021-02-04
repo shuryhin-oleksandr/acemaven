@@ -72,3 +72,12 @@ def daily_delete_old_notifications():
     Notification.objects.filter(
         date_created__lt=now_date - datetime.timedelta(days=30),
     ).delete()
+
+
+@celery_app.task(name='reassign_notifications_after_change_request_confirm')
+def reassign_confirmed_operation_notifications(old_operation_id, new_operation_id):
+    Notification.objects.filter(
+        section=Notification.OPERATIONS,
+        object_id=old_operation_id,
+    ).update(object_id=new_operation_id)
+

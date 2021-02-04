@@ -38,8 +38,7 @@ from app.core.serializers import ReviewBaseSerializer
 from app.handling.models import Port, Currency, ClientPlatformSetting
 from app.location.models import Country
 from app.websockets.models import Notification
-from app.websockets.tasks import create_and_assign_notification
-
+from app.websockets.tasks import create_and_assign_notification, reassign_confirmed_operation_notifications
 
 main_country = Country.objects.filter(is_main=True).first()
 MAIN_COUNTRY_CODE = main_country.code if main_country else 'BR'
@@ -758,6 +757,7 @@ class OperationViewSet(PermissionClassByActionMixin,
     @action(methods=['post'], detail=True, url_path='confirm_change_request')
     def confirm_change_request(self, request, *args, **kwargs):
         operation = self.get_object()
+        operation_id = operation.id
         change_request = operation.change_requests.first()
 
         chat = operation.chat
@@ -778,6 +778,11 @@ class OperationViewSet(PermissionClassByActionMixin,
             [change_request.client_contact_person_id, ],
             Notification.OPERATION,
             object_id=change_request.id,
+        )
+
+        reassign_confirmed_operation_notifications.delay(
+            operation_id,
+            change_request.id,
         )
 
         return Response(data={'id': change_request.id}, status=status.HTTP_200_OK)

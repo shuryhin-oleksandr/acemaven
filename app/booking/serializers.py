@@ -1098,9 +1098,14 @@ class OperationListBaseSerializer(GetTrackingInitialMixin, OperationSerializer):
         )
 
     def get_status(self, obj):
-        if (change_request_status := obj.change_request_status) and change_request_status != Booking.CHANGE_CONFIRMED:
-            return list(filter(lambda x: x[0] == change_request_status, Booking.CHANGE_REQUESTED_CHOICES))[0][1]
-        return list(filter(lambda x: x[0] == obj.status, Booking.STATUS_CHOICES))[0][1]
+        if obj.payment_due_by:
+            return 'Awaiting Payment'
+        elif obj.shipment_details.first().actual_date_of_departure:
+            return 'Shipment in progress'
+        elif (change_request_status := obj.change_request_status) and change_request_status != Booking.CHANGE_CONFIRMED:
+            return next(filter(lambda x: x[0] == change_request_status, Booking.CHANGE_REQUESTED_CHOICES),
+                        Booking.CHANGE_REQUESTED_CHOICES[0])[1]
+        return next(filter(lambda x: x[0] == obj.status, Booking.STATUS_CHOICES), Booking.STATUS_CHOICES[0])[1]
 
     def get_has_change_request(self, obj):
         return True if obj.change_requests.exists() else False

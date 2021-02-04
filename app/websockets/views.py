@@ -1,20 +1,8 @@
 from rest_framework import mixins, viewsets
 from rest_framework.permissions import IsAuthenticated
 
-from django.shortcuts import render
-
 from app.websockets.models import Chat, Message, MessageFile
 from app.websockets.serializers import ChatBaseSerializer, MessageBaseSerializer, MessageFileBaseSerializer
-
-
-def notification(request):
-    return render(request, 'websockets/notification.html')
-
-
-def room(request, room_name):
-    return render(request, 'websockets/room.html', {
-        'room_name': room_name
-    })
 
 
 class ChatViewSet(mixins.ListModelMixin,

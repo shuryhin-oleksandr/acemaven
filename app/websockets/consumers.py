@@ -7,8 +7,7 @@ from channels.generic.websocket import WebsocketConsumer
 from django.conf import settings
 from django.contrib.auth import get_user_model
 
-from app.websockets.models import Message, Chat, Notification
-
+from app.websockets.models import Message, Chat, Notification, MessageFile
 
 User = get_user_model()
 
@@ -28,6 +27,10 @@ class ChatConsumer(WebsocketConsumer):
     def get_full_file_url(self, file_url):
         return f'{self.get_origin_url()}{file_url}'
 
+    @staticmethod
+    def save_files(files_ids, message_id):
+        MessageFile.objects.filter(id__in=files_ids).update(message_id=message_id)
+
     def fetch_messages(self):
         messages = Message.objects.filter(chat_id=self.chat_id)
         content = {
@@ -42,6 +45,8 @@ class ChatConsumer(WebsocketConsumer):
             chat_id=self.chat_id,
             user=user,
             text=data['message'])
+        if files_ids := data.get('files'):
+            self.save_files(files_ids, message.id)
         content = {
             'command': 'new_message',
             'message': self.message_to_json(message),

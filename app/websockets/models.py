@@ -76,6 +76,7 @@ class MessageFile(models.Model):
         'Message',
         on_delete=models.CASCADE,
         related_name='files',
+        null=True,
     )
 
     def __str__(self):

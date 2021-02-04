@@ -874,7 +874,7 @@ class ShipmentDetailsBaseSerializer(serializers.ModelSerializer):
             )
             create_and_assign_notification.delay(
                 Notification.OPERATIONS,
-                f' Shipment details in {booking.aceid} have changed.',
+                f' Shipment details in {booking.aceid} have changed. {track_message}',
                 [booking.agent_contact_person_id, booking.client_contact_person_id, ],
                 Notification.OPERATION,
                 object_id=booking.id,

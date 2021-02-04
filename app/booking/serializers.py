@@ -1086,7 +1086,7 @@ class OperationListBaseSerializer(GetTrackingInitialMixin, OperationSerializer):
     has_change_request = serializers.SerializerMethodField()
     can_be_patched = serializers.SerializerMethodField()
     tracking_initial = serializers.SerializerMethodField()
-    tracking = TrackRetrieveSerializer(many=True)
+    tracking = serializers.SerializerMethodField()
 
     class Meta(OperationSerializer.Meta):
         model = Booking
@@ -1117,6 +1117,13 @@ class OperationListBaseSerializer(GetTrackingInitialMixin, OperationSerializer):
 
     def get_can_be_patched(self, obj):
         return True if obj.status in (Booking.PENDING, Booking.REQUEST_RECEIVED) else False
+
+    def get_tracking(self, obj):
+        serializer = TrackRetrieveSerializer(
+            obj.tracking.filter(date_created__lt=timezone.localtime()-datetime.timedelta(minutes=5)),
+            many=True
+        )
+        return serializer.data
 
 
 class OperationRetrieveSerializer(OperationListBaseSerializer):
@@ -1173,7 +1180,6 @@ class OperationRetrieveSerializer(OperationListBaseSerializer):
 
 class OperationRetrieveClientSerializer(OperationRetrieveSerializer):
     agent_bank_account = serializers.SerializerMethodField()
-    tracking = serializers.SerializerMethodField()
     has_review = serializers.SerializerMethodField()
 
     class Meta(OperationRetrieveSerializer.Meta):
@@ -1189,13 +1195,6 @@ class OperationRetrieveClientSerializer(OperationRetrieveSerializer):
             if bank_account:
                 return BankAccountBaseSerializer(bank_account).data
         return {}
-
-    def get_tracking(self, obj):
-        serializer = TrackRetrieveSerializer(
-            obj.tracking.filter(date_created__lt=timezone.localtime()-datetime.timedelta(minutes=5)),
-            many=True
-        )
-        return serializer.data
 
     def get_has_review(self,  obj):
         return True if hasattr(obj, 'review') else False

@@ -1163,7 +1163,7 @@ class OperationRetrieveSerializer(OperationListBaseSerializer):
         if obj.agent_contact_person:
             company = obj.agent_contact_person.get_company()
             totals = obj.charges.get('totals')
-            billing_exchange_rate = BillingExchangeRate.objects.filter(company=company).first()
+            billing_exchange_rate = BillingExchangeRate.objects.filter(company=company).last()
             if billing_exchange_rate:
                 main_currency_code = Currency.objects.filter(is_main=True).first().code
                 total_today = 0

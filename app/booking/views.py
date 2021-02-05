@@ -38,7 +38,8 @@ from app.core.serializers import ReviewBaseSerializer
 from app.handling.models import Port, Currency, ClientPlatformSetting
 from app.location.models import Country
 from app.websockets.models import Notification
-from app.websockets.tasks import create_and_assign_notification, reassign_confirmed_operation_notifications
+from app.websockets.tasks import create_and_assign_notification, reassign_confirmed_operation_notifications, \
+    delete_accepted_booking_notifications
 
 main_country = Country.objects.filter(is_main=True).first()
 MAIN_COUNTRY_CODE = main_country.code if main_country else 'BR'
@@ -681,9 +682,11 @@ class BookingViesSet(PermissionClassByActionMixin,
                 Notification.REQUESTS,
                 f'{request.user.get_full_name()} has assigned an operation to you. Operation id [{booking.id}].',
                 [assigned_user.id, ],
-                Notification.BILLING,
+                Notification.OPERATION,
                 object_id=booking.id,
             )
+
+        delete_accepted_booking_notifications.delay(booking.id)
 
         return Response(status=status.HTTP_200_OK)
 

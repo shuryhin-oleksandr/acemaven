@@ -91,3 +91,12 @@ def reassign_confirmed_operation_notifications(old_operation_id, new_operation_i
                 'type': 'fetch_notifications',
             },
         )
+
+
+@celery_app.task(name='delete_accepted_booking_notifications')
+def delete_accepted_booking_notifications(booking_id):
+    Notification.objects.filter(
+        section=Notification.REQUESTS,
+        action_path=Notification.BOOKING,
+        object_id=booking_id,
+    ).delete()

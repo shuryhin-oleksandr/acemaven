@@ -27,7 +27,7 @@ from app.booking.serializers import SurchargeSerializer, SurchargeEditSerializer
     ShipmentDetailsBaseSerializer, OperationSerializer, OperationListBaseSerializer, OperationRetrieveSerializer, \
     OperationRetrieveClientSerializer, OperationRecalculateSerializer, TrackSerializer, TrackStatusSerializer, \
     TrackRetrieveSerializer, OperationBillingAgentListSerializer, OperationBillingClientListSerializer, \
-    TrackWidgetListSerializer
+    TrackWidgetListSerializer, OperationListClientSerializer
 from app.booking.utils import date_format, wm_calculate, freight_rate_search, calculate_freight_rate_charges, \
     get_fees, surcharge_search, make_copy_of_surcharge, make_copy_of_freight_rate, \
     apply_operation_select_prefetch_related
@@ -728,12 +728,13 @@ class OperationViewSet(PermissionClassByActionMixin,
 
     def get_serializer_class(self):
         if self.action == 'list':
+            if self.request.user.get_company().type == Company.CLIENT:
+                return OperationListClientSerializer
             return OperationListBaseSerializer
         if self.action == 'retrieve':
             if self.request.user.get_company().type == Company.CLIENT:
                 return OperationRetrieveClientSerializer
-            else:
-                return OperationRetrieveSerializer
+            return OperationRetrieveSerializer
         if self.action == 'leave_review':
             return ReviewBaseSerializer
         return self.serializer_class

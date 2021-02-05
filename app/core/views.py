@@ -119,6 +119,8 @@ class UserViewSet(PermissionClassByActionMixin,
         return self.queryset.filter(id=user.id)
 
     def get_serializer_class(self):
+        if self.action == 'get_users_list_to_assign':
+            return UserBaseSerializerWithPhoto
         if self.request.user.get_roles().filter(name='master').exists():
             if self.request.method == 'POST':
                 return UserCreateSerializer
@@ -130,7 +132,7 @@ class UserViewSet(PermissionClassByActionMixin,
     @action(methods=['get'], detail=False, url_path='assign-users-list')
     def get_users_list_to_assign(self, request, *args, **kwargs):
         queryset = self.get_queryset().filter(role__groups__name='agent')
-        serializer = UserBaseSerializerWithPhoto(queryset, many=True)
+        serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
 

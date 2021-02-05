@@ -95,8 +95,19 @@ def reassign_confirmed_operation_notifications(old_operation_id, new_operation_i
 
 @celery_app.task(name='delete_accepted_booking_notifications')
 def delete_accepted_booking_notifications(booking_id):
-    Notification.objects.filter(
+    notifications = Notification.objects.filter(
         section=Notification.REQUESTS,
         action_path=Notification.BOOKING,
         object_id=booking_id,
-    ).delete()
+    )
+    users_ids = list(set(notifications.values_list('users__id', flat=True)))
+    notifications.delete()
+
+    channel_layer = get_channel_layer()
+    for user_id in users_ids:
+        async_to_sync(channel_layer.group_send)(
+            f'{user_id}',
+            {
+                'type': 'fetch_notifications',
+            },
+        )

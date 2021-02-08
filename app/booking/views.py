@@ -669,8 +669,9 @@ class BookingViesSet(PermissionClassByActionMixin,
         data = request.data
         assigned_user = get_user_model().objects.filter(id=data.get('user')).first()
         booking.agent_contact_person = assigned_user
-        booking.is_assigned = True
-        booking.status = Booking.ACCEPTED
+        if booking.status == Booking.REQUEST_RECEIVED:
+            booking.is_assigned = True
+            booking.status = Booking.ACCEPTED
         now_date = timezone.localtime().date()
         booking.date_accepted_by_agent = now_date
         booking.save()

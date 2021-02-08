@@ -23,6 +23,7 @@ class Chat(models.Model):
     users = models.ManyToManyField(
         User,
         related_name='chats',
+        through='ChatPermission',
     )
 
     class Meta:
@@ -30,6 +31,34 @@ class Chat(models.Model):
 
     def __str__(self):
         return f'Chat [{self.id}]'
+
+
+class ChatPermission(models.Model):
+    """
+    Through model for chat and users.
+    """
+
+    has_perm_to_read = models.BooleanField(
+        _('User has permission to read messages'),
+        default=True,
+    )
+    has_perm_to_write = models.BooleanField(
+        _('User has permission to write messages'),
+        default=True,
+    )
+    chat = models.ForeignKey(
+        'Chat',
+        on_delete=models.CASCADE,
+        related_name='user_permissions',
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='chat_permissions',
+    )
+
+    def __str__(self):
+        return f'{self.user.get_full_name()} permission for chat {self.chat_id}'
 
 
 class Message(models.Model):

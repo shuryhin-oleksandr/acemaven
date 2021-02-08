@@ -1142,7 +1142,7 @@ class OperationRetrieveSerializer(OperationListBaseSerializer):
     charges_today = serializers.SerializerMethodField()
     shipper = ShipperSerializer()
     change_requests = serializers.SerializerMethodField()
-    chat = serializers.PrimaryKeyRelatedField(read_only=True)
+    chat = serializers.SerializerMethodField()
 
     class Meta(OperationListBaseSerializer.Meta):
         model = Booking
@@ -1184,6 +1184,17 @@ class OperationRetrieveSerializer(OperationListBaseSerializer):
                     total_today += value * rate_today
                 result['total_today'] = total_today
         return result
+
+    def get_chat(self, obj):
+        user = self.context['request'].user
+        data = dict()
+        chat = obj.chat if hasattr(obj, 'chat') else None
+        if chat:
+            user_chat_permissions = user.chat_permissions.filter(chat=chat).first()
+            data['chat'] = chat.id
+            data['has_perm_to_read'] = user_chat_permissions.has_perm_to_read if user_chat_permissions else False
+            data['has_perm_to_write'] = user_chat_permissions.has_perm_to_write if user_chat_permissions else False
+        return data
 
 
 class OperationRetrieveClientSerializer(OperationRetrieveSerializer):

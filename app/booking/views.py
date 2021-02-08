@@ -665,6 +665,7 @@ class BookingViesSet(PermissionClassByActionMixin,
     @action(methods=['post'], detail=True, url_path='assign')
     def assign_booking_to_agent(self, request, *args, **kwargs):
         booking = self.get_object()
+        old_agent_contact_person = booking.agent_contact_person
         data = request.data
         assigned_user = get_user_model().objects.filter(id=data.get('user')).first()
         booking.agent_contact_person = assigned_user
@@ -675,12 +676,16 @@ class BookingViesSet(PermissionClassByActionMixin,
         booking.save()
 
         if hasattr(booking, 'chat'):
-            booking.chat.users.add(assigned_user)
+            chat = booking.chat
+            user_chat_permissions = old_agent_contact_person.chat_permissions.filter(chat=chat).first()
+            user_chat_permissions.has_perm_to_write = False
+            user_chat_permissions.save()
+            chat.users.add(assigned_user)
 
         if request.user != assigned_user:
             create_and_assign_notification.delay(
                 Notification.REQUESTS,
-                f'{request.user.get_full_name()} has assigned an operation to you. Operation id [{booking.id}].',
+                f'{request.user.get_full_name()} has assigned an operation to you. Operation [{booking.aceid}].',
                 [assigned_user.id, ],
                 Notification.OPERATION,
                 object_id=booking.id,

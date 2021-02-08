@@ -678,10 +678,14 @@ class BookingViesSet(PermissionClassByActionMixin,
 
         if hasattr(booking, 'chat'):
             chat = booking.chat
-            user_chat_permissions = old_agent_contact_person.chat_permissions.filter(chat=chat).first()
-            user_chat_permissions.has_perm_to_write = False
-            user_chat_permissions.save()
-            chat.users.add(assigned_user)
+            old_user_chat_permissions = old_agent_contact_person.chat_permissions.filter(chat=chat).first()
+            old_user_chat_permissions.has_perm_to_write = False
+            old_user_chat_permissions.save()
+            if new_user_existing_chat_permissions := assigned_user.chat_permissions.filter(chat=chat).first():
+                new_user_existing_chat_permissions.has_perm_to_write = True
+                new_user_existing_chat_permissions.save()
+            else:
+                chat.users.add(assigned_user)
 
         if request.user != assigned_user:
             create_and_assign_notification.delay(

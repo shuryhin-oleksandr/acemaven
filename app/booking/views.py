@@ -566,7 +566,7 @@ class BookingViesSet(PermissionClassByActionMixin,
         'create': (IsAuthenticated, IsClientCompany,),
         'update': (IsAuthenticated, IsClientCompany,),
         'partial_update': (IsAuthenticated, IsClientCompany,),
-        'assign_booking_to_agent': (IsAuthenticated, IsAgentCompany, IsMaster,),
+        'assign_booking_to_agent': (IsAuthenticated, IsAgentCompany, IsMasterOrAgent, ),
         'reject_booking': (IsAuthenticated, IsAgentCompany,),
     }
     filter_class = BookingFilterSet

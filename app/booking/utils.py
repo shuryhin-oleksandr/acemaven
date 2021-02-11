@@ -10,6 +10,7 @@ from app.booking.models import Surcharge, Charge, FreightRate
 from app.handling.models import GlobalFee, ShippingMode, ShippingType, ExchangeRate, ContainerType, PackagingType, Port
 from app.location.models import Country
 
+
 try:
     MAIN_COUNTRY_CODE = Country.objects.filter(is_main=True).first().code
 except (ProgrammingError, AttributeError):
@@ -22,9 +23,6 @@ def get_shipping_type_titles():
         return list(ShippingType.objects.values_list('title', flat=True))
     except ProgrammingError:
         return titles
-
-
-SHIPPING_CHOICES = get_shipping_type_titles()
 
 
 def date_format(date):

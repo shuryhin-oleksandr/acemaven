@@ -34,13 +34,14 @@ from app.booking.utils import date_format, wm_calculate, freight_rate_search, ca
     apply_operation_select_prefetch_related
 from app.core.mixins import PermissionClassByActionMixin
 from app.core.models import Company
-from app.core.permissions import IsMasterOrAgent, IsClientCompany, IsAgentCompany, IsMaster
+from app.core.permissions import IsMasterOrAgent, IsClientCompany, IsAgentCompany
 from app.core.serializers import ReviewBaseSerializer
 from app.handling.models import Port, Currency, ClientPlatformSetting
 from app.location.models import Country
 from app.websockets.models import Notification
 from app.websockets.tasks import create_and_assign_notification, reassign_confirmed_operation_notifications, \
     delete_accepted_booking_notifications
+
 
 try:
     MAIN_COUNTRY_CODE = Country.objects.filter(is_main=True).first().code

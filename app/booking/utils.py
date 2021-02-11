@@ -3,14 +3,28 @@ import random
 import string
 from decimal import Decimal
 
+from django.db.utils import ProgrammingError
 from django.db.models import Q
 
 from app.booking.models import Surcharge, Charge, FreightRate
-from app.handling.models import GlobalFee, ShippingMode, ExchangeRate, ContainerType, PackagingType, Port
+from app.handling.models import GlobalFee, ShippingMode, ShippingType, ExchangeRate, ContainerType, PackagingType, Port
 from app.location.models import Country
 
-main_country = Country.objects.filter(is_main=True).first()
-MAIN_COUNTRY_CODE = main_country.code if main_country else 'BR'
+try:
+    MAIN_COUNTRY_CODE = Country.objects.filter(is_main=True).first().code
+except (ProgrammingError, AttributeError):
+    MAIN_COUNTRY_CODE = 'BR'
+
+
+def get_shipping_type_titles():
+    titles = ('sea', 'air')
+    try:
+        return list(ShippingType.objects.values_list('title', flat=True))
+    except ProgrammingError:
+        return titles
+
+
+SHIPPING_CHOICES = get_shipping_type_titles()
 
 
 def date_format(date):

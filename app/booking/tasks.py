@@ -4,6 +4,7 @@ import requests
 
 from config.celery import celery_app
 from django.db.models import Q, Case, When, Value, CharField
+from django.db.utils import ProgrammingError
 from django.utils import timezone
 
 from app.booking.models import Quote, Booking, Track, CancellationReason, Surcharge, FreightRate, ShipmentDetails
@@ -15,8 +16,10 @@ from app.websockets.models import Notification
 
 logger = logging.getLogger("acemaven.task.logging")
 
-main_country = Country.objects.filter(is_main=True).first()
-MAIN_COUNTRY_CODE = main_country.code if main_country else 'BR'
+try:
+    MAIN_COUNTRY_CODE = Country.objects.filter(is_main=True).first().code
+except (ProgrammingError, AttributeError):
+    MAIN_COUNTRY_CODE = 'BR'
 
 
 @celery_app.task(name='archive_quotes')

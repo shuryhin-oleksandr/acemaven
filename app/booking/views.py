@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.db.models import CharField, Case, When, Value, Q, Count
+from django.db.utils import ProgrammingError
 from django.utils import timezone
 
 from app.booking.filters import SurchargeFilterSet, FreightRateFilterSet, QuoteFilterSet, QuoteOrderingFilterBackend, \
@@ -41,8 +42,10 @@ from app.websockets.models import Notification
 from app.websockets.tasks import create_and_assign_notification, reassign_confirmed_operation_notifications, \
     delete_accepted_booking_notifications
 
-main_country = Country.objects.filter(is_main=True).first()
-MAIN_COUNTRY_CODE = main_country.code if main_country else 'BR'
+try:
+    MAIN_COUNTRY_CODE = Country.objects.filter(is_main=True).first().code
+except (ProgrammingError, AttributeError):
+    MAIN_COUNTRY_CODE = 'BR'
 
 
 class SurchargeViesSet(viewsets.ModelViewSet):

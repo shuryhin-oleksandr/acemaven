@@ -1,9 +1,10 @@
-from rest_framework import mixins, viewsets
-from rest_framework.permissions import IsAuthenticated
-from django_filters import rest_framework
-from rest_framework.filters import SearchFilter
-
 from django.db.models import BooleanField, Case, QuerySet, When, Q
+from django.db.utils import ProgrammingError
+
+from django_filters import rest_framework
+from rest_framework import mixins, viewsets
+from rest_framework.filters import SearchFilter
+from rest_framework.permissions import IsAuthenticated
 
 from app.core.permissions import IsAgentCompany, IsMasterOrBilling
 from app.handling.filters import CarrierFilterSet, PortFilterSet
@@ -14,8 +15,10 @@ from app.handling.serializers import CarrierSerializer, CurrencySerializer, Port
 from app.location.models import Country
 
 
-main_country = Country.objects.filter(is_main=True).first()
-MAIN_COUNTRY_CODE = main_country.code if main_country else 'BR'
+try:
+    MAIN_COUNTRY_CODE = Country.objects.filter(is_main=True).first().code
+except (ProgrammingError, AttributeError):
+    MAIN_COUNTRY_CODE = 'BR'
 
 
 class CarrierViewSet(mixins.ListModelMixin,

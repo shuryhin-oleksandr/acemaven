@@ -4,17 +4,18 @@ from rest_framework import serializers
 
 from django.db import transaction
 from django.db.models import Min
+from django.db.utils import ProgrammingError
 from django.utils import timezone
 
 from app.booking.models import Surcharge, UsageFee, Charge, AdditionalSurcharge, FreightRate, Rate, CargoGroup, Quote, \
     Booking, Status, ShipmentDetails, CancellationReason, Track, TrackStatus
 from app.booking.tasks import send_awb_number_to_air_tracking_api
 from app.booking.utils import rate_surcharges_filter, calculate_freight_rate_charges, get_fees, generate_aceid, \
-    create_message_for_track
+    create_message_for_track, get_shipping_type_titles
 from app.core.models import Shipper
 from app.core.serializers import ShipperSerializer, BankAccountBaseSerializer
 from app.core.utils import get_average_company_rating
-from app.handling.models import ShippingType, ClientPlatformSetting, Currency, GeneralSetting, BillingExchangeRate
+from app.handling.models import ClientPlatformSetting, Currency, GeneralSetting, BillingExchangeRate
 from app.handling.serializers import ContainerTypesSerializer, CurrencySerializer, CarrierBaseSerializer, \
     PortSerializer, ShippingModeBaseSerializer, PackagingTypeBaseSerializer, ReleaseTypeSerializer
 from app.location.models import Country
@@ -23,8 +24,10 @@ from app.websockets.tasks import create_chat_for_operation
 from app.websockets.tasks import create_and_assign_notification
 
 
-main_country = Country.objects.filter(is_main=True).first()
-MAIN_COUNTRY_CODE = main_country.code if main_country else 'BR'
+try:
+    MAIN_COUNTRY_CODE = Country.objects.filter(is_main=True).first().code
+except (ProgrammingError, AttributeError):
+    MAIN_COUNTRY_CODE = 'BR'
 
 
 class UserUpdateMixin:
@@ -452,7 +455,7 @@ class OperationRecalculateSerializer(serializers.Serializer):
 
 
 class WMCalculateSerializer(serializers.Serializer):
-    shipping_type = serializers.ChoiceField(choices=ShippingType.objects.values_list('title', flat=True))
+    shipping_type = serializers.ChoiceField(choices=get_shipping_type_titles())
     weight_measurement = serializers.ChoiceField(choices=CargoGroup.WEIGHT_MEASUREMENT_CHOICES)
     length_measurement = serializers.ChoiceField(choices=CargoGroup.LENGTH_MEASUREMENT_CHOICES)
     weight = serializers.DecimalField(max_digits=15, decimal_places=4, min_value=0)

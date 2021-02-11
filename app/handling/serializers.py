@@ -1,3 +1,4 @@
+from django.db.utils import ProgrammingError
 from django.utils import timezone
 
 from rest_framework import serializers
@@ -8,8 +9,10 @@ from app.booking.models import AdditionalSurcharge
 from app.location.models import Country
 
 
-main_country = Country.objects.filter(is_main=True).first()
-MAIN_COUNTRY_CODE = main_country.code if main_country else 'BR'
+try:
+    MAIN_COUNTRY_CODE = Country.objects.filter(is_main=True).first().code
+except (ProgrammingError, AttributeError):
+    MAIN_COUNTRY_CODE = 'BR'
 
 
 class PackagingTypeBaseSerializer(serializers.ModelSerializer):

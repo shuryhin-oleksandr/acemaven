@@ -19,7 +19,6 @@ class MessageBaseSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'text',
-            'file',
             'user',
             'chat',
         )

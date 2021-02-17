@@ -82,7 +82,7 @@ def wm_calculate(data, shipping_type=None):
     height = Decimal(data.get('height'))
     length = Decimal(data.get('length'))
     width = Decimal(data.get('width'))
-    volume = data.get('volume')
+    volume = data.get('volume', 0)
     if shipping_type == 'air':
         gross_weight = weight if weight_measurement == 'kg' else weight * 1000
         divider = 6000 if length_measurement == 'cm' else 0.006

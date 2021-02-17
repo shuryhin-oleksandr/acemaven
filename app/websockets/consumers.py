@@ -22,6 +22,9 @@ class ChatConsumer(WebsocketConsumer):
         origin_url = origin[1].decode() if origin else ''
         scheme = parse.urlparse(origin_url).scheme
 
+
+
+
         return f"{scheme if scheme else 'http'}://{':'.join(list(map(str, server)))}" if server else ''
 
     def get_full_file_url(self, file_url):

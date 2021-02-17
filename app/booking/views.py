@@ -40,8 +40,8 @@ from app.handling.models import Port, Currency, ClientPlatformSetting
 from app.location.models import Country
 from app.websockets.models import Notification
 from app.websockets.tasks import create_and_assign_notification, reassign_confirmed_operation_notifications, \
-    delete_accepted_booking_notifications
-
+    delete_accepted_booking_notifications, send_email
+from config import settings
 
 try:
     MAIN_COUNTRY_CODE = Country.objects.filter(is_main=True).first().code
@@ -52,10 +52,10 @@ except (ProgrammingError, AttributeError):
 class SurchargeViesSet(viewsets.ModelViewSet):
     queryset = Surcharge.objects.all()
     serializer_class = SurchargeSerializer
-    permission_classes = (IsAuthenticated, IsMasterOrAgent, )
+    permission_classes = (IsAuthenticated, IsMasterOrAgent,)
     filter_class = SurchargeFilterSet
     filter_backends = (filters.OrderingFilter, rest_framework.DjangoFilterBackend,)
-    ordering_fields = ('shipping_mode', 'carrier', 'location', 'start_date', 'expiration_date', )
+    ordering_fields = ('shipping_mode', 'carrier', 'location', 'start_date', 'expiration_date',)
 
     def get_serializer_class(self):
         if self.action == 'list':
@@ -147,7 +147,7 @@ class UsageFeeViesSet(FeeGetQuerysetMixin,
                       viewsets.GenericViewSet):
     queryset = UsageFee.objects.all()
     serializer_class = UsageFeeSerializer
-    permission_classes = (IsAuthenticated, IsMasterOrAgent, )
+    permission_classes = (IsAuthenticated, IsMasterOrAgent,)
 
 
 class ChargeViesSet(FeeGetQuerysetMixin,
@@ -156,21 +156,21 @@ class ChargeViesSet(FeeGetQuerysetMixin,
                     viewsets.GenericViewSet):
     queryset = Charge.objects.all()
     serializer_class = ChargeSerializer
-    permission_classes = (IsAuthenticated, IsMasterOrAgent, )
+    permission_classes = (IsAuthenticated, IsMasterOrAgent,)
 
 
 class FreightRateViesSet(PermissionClassByActionMixin,
                          viewsets.ModelViewSet):
     queryset = FreightRate.objects.all()
     serializer_class = FreightRateSerializer
-    permission_classes = (IsAuthenticated, IsMasterOrAgent, )
+    permission_classes = (IsAuthenticated, IsMasterOrAgent,)
     permission_classes_by_action = {
-        'freight_rate_search_and_calculate': (IsAuthenticated, IsClientCompany, ),
-        'save_freight_rate': (IsAuthenticated, IsAgentCompany, ),
+        'freight_rate_search_and_calculate': (IsAuthenticated, IsClientCompany,),
+        'save_freight_rate': (IsAuthenticated, IsAgentCompany,),
     }
     filter_class = FreightRateFilterSet
     filter_backends = (filters.OrderingFilter, rest_framework.DjangoFilterBackend,)
-    ordering_fields = ('shipping_mode', 'carrier', 'origin', 'destination', )
+    ordering_fields = ('shipping_mode', 'carrier', 'origin', 'destination',)
 
     def get_serializer_class(self):
         if self.action == 'list':
@@ -264,7 +264,7 @@ class FreightRateViesSet(PermissionClassByActionMixin,
                                                  destination=freight_rate.destination,
                                                  carrier=freight_rate.carrier,
                                                  temporary=False,
-                                                 is_archived=False,)
+                                                 is_archived=False, )
         shipping_mode = freight_rate.shipping_mode
 
         rates = freight_rate.rates.all()
@@ -273,14 +273,15 @@ class FreightRateViesSet(PermissionClassByActionMixin,
             for old_freight_rate in old_freight_rates:
                 for new_rate in new_not_empty_rates:
                     if old_freight_rate.rates.filter(
-                        Q(
-                            Q(start_date__gt=new_rate.start_date, start_date__lte=new_rate.expiration_date),
-                            Q(expiration_date__gte=new_rate.start_date, expiration_date__lt=new_rate.expiration_date),
-                            Q(start_date__lte=new_rate.start_date, expiration_date__gte=new_rate.expiration_date),
-                            Q(start_date__isnull=True),
-                            _connector='OR',
-                        ),
-                        container_type=new_rate.container_type,
+                            Q(
+                                Q(start_date__gt=new_rate.start_date, start_date__lte=new_rate.expiration_date),
+                                Q(expiration_date__gte=new_rate.start_date,
+                                  expiration_date__lt=new_rate.expiration_date),
+                                Q(start_date__lte=new_rate.start_date, expiration_date__gte=new_rate.expiration_date),
+                                Q(start_date__isnull=True),
+                                _connector='OR',
+                            ),
+                            container_type=new_rate.container_type,
                     ).exists():
                         return Response(status=status.HTTP_400_BAD_REQUEST)
         else:
@@ -374,7 +375,7 @@ class FreightRateViesSet(PermissionClassByActionMixin,
                                                     container_type_ids_list,
                                                     booking_fee=booking_fee,
                                                     service_fee=service_fee,
-                                                    calculate_fees=calculate_fees,)
+                                                    calculate_fees=calculate_fees, )
 
             results.append(result)
 
@@ -386,7 +387,7 @@ class RateViesSet(mixins.CreateModelMixin,
                   viewsets.GenericViewSet):
     queryset = Rate.objects.all()
     serializer_class = RateSerializer
-    permission_classes = (IsAuthenticated, IsMasterOrAgent, )
+    permission_classes = (IsAuthenticated, IsMasterOrAgent,)
 
     def get_queryset(self):
         user = self.request.user
@@ -395,7 +396,7 @@ class RateViesSet(mixins.CreateModelMixin,
 
 class WMCalculateView(generics.GenericAPIView):
     serializer_class = WMCalculateSerializer
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -413,7 +414,7 @@ class QuoteViesSet(PermissionClassByActionMixin,
                    viewsets.ModelViewSet):
     queryset = Quote.objects.all()
     serializer_class = QuoteSerializer
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated,)
     permission_classes_by_action = {
         'list': (IsAuthenticated, IsClientCompany,),
         'get_agent_quotes_list': (IsAuthenticated, IsAgentCompany,),
@@ -516,7 +517,7 @@ class QuoteViesSet(PermissionClassByActionMixin,
                                                             main_currency_code,
                                                             quote.date_from,
                                                             quote.date_to,
-                                                            container_type_ids_list,)
+                                                            container_type_ids_list, )
                     data['charges'] = result
 
                     serializer = QuoteStatusBaseSerializer(data=data)
@@ -565,12 +566,12 @@ class BookingViesSet(PermissionClassByActionMixin,
                      viewsets.ModelViewSet):
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated,)
     permission_classes_by_action = {
         'create': (IsAuthenticated, IsClientCompany,),
         'update': (IsAuthenticated, IsClientCompany,),
         'partial_update': (IsAuthenticated, IsClientCompany,),
-        'assign_booking_to_agent': (IsAuthenticated, IsAgentCompany, IsMasterOrAgent, ),
+        'assign_booking_to_agent': (IsAuthenticated, IsAgentCompany, IsMasterOrAgent,),
         'reject_booking': (IsAuthenticated, IsAgentCompany,),
     }
     filter_class = BookingFilterSet
@@ -650,7 +651,7 @@ class BookingViesSet(PermissionClassByActionMixin,
                                                          instance.date_from,
                                                          instance.date_to,
                                                          container_type_ids_list,
-                                                         number_of_documents=instance.number_of_documents,)
+                                                         number_of_documents=instance.number_of_documents, )
             instance.charges = new_charges
             instance.save()
         except AttributeError:
@@ -692,6 +693,7 @@ class BookingViesSet(PermissionClassByActionMixin,
                 chat.users.add(assigned_user)
 
         if request.user != assigned_user:
+            message_body = f'{request.user.get_full_name()} has assigned an operation to you. Operation [{booking.aceid}].'
             create_and_assign_notification.delay(
                 Notification.REQUESTS,
                 f'{request.user.get_full_name()} has assigned an operation to you. Operation [{booking.aceid}].',
@@ -699,6 +701,8 @@ class BookingViesSet(PermissionClassByActionMixin,
                 Notification.OPERATION,
                 object_id=booking.id,
             )
+            send_email.delay(message_body,
+                             [assigned_user.email], object_id=f'{settings.DOMAIN_ADDRESS}booking/{booking.id}')
 
         delete_accepted_booking_notifications.delay(booking.id)
 
@@ -720,7 +724,7 @@ class OperationViewSet(PermissionClassByActionMixin,
                        viewsets.ModelViewSet):
     queryset = Booking.objects.all()
     serializer_class = OperationSerializer
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated,)
     permission_classes_by_action = {
         'complete_operation': (IsAuthenticated, IsAgentCompany,),
         'leave_review': (IsAuthenticated, IsClientCompany,),
@@ -789,6 +793,8 @@ class OperationViewSet(PermissionClassByActionMixin,
         change_request.original_booking = None
         change_request.save()
 
+        message_body = f'The Agent has confirmed your changes in the shipment {change_request.aceid} ' \
+                       f'from {change_request.freight_rate.origin} to {change_request.freight_rate.destination}.'
         create_and_assign_notification.delay(
             Notification.OPERATIONS,
             f'The Agent has confirmed your changes in the shipment {change_request.aceid} '
@@ -802,7 +808,9 @@ class OperationViewSet(PermissionClassByActionMixin,
             operation_id,
             change_request.id,
         )
-
+        client_emails = [change_request.client_contact_person.email, ]
+        send_email.delay(message_body, client_emails,
+                         object_id=f'{settings.DOMAIN_ADDRESS}change_request/{change_request.id}')
         return Response(data={'id': change_request.id}, status=status.HTTP_200_OK)
 
     @action(methods=['post'], detail=True, url_path='cancel_change_request')
@@ -857,7 +865,7 @@ class OperationBillingViewSet(mixins.ListModelMixin,
                               viewsets.GenericViewSet):
     queryset = Booking.objects.all()
     serializer_class = OperationBillingAgentListSerializer
-    permission_classes = (IsAuthenticated, IsMasterOrAgent, )
+    permission_classes = (IsAuthenticated, IsMasterOrAgent,)
     filter_class = OperationBillingFilterSet
     filter_backends = (OperationOrderingFilterBackend, rest_framework.DjangoFilterBackend,)
 
@@ -896,13 +904,13 @@ class StatusViesSet(mixins.UpdateModelMixin,
                     viewsets.GenericViewSet):
     queryset = Status.objects.all()
     serializer_class = QuoteStatusBaseSerializer
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated,)
 
 
 class ShipmentDetailsViesSet(viewsets.ModelViewSet):
     queryset = ShipmentDetails.objects.all()
     serializer_class = ShipmentDetailsBaseSerializer
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated,)
 
 
 class TrackView(views.APIView):
@@ -926,26 +934,35 @@ class TrackView(views.APIView):
                 shipment_details.save()
 
                 if direction == 'import':
+                    message_body = f'The shipment {booking.aceid} has departed from {booking.freight_rate.origin}.'
                     create_and_assign_notification.delay(
                         Notification.OPERATIONS_IMPORT,
-                        f'The shipment {booking.aceid} has departed from {booking.freight_rate.origin}.',
+                        message_body,
                         [booking.agent_contact_person_id, booking.client_contact_person_id, ],
                         Notification.OPERATION,
                         object_id=booking.id,
                     )
+                    emails = [booking.agent_contact_person.email, booking.client_contact_person.email, ]
+                    send_email.delay(message_body, emails,
+                                     object_id=f'{settings.DOMAIN_ADDRESS}shipment_departed/{booking.id}')
 
             if event.get('type') == 'arrived' and destination == origin_and_destination.get('destination'):
                 shipment_details.actual_date_of_arrival = time_of_event
                 shipment_details.save()
 
                 if direction == 'export':
+                    message_body = f'The shipment {booking.aceid} has arrived at {booking.freight_rate.destination}.'
                     create_and_assign_notification.delay(
                         Notification.OPERATIONS_EXPORT,
-                        f'The shipment {booking.aceid} has arrived at {booking.freight_rate.destination}.',
+                        message_body,
                         [booking.agent_contact_person_id, booking.client_contact_person_id, ],
                         Notification.OPERATION,
                         object_id=booking.id,
                     )
+                    emails = [booking.agent_contact_person.email, booking.client_contact_person.email, ]
+                    send_email.delay(message_body, emails,
+                                     object_id=f'{settings.DOMAIN_ADDRESS}shipment_arrived/{booking.id}')
+
         try:
             Track.objects.create(data=data, booking=booking)
         except Exception:
@@ -954,7 +971,7 @@ class TrackView(views.APIView):
 
 
 class PixApiView(views.APIView):
-    permission_classes = (AllowAny, )
+    permission_classes = (AllowAny,)
 
     def post(self, request, *args, **kwargs):
         data = request.data
@@ -972,7 +989,7 @@ class TrackViewSet(mixins.ListModelMixin,
                    viewsets.GenericViewSet):
     queryset = Track.objects.all()
     serializer_class = TrackSerializer
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated,)
 
     def get_serializer_class(self):
         if self.action == 'get_widget_latest_tracking':
@@ -1012,6 +1029,6 @@ class TrackStatusViewSet(mixins.ListModelMixin,
                          viewsets.GenericViewSet):
     queryset = TrackStatus.objects.all()
     serializer_class = TrackStatusSerializer
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated,)
     filter_class = TrackStatusFilterSet
-    filter_backends = (rest_framework.DjangoFilterBackend, )
+    filter_backends = (rest_framework.DjangoFilterBackend,)

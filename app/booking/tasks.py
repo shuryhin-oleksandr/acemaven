@@ -1,7 +1,10 @@
 import datetime
 import logging
 import requests
+from django.contrib.auth import get_user_model
 
+from app.core.models import Company
+from config import settings
 from config.celery import celery_app
 from django.db.models import Q, Case, When, Value, CharField
 from django.db.utils import ProgrammingError
@@ -11,7 +14,7 @@ from app.booking.models import Quote, Booking, Track, CancellationReason, Surcha
 from app.booking.utils import sea_event_codes
 from app.handling.models import ClientPlatformSetting, AirTrackingSetting, SeaTrackingSetting, GeneralSetting
 from app.location.models import Country
-from app.websockets.tasks import create_and_assign_notification
+from app.websockets.tasks import create_and_assign_notification, send_email
 from app.websockets.models import Notification
 
 logger = logging.getLogger("acemaven.task.logging")
@@ -97,13 +100,15 @@ def send_awb_number_to_air_tracking_api(booking_number, booking_id, agent_contac
     if response.status_code == 200:
         confirmation = response.json().get('confirmations')[0]
         if (error := confirmation.get('error')) == 'Wrong format of waybill number':
+            message_body = f'The shipment {booking_number} cannot be tracked because of wrong booking number.'
             create_and_assign_notification.delay(
                 Notification.OPERATIONS,
-                f'The shipment {booking_number} cannot be tracked because of wrong booking number.',
+                message_body,
                 [agent_contact_person_id, ],
                 Notification.OPERATION,
                 object_id=booking_id,
             )
+
         else:
             pass
             # Add notification to acemaven platform
@@ -144,13 +149,19 @@ def track_confirmed_sea_operations():
 
         if data_json.get('status') == 'error':
             if (message := data_json.get('message')) == 'WRONG_NUMBER':
+                message_body = f'The shipment {operation.aceid} cannot be tracked because of wrong booking number.',
                 create_and_assign_notification.delay(
                     Notification.OPERATIONS,
-                    f'The shipment {operation.aceid} cannot be tracked because of wrong booking number.',
+                    message_body,
                     [operation.agent_contact_person_id, ],
                     Notification.OPERATION,
                     object_id=operation.id,
                 )
+                client_email = [operation.agent_contact_person.email, ]
+                send_email.delay(message_body, client_email,
+                                 object_id=f'{settings.DOMAIN_ADDRESS}instance/{operation.id}')
+
+
             else:
                 pass
                 # Add notification to acemaven platform
@@ -170,13 +181,17 @@ def track_confirmed_sea_operations():
                         shipment_details.actual_date_of_departure = timezone.localtime()
                         shipment_details.save()
                         if direction == 'import':
+                            message_body = f'The shipment {operation.aceid} has departed from {operation.freight_rate.origin}.'
                             create_and_assign_notification.delay(
                                 Notification.OPERATIONS_IMPORT,
-                                f'The shipment {operation.aceid} has departed from {operation.freight_rate.origin}.',
+                                message_body,
                                 [operation.agent_contact_person_id, operation.client_contact_person_id, ],
                                 Notification.OPERATION,
                                 object_id=operation.id,
                             )
+                            send_email.delay(message_body, [operation.agent_contact_person.email, operation.client_contact_person.email, ],
+                                             object_id=f'{settings.DOMAIN_ADDRESS}operation/{operation.id}')
+
                     event['location'] = next(
                         filter(lambda x: x.get('id') == event['location'], data_json['data'].get('locations')), {}
                     ).get('name', '')
@@ -190,13 +205,17 @@ def track_confirmed_sea_operations():
                 shipment_details.actual_date_of_arrival = datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S')
                 shipment_details.save()
                 if direction == 'export':
+                    message_body = f'The shipment {operation.aceid} has arrived at {operation.freight_rate.destination}.'
                     create_and_assign_notification.delay(
                         Notification.OPERATIONS_EXPORT,
-                        f'The shipment {operation.aceid} has arrived at {operation.freight_rate.destination}.',
+                        message_body,
                         [operation.agent_contact_person_id, operation.client_contact_person_id, ],
                         Notification.OPERATION,
                         object_id=operation.id,
                     )
+                    send_email.delay(message_body,
+                                     [operation.agent_contact_person.email, operation.client_contact_person.email, ],
+                                     object_id=f'{settings.DOMAIN_ADDRESS}operation/{operation.id}')
 
         route_response = requests.get(route_url)
         route_json = route_response.json() if (route_status_code := route_response.status_code) == 200 \
@@ -227,14 +246,38 @@ def daily_notify_users_of_expiring_surcharges():
         users_ids = list(surcharge.company.role_set.filter(
             groups__name__in=('master', 'agent')
         ).values_list('user__id', flat=True))
+        message_body = 'Surcharges are about to expire. Please, extend its expiration rate ' \
+                       'or create a new one with the updated costs.'
         create_and_assign_notification.delay(
             Notification.SURCHARGES,
-            'Surcharges are about to expire. '
-            'Please, extend its expiration rate or create a new one with the updated costs.',
+            message_body,
             users_ids,
             Notification.SURCHARGE,
             object_id=surcharge.id,
         )
+        users_emails = list(surcharge.company.role_set.filter(
+            groups__name__in=('master', 'agent')
+        ).values_list('user__emails', flat=True))
+        send_email.delay(message_body, users_emails,
+                         object_id=f'{settings.DOMAIN_ADDRESS}surcharge/{surcharge.id}')
+
+    for user in get_user_model().objects.filter(role__groups__name__in=('master', 'agent'),
+                                                emailnotificationsetting__surcharge_expiration=True,
+                                                companies__type=Company.FREIGHT_FORWARDER,
+                                                ).distinct():
+        expiration_days = user.emailnotificationsetting.surcharge_expiration_days
+        for surcharge in user.get_company().surcharges.filter(temporary=False,
+                                                              is_archived=False,
+                                                              expiration_date=now_date + datetime.timedelta(
+                                                                  days=expiration_days
+                                                              ), ):
+            message_body = 'Surcharges are about to expire. Please, extend its expiration rate ' \
+                           'or create a new one with the updated costs.'
+            if user_email := user.email:
+                send_email(
+                    message_body,
+                    [user_email, ],
+                    object_id=f'{settings.DOMAIN_ADDRESS}surcharge/{surcharge.id}')  # TODO generate a link
 
 
 @celery_app.task(name='notify_users_of_expiring_freight_rates')
@@ -250,35 +293,82 @@ def daily_notify_users_of_expiring_freight_rates():
         users_ids = list(freight_rate.company.role_set.filter(
             groups__name__in=('master', 'agent')
         ).values_list('user__id', flat=True))
+        message_body = 'Rates are about to expire.Please, extend its expiration rate or create a new one with the updated costs.'
         create_and_assign_notification.delay(
             Notification.FREIGHT_RATES,
-            'Rates are about to expire. '
-            'Please, extend its expiration rate or create a new one with the updated costs.',
+            message_body,
             users_ids,
             Notification.FREIGHT_RATE,
             object_id=freight_rate.id,
         )
+        users_emails = list(freight_rate.company.role_set.filter(
+            groups__name__in=('master', 'agent')
+        ).values_list('user__emails', flat=True))
+        send_email.delay(message_body, users_emails,
+                         object_id=f'{settings.DOMAIN_ADDRESS}freight_rate/{freight_rate.id}')
+
+    for user in get_user_model().objects.filter(role__groups__name__in=('master', 'agent'),
+                                                emailnotificationsetting__freight_rate_expiration=True,
+                                                companies__type=Company.FREIGHT_FORWARDER,
+                                                ).distinct():
+        expiration_days = user.emailnotificationsetting.freight_rate_expiration_days
+        for freight_rate in user.get_company().freight_rates.filter(is_active=True,
+                                                                    temporary=False,
+                                                                    is_archived=False,
+                                                                    rates__expiration_date=now_date + datetime.timedelta(
+                                                                        days=expiration_days), ).distinct():
+            message_body = 'Rates are about to expire.Please, extend its expiration rate or create ' \
+                           'a new one with the updated costs.'
+            if user_email := user.email:
+                send_email(message_body,
+                           [user_email, ],
+                           object_id=f'{settings.DOMAIN_ADDRESS}freight_rate/{freight_rate.id}')  # TODO generate a link
 
 
 @celery_app.task(name='notify_users_of_import_sea_shipment_arrival')
 def daily_notify_users_of_import_sea_shipment_arrival():
     now_date = timezone.localtime().date()
-    shipment_details = ShipmentDetails.objects.annotate(
+    import_shipment_details = ShipmentDetails.objects.annotate(
         direction=Case(When(booking__freight_rate__origin__code__startswith=MAIN_COUNTRY_CODE, then=Value('export')),
                        default=Value('import'),
                        output_field=CharField(),
                        )
     ).filter(
         direction='import',
-        date_of_arrival__date=now_date + datetime.timedelta(days=3),
         booking__freight_rate__shipping_mode__shipping_type__title='sea',
     )
-    for shipment_detail in shipment_details:
+    notification_shipment_details = import_shipment_details.filter(
+        date_of_arrival__date=now_date + datetime.timedelta(days=3),
+    )
+    for shipment_detail in notification_shipment_details:
         booking = shipment_detail.booking
+        message_body = f'The shipment {booking.aceid} is set to arrive in 3 days ' \
+                       f'at {booking.freight_rate.destination}.'
         create_and_assign_notification.delay(
             Notification.OPERATIONS_IMPORT,
-            f'The shipment {booking.aceid} is set to arrive in 3 days at {booking.freight_rate.destination}.',
+            message_body,
             [booking.agent_contact_person_id, booking.client_contact_person_id, ],
             Notification.OPERATION,
             object_id=booking.id,
         )
+    for user in get_user_model().objects.filter(
+            role__groups__name__in=('master', 'agent', 'client'),
+            emailnotificationsetting__sea_import_shipment_arrival_alert=True, ).distinct():
+        expiration_days = user.emailnotificationsetting.sea_import_shipment_arrival_alert_days
+        filter_data = dict()
+        if user.get_company().type == Company.FREIGHT_FORWARDER:
+            filter_data['booking__agent_contact_person'] = user
+        else:
+            filter_data['booking__client_contact_person'] = user
+        email_shipment_details = import_shipment_details.filter(
+            date_of_arrival__date=now_date + datetime.timedelta(days=expiration_days),
+            **filter_data,
+        )
+
+        for shipment_detail in email_shipment_details:
+            booking = shipment_detail.booking
+            message_body = f'The shipment {booking.aceid} is set to arrive in 3 days ' \
+                           f'at {booking.freight_rate.destination}.'
+            if email := user.email:
+                send_email(message_body, [email, ],
+                           object_id=f'{settings.DOMAIN_ADDRESS}operation/{booking.id}')  # TODO generate a link

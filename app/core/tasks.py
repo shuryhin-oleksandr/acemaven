@@ -1,4 +1,6 @@
 import logging
+from django.template.loader import get_template
+
 from config.celery import celery_app
 from django.core.mail import send_mail
 from django.conf import settings
@@ -13,7 +15,17 @@ def send_registration_email(token, recipient_email):
     subject = 'Acemaven. Registration process.'
     logger.info(f'New registration email is going to be send to {recipient_email}')
     message_body = f'{settings.DOMAIN_ADDRESS}signup?token={token}'
-    send_mail(subject, message_body, settings.DEFAULT_FROM_EMAIL, [recipient_email])
+    template_html = get_template(f"core/emails_templates/index.html")
+    text = "To complete your sign-up, please press the button:"
+    context = {
+        "email": recipient_email,
+        "text": text,
+        "link": message_body,
+        }
+    message_html = template_html.render(context)
+    logger.debug(f"sending invitation email to {recipient_email}")
+    send_mail(subject, message_body, settings.EMAIL_HOST_USER, [recipient_email], html_message=message_html)
+    logger.info(f"invitation has been sent to {recipient_email} from {settings.EMAIL_HOST_USER}")
 
 
 @celery_app.task

@@ -10,8 +10,8 @@
     sudo docker run --name my-redis-container -p 6379:6379 -d redis
     
 # Run celery:
-    celery worker -A config --loglevel=info
-    celery beat -A config -l INFO
+    celery  -A config worker --loglevel=info
+    celery  -A config beat -l INFO
 
 # Apply fixtures:
     python manage.py loaddata fixtures/*.json

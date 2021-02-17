@@ -3,8 +3,11 @@ import logging
 
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
+from django.core.mail import send_mail
+from django.template.loader import get_template
 
 from app.websockets.utils import notification_to_json
+from config import settings
 from config.celery import celery_app
 
 from django.contrib.auth import get_user_model
@@ -111,3 +114,18 @@ def delete_accepted_booking_notifications(booking_id):
                 'type': 'fetch_notifications',
             },
         )
+
+
+@celery_app.task(name='send_emails')
+def send_email(text, recipient_emails: list, object_id=None):
+    for email in recipient_emails:
+        context = {
+            "email": email,
+            "text": text,
+            "link": object_id,
+            }
+        template_html = get_template(f"core/emails_templates/index.html")
+        message_html = template_html.render(context)
+        logger.debug(f"sending email to {email}")
+        send_mail(text, text, settings.EMAIL_HOST_USER, [email, ], html_message=message_html)
+        logger.info(f"email has been sent to {email}")

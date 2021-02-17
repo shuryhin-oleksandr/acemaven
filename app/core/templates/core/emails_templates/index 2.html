@@ -1,0 +1,363 @@
+
+<!DOCTYPE html
+PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400&display=swap" rel="stylesheet">
+<title>HTML Template</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<style>
+    body {
+        width: 100% !important;
+        -webkit-text-size-adjust: 100%;
+        -ms-text-size-adjust: 100%;
+        margin: 0;
+        padding: 0;
+        line-height: 100%;
+    }
+
+    [style*="Roboto"] {font-family: 'Roboto', arial, sans-serif !important;}
+
+    img {
+        outline: none;
+        text-decoration: none;
+        border:none;
+        -ms-interpolation-mode: bicubic;
+        max-width: 100%!important;
+        margin: 0;
+        padding: 0;
+        display: block;
+    }
+
+    table td {
+        border-collapse: collapse;
+    }
+
+    table {
+        border-collapse: collapse;
+        mso-table-lspace: 0pt;
+        mso-table-rspace: 0pt;
+    }
+
+    .header-td {
+        padding-top: 20px;
+        padding-bottom: 60px;
+    }
+
+    .button-sent {
+       background-color: #000000;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        transition: .3s;
+    }
+    .button-sent:hover {
+       cursor: pointer; 
+       transition: .3s;
+       box-shadow: 0 0 13px #a2a2a2;
+    }
+
+    .button-sent a{
+        text-decoration: none;
+        color: #ffffff;
+        font-size: 14px;
+        
+    }
+
+    .text-td {
+        padding-left: 40px;
+        padding-right: 40px;
+        font-size: 24px;
+        padding-bottom: 20px;
+    }
+    .text-descr-td {
+        padding-left: 40px;
+        padding-right: 40px;
+        font-size: 16px;
+        padding-bottom: 40px;
+    }
+    .regards-td {
+        padding-top: 30px;
+        padding-left: 40px;
+        padding-right: 40px;
+        padding-bottom: 15px;
+    }
+    .regards-sign-td {
+        padding-left: 40px;
+        padding-right: 40px;
+        padding-bottom: 30px;
+    }
+    .underline-table {
+        
+    }
+
+    @media (max-width: 720px) {
+        .table-700 {
+            width: 520px !important;
+        }
+        .table-600 {
+            width: 450px !important;
+        }
+        .table-450 {
+            width: 500px !important;
+        }
+        .underline-table {
+            width: 450px !important;
+        }
+        .table-regards {
+            width: 500px !important;
+        }
+    }
+    @media (max-width: 600px) {
+        .table-700 {
+            width: 400px !important;
+        }
+        .table-600 {
+            width: 410px !important;
+        }
+        .table-450 {
+            width: 380px !important;
+        }
+    }
+    @media (max-width: 510px) {
+        .table-700 {
+            width: 400px !important;
+        }
+        .table-600 {
+            width: 330px !important;
+        }
+        .table-450 {
+            width: 360px !important;
+        }
+        .underline-table {
+            width: 330px !important;
+        }
+        .table-regards {
+            width: 330px !important;
+        }
+        .text-descr-td {
+            line-height: 20px;
+            padding-bottom: 40px;
+        }
+    }
+    @media (max-width: 400px) {
+        .header-td {
+            padding-bottom: 50px;
+        }
+        .table-700 {
+            width: 330px !important;
+        }
+        .table-600 {
+            width: 250px !important;
+        }
+        .table-450 {
+            width: 310px !important;
+        }
+        .underline-table {
+            width: 250px !important;
+        }
+        .table-regards {
+            width: 250px !important;
+        }
+        .text-td {
+            font-size: 21px;
+            padding-bottom: 14px;
+        }
+        .text-descr-td {
+            font-size: 15px;
+            line-height: 20px;
+            padding-bottom: 40px;
+        }
+        .regards-td {
+            padding-top: 25px;
+            padding-bottom: 8px;
+            font-size: 15px;
+        
+        }
+        .regards-sign-td {
+            padding-top: 0;
+            padding-bottom: 40px;
+            font-weight: bold;
+            font-size: 15px;
+        }
+    }
+    @media (max-width: 340px) {
+        .header-td {
+            padding-bottom: 50px;
+        } 
+        .table-700 {
+            width: 300px !important;
+        }
+        .table-600 {
+            width: 250px !important;
+        }
+        .logo img{  
+            max-width: 80% !important;
+            padding-left: 15px;
+        }
+        .table-450 {
+            width: 270px !important;
+        }
+        .text-td {
+            font-size: 21px;
+            padding-bottom: 14px;
+        }
+        .text-descr-td {
+            font-size: 15px;
+            line-height: 20px;
+            padding-bottom: 40px;
+        }
+        .regards-td {
+            padding-top: 25px;
+            padding-bottom: 8px;
+            font-size: 15px;
+        
+        }
+        .regards-sign-td {
+            padding-top: 0;
+            padding-bottom: 40px;
+            font-weight: bold;
+            font-size: 15px;
+        }
+       
+    }
+    @media (max-width: 300px) {
+        .header-td {
+            padding-bottom: 45px;
+        }   
+        .table-700 {
+            width: 260px !important;
+        }
+        .table-600 {
+            width: 220px !important;
+        }
+        .logo img{  
+            max-width: 80% !important;
+        }
+        .table-450 {
+            width: 220px !important;
+        }
+        .text-td {
+            padding-left: 40px;
+            padding-right: 0;
+            font-size: 20px;
+            padding-bottom: 14px;
+        }
+        .text-descr-td {
+            padding-left: 40px;
+            padding-right: 0;
+            font-size: 14px;
+            line-height: 20px;
+            padding-bottom: 40px;
+        }
+        .underline-table {
+            width: 220px !important;
+        }
+        .table-regards {
+            width: 220px !important;
+        }
+        .regards-td {
+            padding-top: 15px;
+            padding-left: 40px;
+            padding-right: 40px;
+            padding-bottom: 8px;
+            font-size: 14px;
+        }
+        .regards-sign-td {
+            padding-top: 0;
+            padding-left: 40px;
+            padding-right: 40px;
+            padding-bottom: 40px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+       
+    }
+
+</style>
+</head>
+
+<body style="margin: 0; padding: 0;">
+<div style="font-size:0px;color:#ffffff;opacity:0;visibility:hidden;width:0;height:0;display:none;">Тестовое письмо</div>
+<table cellpadding="0" cellspacing="0" width="100%" height='600px' bgcolor="#115b86">
+        <tr>
+            <td>
+                <table class="main table-700" cellpadding="0" cellspacing="0" width="700px" bgcolor="#ffffff" align="center">
+                    <tr>
+                        <td bgcolor="#ffffff" class="header-td">
+                            <table class="table-600" cellpadding="0" cellspacing="0" width="600px" align="center">
+                                <tr>
+                                    <td align="left" class="logo">
+                                        <img src="../../../static/core/inline_logo.svg" alt="ACEMAVEN">
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr >
+                        <td class="content-td" align="left">
+                            <table class="table-450" cellpadding="0" cellspacing="0" width="580px" align="left">
+                                <tr>
+                                    <td class="text-td" style="font-family: Arial, Helvetica, sans-serif, 'Roboto';">
+                                        Hello Hanna,
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-descr-td" style="font-family: Arial, Helvetica, sans-serif, 'Roboto';">
+                                        A new Booking Request is pending of Booking Fee payment to be sent.
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <table class="table-100" cellpadding="0" cellspacing="0" width="100px" align="center">
+                                <tr>
+                                    <td class='button-sent' style="font-family: Arial, Helvetica, sans-serif, 'Roboto';" align="center" >
+                                       <a href="#">
+                                        SENT
+                                       </a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td >
+                            <table class='underline-table' cellpadding="0" cellspacing="0" width="620px" align="center">
+                                <tr>
+                                    <td  align="center" height='50px' width="100%" bgcolor="#ffffff"></td>
+                                </tr>
+                                <tr>
+                                    <td  align="center" height='1px' width="100%" bgcolor="#115b86"></td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <table class="table-regards" cellpadding="0" cellspacing="0" width="580px" align="left">
+                                <tr>
+                                    <td class='regards-td' style="font-family: Arial, Helvetica, sans-serif, 'Roboto';" align="left" >
+                                        Best regards,
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class='regards-sign-td' style="font-family: Arial, Helvetica, sans-serif, 'Roboto';" align="left" >
+                                        ACEMAVEN Team
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+            </td>
+        </tr>
+    </table>
+</table>
+</body>
+
+</html>

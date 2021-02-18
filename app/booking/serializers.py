@@ -921,6 +921,7 @@ class ShipmentDetailsBaseSerializer(serializers.ModelSerializer):
 class TrackSerializer(serializers.ModelSerializer):
     actual_date_of_departure = serializers.DateTimeField(write_only=True, required=False)
     actual_date_of_arrival = serializers.DateTimeField(write_only=True, required=False)
+    date_created = serializers.DateTimeField(default=timezone, format="%Y/%m/%d %H:%M %z")
 
     class Meta:
         model = Track

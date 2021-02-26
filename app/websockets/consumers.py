@@ -73,7 +73,7 @@ class ChatConsumer(WebsocketConsumer):
                         message_body = f'You have a new message in chat on operation number {aceid}'
                     else:
                         topic = Ticket.objects.filter(chat_id=self.chat_id).values_list('topic', flat=True).first()
-                        message_body = f'You have a new message in support chat on topic {topic}'
+                        message_body = f'You have a new message in support chat on topic "{topic}"'
 
                     create_and_assign_notification.delay(
                         Notification.CHATS,

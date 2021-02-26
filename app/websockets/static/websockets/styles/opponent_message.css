@@ -1,0 +1,47 @@
+.opponentMessageWrapper {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    margin-bottom: 30px;
+}
+
+.opponentPhotoWrapper {
+    width: 40px;
+    height: 40px;
+    border-radius: 100px;
+    margin-right: 19px;
+    margin-left: 0;
+}
+
+.opponentPhotoWrapper img {
+    width: 40px;
+    height: 40px;
+    border-radius: 100px;
+}
+
+.opponentTextContent {
+    font-family: "Helvetica Reg", sans-serif;
+    font-size: 16px;
+    line-height: 18.34px;
+    color: #1B1B25;
+    background-color: rgba(26, 184, 230, .4);
+    padding: 15px 29px 15px 24px;
+    border-radius: 0 20px 20px 20px;
+}
+
+.opponentFileMessageContent {
+    font-family: "Helvetica Reg", sans-serif;
+    font-size: 16px;
+    line-height: 18.34px;
+    color: #1B1B25;
+    background-color: rgba(26, 184, 230, .4);
+    padding: 15px 29px 15px 24px;
+    border-radius: 0 20px 20px 20px;
+    display: flex;
+    align-items: center;
+}
+
+.opponentFileMessageContent span {
+    margin-left: 10px;
+}

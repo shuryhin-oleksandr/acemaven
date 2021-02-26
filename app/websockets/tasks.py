@@ -56,13 +56,15 @@ def send_notification(notification_id):
     if notification:
         data = notification_to_json(notification)
         for user in notification.users.all():
+            logger.info(f'{user.id}{"_chat" if notification.section == Notification.CHATS else ""}')
+            condition = notification.section == Notification.CHATS
             async_to_sync(channel_layer.group_send)(
-                f'{user.id}',
+                f'{user.id}{"_chat" if condition else ""}',
                 {
                     'type': 'notify',
                     'data': {
-                        'command': 'notification',
-                        'notification': data,
+                        'command': f'{"chat_" if condition else ""}notification',
+                        f'{"chat_" if condition else ""}notification': data,
                     },
                 },
             )
@@ -123,7 +125,7 @@ def send_email(text, recipient_emails: list, object_id=None):
             "email": email,
             "text": text,
             "link": object_id,
-            }
+        }
         template_html = get_template(f"core/emails_templates/index.html")
         message_html = template_html.render(context)
         logger.debug(f"sending email to {email}")

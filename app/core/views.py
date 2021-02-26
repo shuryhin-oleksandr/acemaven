@@ -15,6 +15,7 @@ from app.core.serializers import CompanySerializer, SignUpRequestSerializer, Use
 from app.core.utils import choice_to_value_name
 from app.booking.models import CargoGroup, CancellationReason
 from app.handling.models import ReleaseType, PackagingType, ContainerType
+from app.websockets.models import Ticket
 
 
 class BankAccountViewSet(PermissionClassByActionMixin,
@@ -207,6 +208,10 @@ class SelectChoiceView(generics.GenericAPIView):
                 'cancellation_reason': {
                     'choice_type': 'choice',
                     'data': CancellationReason.REASON_CHOICES,
+                },
+                'ticket_category': {
+                    'choice_type': 'choice',
+                    'data': Ticket.CATEGORIES_CHOICES,
                 },
             }
             for model in models:

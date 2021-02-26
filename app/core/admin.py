@@ -7,7 +7,7 @@ from django.forms import model_to_dict
 from django.http import HttpResponseRedirect
 
 from app.core.models import CustomUser, Company, BankAccount, Role, SignUpRequest, SignUpToken, Review
-from app.core.utils import master_account_processing
+
 from app.handling.models import LocalFee
 from app.core.tasks import create_company_empty_fees
 
@@ -159,6 +159,8 @@ class CompanyAdmin(TabbedModelAdmin):
         ('Company', tab_company),
         ('Fees', tab_fee),
     )
+
+    search_fields = ('id', 'name',)
 
 
 @admin.register(SignUpRequest)

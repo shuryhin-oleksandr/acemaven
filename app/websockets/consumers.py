@@ -3,11 +3,14 @@ import json
 from urllib import parse
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
+from django.db.models import Q
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
 
-from app.websockets.models import Message, Chat, Notification, MessageFile
+from app.booking.models import Booking
+from app.websockets.models import Message, Chat, Notification, MessageFile, ChatPermission, Ticket
+from app.websockets.tasks import create_and_assign_notification
 
 User = get_user_model()
 
@@ -21,9 +24,6 @@ class ChatConsumer(WebsocketConsumer):
         origin = next(filter(lambda x: x[0] == b'origin', headers), [])
         origin_url = origin[1].decode() if origin else ''
         scheme = parse.urlparse(origin_url).scheme
-
-
-
 
         return f"{scheme if scheme else 'http'}://{':'.join(list(map(str, server)))}" if server else ''
 
@@ -40,6 +40,11 @@ class ChatConsumer(WebsocketConsumer):
             'command': 'messages',
             'messages': self.messages_to_json(messages),
         }
+        user = self.scope['user']
+        if user_permission := user.chat_permissions.filter(chat_id=self.chat_id).first():
+            if user_permission.unread_messages > 0:
+                user_permission.unread_messages = 0
+                user_permission.save()
         self.send_message(content)
 
     def new_message(self, data):
@@ -54,6 +59,32 @@ class ChatConsumer(WebsocketConsumer):
             'command': 'new_message',
             'message': self.message_to_json(message),
         }
+
+        users_offline = ChatPermission.objects.filter(chat_id=self.chat_id, is_online=False)
+        ticket = Ticket.objects.filter(chat_id=self.chat_id).values_list('id', flat=True).first()
+
+        if users_offline.exists():
+            for user in users_offline:
+                unread_messages = user.unread_messages
+                if unread_messages == 0:
+                    operation_id = user.chat.operation_id
+                    if operation_id:
+                        aceid = Booking.objects.filter(id=user.chat.operation_id).values_list('aceid', flat=True).first()
+                        message_body = f'You have a new message in chat on operation number {aceid}'
+                    else:
+                        topic = Ticket.objects.filter(chat_id=self.chat_id).values_list('topic', flat=True).first()
+                        message_body = f'You have a new message in support chat on topic {topic}'
+
+                    create_and_assign_notification.delay(
+                        Notification.CHATS,
+                        message_body,
+                        [user.user_id, ],
+                        Notification.OPERATION if operation_id else Notification.SUPPORT,
+                        object_id=operation_id if operation_id else ticket,
+                    )
+                unread_messages += 1
+                user.unread_messages = unread_messages
+                user.save()
         return self.send_chat_message(content)
 
     def typing_message(self, data):
@@ -116,7 +147,8 @@ class ChatConsumer(WebsocketConsumer):
             'photo': f'{self.get_full_file_url(photo.url)}' if (photo := message.user.photo) else None,
             'content': message.text,
             'files': list(
-                map(self.get_full_file_url, map(lambda url: f'{settings.MEDIA_URL}{url}', message.files.values_list('file', flat=True)))
+                map(self.get_full_file_url,
+                    map(lambda url: f'{settings.MEDIA_URL}{url}', message.files.values_list('file', flat=True)))
             ),
             'date_created': str(message.date_created)
         }
@@ -147,11 +179,17 @@ class ChatConsumer(WebsocketConsumer):
 
         self.fetch_messages()
 
+        ChatPermission.objects.filter(chat_id=self.chat_id, user_id=user).update(is_online=True, unread_messages=0)
+
     def disconnect(self, close_code):
+        self.chat_id = self.scope['url_route']['kwargs']['chat_id']
+        user = self.scope['user']
+        self.group_name = self.chat_id
         async_to_sync(self.channel_layer.group_discard)(
             self.group_name,
             self.channel_name
         )
+        ChatPermission.objects.filter(chat_id=self.chat_id, user_id=user).update(is_online=False)
 
     def receive(self, text_data):
         data = json.loads(text_data)
@@ -177,10 +215,20 @@ class ChatConsumer(WebsocketConsumer):
 class NotificationConsumer(WebsocketConsumer):
 
     def fetch_notifications(self):
-        notifications = Notification.objects.filter(users=self.scope['user'])
+        notifications = Notification.objects.filter(Q(users=self.scope['user']))
+        if self.scope['path'] == '/ws/notification/':
+            notification = notifications.filter(~Q(section=Notification.CHATS))
+            command = 'notifications'
+            type = ''
+        else:
+            notification = notifications.filter(Q(section=Notification.CHATS))
+            command = 'chat_notifications'
+            type = 'chat_'
+
         content = {
-            'command': 'notifications',
-            'notifications': self.notifications_to_json(notifications)
+            'command': command,
+            f'{type}notifications': self.notifications_to_json(notification)
+
         }
         self.send_message(content)
 
@@ -188,9 +236,12 @@ class NotificationConsumer(WebsocketConsumer):
         user = self.scope['user']
         notification = Notification.objects.filter(id=data['id']).first()
         if notification:
-            notification_seen = notification.users_seen.filter(user=user).first()
-            notification_seen.is_viewed = True
-            notification_seen.save()
+            if notification.section == Notification.CHATS:
+                notification.delete()
+            else:
+                notification_seen = notification.users_seen.filter(user=user).first()
+                notification_seen.is_viewed = True
+                notification_seen.save()
 
     def notifications_to_json(self, notifications):
         result = []
@@ -222,7 +273,8 @@ class NotificationConsumer(WebsocketConsumer):
         if user.is_anonymous:
             self.close()
         else:
-            self.group_name = str(user.id)
+            condition = self.scope['path'] == '/ws/notification/'
+            self.group_name = f'{user.id}{"" if condition else "_chat"}'
             async_to_sync(self.channel_layer.group_add)(
                 self.group_name,
                 self.channel_name

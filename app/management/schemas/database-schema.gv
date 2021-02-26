@@ -1,0 +1,1714 @@
+digraph G {
+
+graph [pad="0.5" nodesep="1" ranksep="2" fontname = "helvetica"];
+node [fontname = "helvetica"];
+edge [fontname = "helvetica" labeldistance=3 labelfontcolor="#5959a9" labelfontsize=10 tailclip=false color="black"];
+node [shape=plain]
+rankdir=LR;
+dpi=96;
+
+
+LogEntry [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>LogEntry</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="action_flag"><font color="#000000">action_flag</font></td></tr>
+    <tr><td port="action_time"><font color="#000000">action_time</font></td></tr>
+    <tr><td port="change_message"><font color="#000000">change_message</font></td></tr>
+    <tr><td port="content_type"><font color="#808080">content_type</font></td></tr>
+    <tr><td port="object_id"><font color="#808080">object_id</font></td></tr>
+    <tr><td port="object_repr"><font color="#000000">object_repr</font></td></tr>
+    <tr><td port="user"><font color="#000000">user</font></td></tr>
+    </table>>];
+
+Permission [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>Permission</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="codename"><font color="#000000">codename</font></td></tr>
+    <tr><td port="content_type"><font color="#000000">content_type</font></td></tr>
+    <tr><td port="group"><font color="#808080">group</font></td></tr>
+    <tr><td port="name"><font color="#000000">name</font></td></tr>
+    <tr><td port="user"><font color="#808080">user</font></td></tr>
+    </table>>];
+
+Group [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>Group</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="name"><font color="#000000">name</font></td></tr>
+    <tr><td port="permissions"><font color="#000000">permissions</font></td></tr>
+    <tr><td port="user"><font color="#808080">user</font></td></tr>
+    <tr><td port="users"><font color="#808080">users</font></td></tr>
+    </table>>];
+
+ContentType [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>ContentType</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="app_label"><font color="#000000">app_label</font></td></tr>
+    <tr><td port="model"><font color="#000000">model</font></td></tr>
+    </table>>];
+
+Session [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>Session</b></td></tr>
+    <tr><td port="expire_date"><font color="#000000">expire_date</font></td></tr>
+    <tr><td port="session_data"><font color="#000000">session_data</font></td></tr>
+    <tr><td port="session_key"><font color="#0000ff">session_key</font></td></tr>
+    </table>>];
+
+PostGISGeometryColumns [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>PostGISGeometryColumns</b></td></tr>
+    <tr><td port="coord_dimension"><font color="#000000">coord_dimension</font></td></tr>
+    <tr><td port="f_geometry_column"><font color="#000000">f_geometry_column</font></td></tr>
+    <tr><td port="f_table_catalog"><font color="#000000">f_table_catalog</font></td></tr>
+    <tr><td port="f_table_name"><font color="#000000">f_table_name</font></td></tr>
+    <tr><td port="f_table_schema"><font color="#000000">f_table_schema</font></td></tr>
+    <tr><td port="srid"><font color="#0000ff">srid</font></td></tr>
+    <tr><td port="type"><font color="#000000">type</font></td></tr>
+    </table>>];
+
+PostGISSpatialRefSys [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>PostGISSpatialRefSys</b></td></tr>
+    <tr><td port="auth_name"><font color="#000000">auth_name</font></td></tr>
+    <tr><td port="auth_srid"><font color="#000000">auth_srid</font></td></tr>
+    <tr><td port="proj4text"><font color="#000000">proj4text</font></td></tr>
+    <tr><td port="srid"><font color="#0000ff">srid</font></td></tr>
+    <tr><td port="srtext"><font color="#000000">srtext</font></td></tr>
+    </table>>];
+
+CustomUser [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>CustomUser</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="chats"><font color="#808080">chats</font></td></tr>
+    <tr><td port="companies"><font color="#000000">companies</font></td></tr>
+    <tr><td port="date_joined"><font color="#000000">date_joined</font></td></tr>
+    <tr><td port="email"><font color="#000000">email</font></td></tr>
+    <tr><td port="first_name"><font color="#000000">first_name</font></td></tr>
+    <tr><td port="groups"><font color="#000000">groups</font></td></tr>
+    <tr><td port="is_active"><font color="#000000">is_active</font></td></tr>
+    <tr><td port="is_staff"><font color="#000000">is_staff</font></td></tr>
+    <tr><td port="is_superuser"><font color="#000000">is_superuser</font></td></tr>
+    <tr><td port="last_login"><font color="#808080">last_login</font></td></tr>
+    <tr><td port="last_name"><font color="#000000">last_name</font></td></tr>
+    <tr><td port="notifications"><font color="#808080">notifications</font></td></tr>
+    <tr><td port="password"><font color="#000000">password</font></td></tr>
+    <tr><td port="phone"><font color="#808080">phone</font></td></tr>
+    <tr><td port="photo"><font color="#808080">photo</font></td></tr>
+    <tr><td port="position"><font color="#000000">position</font></td></tr>
+    <tr><td port="user_permissions"><font color="#000000">user_permissions</font></td></tr>
+    </table>>];
+
+Company [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>Company</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="address_line_first"><font color="#808080">address_line_first</font></td></tr>
+    <tr><td port="address_line_second"><font color="#808080">address_line_second</font></td></tr>
+    <tr><td port="city"><font color="#000000">city</font></td></tr>
+    <tr><td port="date_created"><font color="#000000">date_created</font></td></tr>
+    <tr><td port="employees_number"><font color="#000000">employees_number</font></td></tr>
+    <tr><td port="name"><font color="#000000">name</font></td></tr>
+    <tr><td port="phone"><font color="#000000">phone</font></td></tr>
+    <tr><td port="state"><font color="#000000">state</font></td></tr>
+    <tr><td port="tax_id"><font color="#000000">tax_id</font></td></tr>
+    <tr><td port="type"><font color="#000000">type</font></td></tr>
+    <tr><td port="users"><font color="#808080">users</font></td></tr>
+    <tr><td port="website"><font color="#808080">website</font></td></tr>
+    <tr><td port="zip_code"><font color="#000000">zip_code</font></td></tr>
+    </table>>];
+
+EmailNotificationSetting [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>EmailNotificationSetting</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="export_shipment_arrival_alert"><font color="#000000">export_shipment_arrival_alert</font></td></tr>
+    <tr><td port="freight_rate_expiration"><font color="#000000">freight_rate_expiration</font></td></tr>
+    <tr><td port="freight_rate_expiration_days"><font color="#000000">freight_rate_expiration_days</font></td></tr>
+    <tr><td port="import_shipment_departure_alert"><font color="#000000">import_shipment_departure_alert</font></td></tr>
+    <tr><td port="operation_details_change"><font color="#000000">operation_details_change</font></td></tr>
+    <tr><td port="sea_import_shipment_arrival_alert"><font color="#000000">sea_import_shipment_arrival_alert</font></td></tr>
+    <tr><td port="sea_import_shipment_arrival_alert_days"><font color="#000000">sea_import_shipment_arrival_alert_days</font></td></tr>
+    <tr><td port="surcharge_expiration"><font color="#000000">surcharge_expiration</font></td></tr>
+    <tr><td port="surcharge_expiration_days"><font color="#000000">surcharge_expiration_days</font></td></tr>
+    <tr><td port="user"><font color="#000000">user</font></td></tr>
+    </table>>];
+
+SignUpRequest [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>SignUpRequest</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="address_line_first"><font color="#808080">address_line_first</font></td></tr>
+    <tr><td port="address_line_second"><font color="#808080">address_line_second</font></td></tr>
+    <tr><td port="approved"><font color="#000000">approved</font></td></tr>
+    <tr><td port="city"><font color="#000000">city</font></td></tr>
+    <tr><td port="email"><font color="#000000">email</font></td></tr>
+    <tr><td port="employees_number"><font color="#000000">employees_number</font></td></tr>
+    <tr><td port="first_name"><font color="#808080">first_name</font></td></tr>
+    <tr><td port="last_name"><font color="#808080">last_name</font></td></tr>
+    <tr><td port="master_phone"><font color="#808080">master_phone</font></td></tr>
+    <tr><td port="name"><font color="#000000">name</font></td></tr>
+    <tr><td port="phone"><font color="#000000">phone</font></td></tr>
+    <tr><td port="position"><font color="#808080">position</font></td></tr>
+    <tr><td port="state"><font color="#000000">state</font></td></tr>
+    <tr><td port="tax_id"><font color="#000000">tax_id</font></td></tr>
+    <tr><td port="type"><font color="#000000">type</font></td></tr>
+    <tr><td port="website"><font color="#808080">website</font></td></tr>
+    <tr><td port="zip_code"><font color="#000000">zip_code</font></td></tr>
+    </table>>];
+
+SignUpToken [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>SignUpToken</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="token"><font color="#000000">token</font></td></tr>
+    <tr><td port="user"><font color="#000000">user</font></td></tr>
+    </table>>];
+
+Role [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>Role</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="company"><font color="#000000">company</font></td></tr>
+    <tr><td port="groups"><font color="#000000">groups</font></td></tr>
+    <tr><td port="user"><font color="#000000">user</font></td></tr>
+    </table>>];
+
+BankAccount [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>BankAccount</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="account_type"><font color="#000000">account_type</font></td></tr>
+    <tr><td port="bank_name"><font color="#000000">bank_name</font></td></tr>
+    <tr><td port="bank_number"><font color="#000000">bank_number</font></td></tr>
+    <tr><td port="branch"><font color="#000000">branch</font></td></tr>
+    <tr><td port="company"><font color="#808080">company</font></td></tr>
+    <tr><td port="is_default"><font color="#000000">is_default</font></td></tr>
+    <tr><td port="is_platforms"><font color="#000000">is_platforms</font></td></tr>
+    <tr><td port="number"><font color="#000000">number</font></td></tr>
+    <tr><td port="pix_key"><font color="#808080">pix_key</font></td></tr>
+    </table>>];
+
+Shipper [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>Shipper</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="address_line_first"><font color="#808080">address_line_first</font></td></tr>
+    <tr><td port="address_line_second"><font color="#808080">address_line_second</font></td></tr>
+    <tr><td port="city"><font color="#000000">city</font></td></tr>
+    <tr><td port="company"><font color="#000000">company</font></td></tr>
+    <tr><td port="contact_name"><font color="#000000">contact_name</font></td></tr>
+    <tr><td port="email"><font color="#000000">email</font></td></tr>
+    <tr><td port="is_partner"><font color="#000000">is_partner</font></td></tr>
+    <tr><td port="name"><font color="#000000">name</font></td></tr>
+    <tr><td port="phone"><font color="#000000">phone</font></td></tr>
+    <tr><td port="phone_additional"><font color="#808080">phone_additional</font></td></tr>
+    <tr><td port="state"><font color="#808080">state</font></td></tr>
+    <tr><td port="zip_code"><font color="#808080">zip_code</font></td></tr>
+    </table>>];
+
+Review [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>Review</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="approved"><font color="#000000">approved</font></td></tr>
+    <tr><td port="comment"><font color="#000000">comment</font></td></tr>
+    <tr><td port="date_created"><font color="#000000">date_created</font></td></tr>
+    <tr><td port="operation"><font color="#000000">operation</font></td></tr>
+    <tr><td port="rating"><font color="#000000">rating</font></td></tr>
+    <tr><td port="reviewer"><font color="#808080">reviewer</font></td></tr>
+    </table>>];
+
+Surcharge [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>Surcharge</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="additional_surcharges"><font color="#000000">additional_surcharges</font></td></tr>
+    <tr><td port="carrier"><font color="#000000">carrier</font></td></tr>
+    <tr><td port="company"><font color="#000000">company</font></td></tr>
+    <tr><td port="container_types"><font color="#000000">container_types</font></td></tr>
+    <tr><td port="direction"><font color="#000000">direction</font></td></tr>
+    <tr><td port="expiration_date"><font color="#000000">expiration_date</font></td></tr>
+    <tr><td port="is_archived"><font color="#000000">is_archived</font></td></tr>
+    <tr><td port="location"><font color="#000000">location</font></td></tr>
+    <tr><td port="rates"><font color="#808080">rates</font></td></tr>
+    <tr><td port="shipping_mode"><font color="#000000">shipping_mode</font></td></tr>
+    <tr><td port="start_date"><font color="#000000">start_date</font></td></tr>
+    <tr><td port="temporary"><font color="#000000">temporary</font></td></tr>
+    </table>>];
+
+UsageFee [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>UsageFee</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="charge"><font color="#808080">charge</font></td></tr>
+    <tr><td port="container_type"><font color="#000000">container_type</font></td></tr>
+    <tr><td port="currency"><font color="#000000">currency</font></td></tr>
+    <tr><td port="date_updated"><font color="#000000">date_updated</font></td></tr>
+    <tr><td port="surcharge"><font color="#000000">surcharge</font></td></tr>
+    <tr><td port="updated_by"><font color="#808080">updated_by</font></td></tr>
+    </table>>];
+
+Charge [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>Charge</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="additional_surcharge"><font color="#000000">additional_surcharge</font></td></tr>
+    <tr><td port="charge"><font color="#808080">charge</font></td></tr>
+    <tr><td port="conditions"><font color="#000000">conditions</font></td></tr>
+    <tr><td port="currency"><font color="#000000">currency</font></td></tr>
+    <tr><td port="date_updated"><font color="#000000">date_updated</font></td></tr>
+    <tr><td port="surcharge"><font color="#000000">surcharge</font></td></tr>
+    <tr><td port="updated_by"><font color="#808080">updated_by</font></td></tr>
+    </table>>];
+
+AdditionalSurcharge [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>AdditionalSurcharge</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="is_cold"><font color="#000000">is_cold</font></td></tr>
+    <tr><td port="is_dangerous"><font color="#000000">is_dangerous</font></td></tr>
+    <tr><td port="is_document"><font color="#000000">is_document</font></td></tr>
+    <tr><td port="is_handling"><font color="#000000">is_handling</font></td></tr>
+    <tr><td port="is_other"><font color="#000000">is_other</font></td></tr>
+    <tr><td port="shipping_mode"><font color="#000000">shipping_mode</font></td></tr>
+    <tr><td port="surcharges"><font color="#808080">surcharges</font></td></tr>
+    <tr><td port="title"><font color="#000000">title</font></td></tr>
+    </table>>];
+
+FreightRate [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>FreightRate</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="carrier"><font color="#000000">carrier</font></td></tr>
+    <tr><td port="carrier_disclosure"><font color="#000000">carrier_disclosure</font></td></tr>
+    <tr><td port="company"><font color="#000000">company</font></td></tr>
+    <tr><td port="destination"><font color="#000000">destination</font></td></tr>
+    <tr><td port="is_active"><font color="#000000">is_active</font></td></tr>
+    <tr><td port="is_archived"><font color="#000000">is_archived</font></td></tr>
+    <tr><td port="origin"><font color="#000000">origin</font></td></tr>
+    <tr><td port="quotes"><font color="#808080">quotes</font></td></tr>
+    <tr><td port="shipping_mode"><font color="#000000">shipping_mode</font></td></tr>
+    <tr><td port="temporary"><font color="#000000">temporary</font></td></tr>
+    <tr><td port="transit_time"><font color="#808080">transit_time</font></td></tr>
+    </table>>];
+
+Rate [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>Rate</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="container_type"><font color="#808080">container_type</font></td></tr>
+    <tr><td port="currency"><font color="#000000">currency</font></td></tr>
+    <tr><td port="date_updated"><font color="#000000">date_updated</font></td></tr>
+    <tr><td port="expiration_date"><font color="#808080">expiration_date</font></td></tr>
+    <tr><td port="freight_rate"><font color="#000000">freight_rate</font></td></tr>
+    <tr><td port="rate"><font color="#808080">rate</font></td></tr>
+    <tr><td port="start_date"><font color="#808080">start_date</font></td></tr>
+    <tr><td port="surcharges"><font color="#000000">surcharges</font></td></tr>
+    <tr><td port="updated_by"><font color="#808080">updated_by</font></td></tr>
+    </table>>];
+
+Booking [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>Booking</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="aceid"><font color="#808080">aceid</font></td></tr>
+    <tr><td port="agent_contact_person"><font color="#808080">agent_contact_person</font></td></tr>
+    <tr><td port="automatic_tracking"><font color="#000000">automatic_tracking</font></td></tr>
+    <tr><td port="change_request_status"><font color="#808080">change_request_status</font></td></tr>
+    <tr><td port="charges"><font color="#808080">charges</font></td></tr>
+    <tr><td port="client_contact_person"><font color="#808080">client_contact_person</font></td></tr>
+    <tr><td port="date_accepted_by_agent"><font color="#808080">date_accepted_by_agent</font></td></tr>
+    <tr><td port="date_created"><font color="#000000">date_created</font></td></tr>
+    <tr><td port="date_from"><font color="#000000">date_from</font></td></tr>
+    <tr><td port="date_to"><font color="#000000">date_to</font></td></tr>
+    <tr><td port="freight_rate"><font color="#000000">freight_rate</font></td></tr>
+    <tr><td port="is_assigned"><font color="#000000">is_assigned</font></td></tr>
+    <tr><td port="is_paid"><font color="#000000">is_paid</font></td></tr>
+    <tr><td port="number_of_documents"><font color="#808080">number_of_documents</font></td></tr>
+    <tr><td port="original_booking"><font color="#808080">original_booking</font></td></tr>
+    <tr><td port="payment_due_by"><font color="#808080">payment_due_by</font></td></tr>
+    <tr><td port="release_type"><font color="#808080">release_type</font></td></tr>
+    <tr><td port="shipper"><font color="#808080">shipper</font></td></tr>
+    <tr><td port="status"><font color="#000000">status</font></td></tr>
+    <tr><td port="vessel_arrived"><font color="#000000">vessel_arrived</font></td></tr>
+    </table>>];
+
+CancellationReason [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>CancellationReason</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="agent_contact_person"><font color="#808080">agent_contact_person</font></td></tr>
+    <tr><td port="booking"><font color="#000000">booking</font></td></tr>
+    <tr><td port="comment"><font color="#808080">comment</font></td></tr>
+    <tr><td port="date"><font color="#000000">date</font></td></tr>
+    <tr><td port="reason"><font color="#808080">reason</font></td></tr>
+    </table>>];
+
+CargoGroup [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>CargoGroup</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="booking"><font color="#808080">booking</font></td></tr>
+    <tr><td port="container_type"><font color="#808080">container_type</font></td></tr>
+    <tr><td port="dangerous"><font color="#000000">dangerous</font></td></tr>
+    <tr><td port="description"><font color="#808080">description</font></td></tr>
+    <tr><td port="frozen"><font color="#808080">frozen</font></td></tr>
+    <tr><td port="height"><font color="#808080">height</font></td></tr>
+    <tr><td port="length"><font color="#808080">length</font></td></tr>
+    <tr><td port="length_measurement"><font color="#808080">length_measurement</font></td></tr>
+    <tr><td port="packaging_type"><font color="#808080">packaging_type</font></td></tr>
+    <tr><td port="quote"><font color="#808080">quote</font></td></tr>
+    <tr><td port="total_wm"><font color="#808080">total_wm</font></td></tr>
+    <tr><td port="volume"><font color="#808080">volume</font></td></tr>
+    <tr><td port="weight"><font color="#808080">weight</font></td></tr>
+    <tr><td port="weight_measurement"><font color="#808080">weight_measurement</font></td></tr>
+    <tr><td port="width"><font color="#808080">width</font></td></tr>
+    </table>>];
+
+Quote [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>Quote</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="company"><font color="#000000">company</font></td></tr>
+    <tr><td port="date_created"><font color="#000000">date_created</font></td></tr>
+    <tr><td port="date_from"><font color="#000000">date_from</font></td></tr>
+    <tr><td port="date_to"><font color="#000000">date_to</font></td></tr>
+    <tr><td port="destination"><font color="#000000">destination</font></td></tr>
+    <tr><td port="freight_rates"><font color="#000000">freight_rates</font></td></tr>
+    <tr><td port="is_active"><font color="#000000">is_active</font></td></tr>
+    <tr><td port="is_archived"><font color="#000000">is_archived</font></td></tr>
+    <tr><td port="origin"><font color="#000000">origin</font></td></tr>
+    <tr><td port="shipping_mode"><font color="#000000">shipping_mode</font></td></tr>
+    </table>>];
+
+Status [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>Status</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="charges"><font color="#808080">charges</font></td></tr>
+    <tr><td port="company"><font color="#808080">company</font></td></tr>
+    <tr><td port="freight_rate"><font color="#808080">freight_rate</font></td></tr>
+    <tr><td port="is_viewed"><font color="#000000">is_viewed</font></td></tr>
+    <tr><td port="quote"><font color="#000000">quote</font></td></tr>
+    <tr><td port="status"><font color="#000000">status</font></td></tr>
+    </table>>];
+
+ShipmentDetails [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>ShipmentDetails</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="actual_date_of_arrival"><font color="#808080">actual_date_of_arrival</font></td></tr>
+    <tr><td port="actual_date_of_departure"><font color="#808080">actual_date_of_departure</font></td></tr>
+    <tr><td port="booking"><font color="#808080">booking</font></td></tr>
+    <tr><td port="booking_notes"><font color="#808080">booking_notes</font></td></tr>
+    <tr><td port="booking_number"><font color="#000000">booking_number</font></td></tr>
+    <tr><td port="booking_number_with_carrier"><font color="#808080">booking_number_with_carrier</font></td></tr>
+    <tr><td port="cargo_cut_off_date"><font color="#808080">cargo_cut_off_date</font></td></tr>
+    <tr><td port="cargo_drop_off_location"><font color="#808080">cargo_drop_off_location</font></td></tr>
+    <tr><td port="cargo_drop_off_location_address"><font color="#808080">cargo_drop_off_location_address</font></td></tr>
+    <tr><td port="cargo_pick_up_location"><font color="#808080">cargo_pick_up_location</font></td></tr>
+    <tr><td port="cargo_pick_up_location_address"><font color="#808080">cargo_pick_up_location_address</font></td></tr>
+    <tr><td port="container_free_time"><font color="#808080">container_free_time</font></td></tr>
+    <tr><td port="container_number"><font color="#808080">container_number</font></td></tr>
+    <tr><td port="date_of_arrival"><font color="#000000">date_of_arrival</font></td></tr>
+    <tr><td port="date_of_departure"><font color="#000000">date_of_departure</font></td></tr>
+    <tr><td port="document_cut_off_date"><font color="#808080">document_cut_off_date</font></td></tr>
+    <tr><td port="empty_pick_up_location"><font color="#808080">empty_pick_up_location</font></td></tr>
+    <tr><td port="empty_pick_up_location_address"><font color="#808080">empty_pick_up_location_address</font></td></tr>
+    <tr><td port="flight_number"><font color="#808080">flight_number</font></td></tr>
+    <tr><td port="mawb"><font color="#808080">mawb</font></td></tr>
+    <tr><td port="vessel"><font color="#808080">vessel</font></td></tr>
+    <tr><td port="voyage"><font color="#808080">voyage</font></td></tr>
+    </table>>];
+
+Transaction [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>Transaction</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="booking"><font color="#808080">booking</font></td></tr>
+    <tr><td port="charge"><font color="#000000">charge</font></td></tr>
+    <tr><td port="status"><font color="#000000">status</font></td></tr>
+    <tr><td port="transaction_id"><font color="#000000">transaction_id</font></td></tr>
+    </table>>];
+
+PaymentData [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>PaymentData</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="data"><font color="#000000">data</font></td></tr>
+    </table>>];
+
+Track [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>Track</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="booking"><font color="#808080">booking</font></td></tr>
+    <tr><td port="comment"><font color="#808080">comment</font></td></tr>
+    <tr><td port="created_by"><font color="#808080">created_by</font></td></tr>
+    <tr><td port="data"><font color="#808080">data</font></td></tr>
+    <tr><td port="date_created"><font color="#000000">date_created</font></td></tr>
+    <tr><td port="manual"><font color="#000000">manual</font></td></tr>
+    <tr><td port="route"><font color="#808080">route</font></td></tr>
+    <tr><td port="status"><font color="#808080">status</font></td></tr>
+    </table>>];
+
+TrackStatus [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>TrackStatus</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="auto_add_on_actual_date_of_arrival"><font color="#000000">auto_add_on_actual_date_of_arrival</font></td></tr>
+    <tr><td port="auto_add_on_actual_date_of_departure"><font color="#000000">auto_add_on_actual_date_of_departure</font></td></tr>
+    <tr><td port="auto_add_on_shipment_details_change"><font color="#000000">auto_add_on_shipment_details_change</font></td></tr>
+    <tr><td port="direction"><font color="#000000">direction</font></td></tr>
+    <tr><td port="must_update_actual_date_of_departure"><font color="#000000">must_update_actual_date_of_departure</font></td></tr>
+    <tr><td port="shipping_mode"><font color="#000000">shipping_mode</font></td></tr>
+    <tr><td port="show_after_departure"><font color="#000000">show_after_departure</font></td></tr>
+    <tr><td port="title"><font color="#000000">title</font></td></tr>
+    </table>>];
+
+Direction [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>Direction</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="title"><font color="#000000">title</font></td></tr>
+    <tr><td port="trackstatus"><font color="#808080">trackstatus</font></td></tr>
+    </table>>];
+
+ShippingType [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>ShippingType</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="title"><font color="#000000">title</font></td></tr>
+    </table>>];
+
+ShippingMode [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>ShippingMode</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="additional_surcharges"><font color="#808080">additional_surcharges</font></td></tr>
+    <tr><td port="has_freight_containers"><font color="#000000">has_freight_containers</font></td></tr>
+    <tr><td port="has_surcharge_containers"><font color="#000000">has_surcharge_containers</font></td></tr>
+    <tr><td port="is_need_volume"><font color="#000000">is_need_volume</font></td></tr>
+    <tr><td port="packaging_types"><font color="#808080">packaging_types</font></td></tr>
+    <tr><td port="shipping_type"><font color="#000000">shipping_type</font></td></tr>
+    <tr><td port="title"><font color="#000000">title</font></td></tr>
+    <tr><td port="tracking_statuses"><font color="#808080">tracking_statuses</font></td></tr>
+    </table>>];
+
+PackagingType [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>PackagingType</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="code"><font color="#000000">code</font></td></tr>
+    <tr><td port="description"><font color="#000000">description</font></td></tr>
+    <tr><td port="description_pt"><font color="#808080">description_pt</font></td></tr>
+    <tr><td port="dimension_unit"><font color="#808080">dimension_unit</font></td></tr>
+    <tr><td port="height"><font color="#000000">height</font></td></tr>
+    <tr><td port="length"><font color="#000000">length</font></td></tr>
+    <tr><td port="shipping_modes"><font color="#000000">shipping_modes</font></td></tr>
+    <tr><td port="weight"><font color="#000000">weight</font></td></tr>
+    <tr><td port="weight_unit"><font color="#808080">weight_unit</font></td></tr>
+    <tr><td port="width"><font color="#000000">width</font></td></tr>
+    </table>>];
+
+ContainerType [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>ContainerType</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="can_be_dangerous"><font color="#000000">can_be_dangerous</font></td></tr>
+    <tr><td port="capacity"><font color="#808080">capacity</font></td></tr>
+    <tr><td port="code"><font color="#000000">code</font></td></tr>
+    <tr><td port="description"><font color="#000000">description</font></td></tr>
+    <tr><td port="description_pt"><font color="#000000">description_pt</font></td></tr>
+    <tr><td port="fcl_type"><font color="#000000">fcl_type</font></td></tr>
+    <tr><td port="gross_weight"><font color="#000000">gross_weight</font></td></tr>
+    <tr><td port="height"><font color="#000000">height</font></td></tr>
+    <tr><td port="iata_class"><font color="#808080">iata_class</font></td></tr>
+    <tr><td port="is_active"><font color="#000000">is_active</font></td></tr>
+    <tr><td port="is_frozen"><font color="#000000">is_frozen</font></td></tr>
+    <tr><td port="iso"><font color="#808080">iso</font></td></tr>
+    <tr><td port="iso_description"><font color="#808080">iso_description</font></td></tr>
+    <tr><td port="iso_size"><font color="#808080">iso_size</font></td></tr>
+    <tr><td port="iso_type"><font color="#808080">iso_type</font></td></tr>
+    <tr><td port="length"><font color="#000000">length</font></td></tr>
+    <tr><td port="shipping_mode"><font color="#808080">shipping_mode</font></td></tr>
+    <tr><td port="surcharges"><font color="#808080">surcharges</font></td></tr>
+    <tr><td port="tare_weight"><font color="#000000">tare_weight</font></td></tr>
+    <tr><td port="teu"><font color="#000000">teu</font></td></tr>
+    <tr><td port="width"><font color="#000000">width</font></td></tr>
+    </table>>];
+
+IMOClass [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>IMOClass</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="imo_class"><font color="#000000">imo_class</font></td></tr>
+    <tr><td port="title"><font color="#000000">title</font></td></tr>
+    </table>>];
+
+ReleaseType [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>ReleaseType</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="code"><font color="#000000">code</font></td></tr>
+    <tr><td port="title"><font color="#000000">title</font></td></tr>
+    </table>>];
+
+Carrier [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>Carrier</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="code"><font color="#808080">code</font></td></tr>
+    <tr><td port="prefix"><font color="#808080">prefix</font></td></tr>
+    <tr><td port="scac"><font color="#808080">scac</font></td></tr>
+    <tr><td port="shipping_type"><font color="#000000">shipping_type</font></td></tr>
+    <tr><td port="title"><font color="#000000">title</font></td></tr>
+    </table>>];
+
+Airline [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>Airline</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="address"><font color="#808080">address</font></td></tr>
+    <tr><td port="address_additional"><font color="#808080">address_additional</font></td></tr>
+    <tr><td port="cass_controlled"><font color="#000000">cass_controlled</font></td></tr>
+    <tr><td port="city"><font color="#808080">city</font></td></tr>
+    <tr><td port="name"><font color="#000000">name</font></td></tr>
+    <tr><td port="name_additional"><font color="#808080">name_additional</font></td></tr>
+    <tr><td port="numeric_code"><font color="#808080">numeric_code</font></td></tr>
+    <tr><td port="postcode"><font color="#808080">postcode</font></td></tr>
+    <tr><td port="three_char_code"><font color="#808080">three_char_code</font></td></tr>
+    <tr><td port="two_char_code"><font color="#808080">two_char_code</font></td></tr>
+    </table>>];
+
+GlobalFee [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>GlobalFee</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="fee_type"><font color="#000000">fee_type</font></td></tr>
+    <tr><td port="is_active"><font color="#000000">is_active</font></td></tr>
+    <tr><td port="shipping_mode"><font color="#000000">shipping_mode</font></td></tr>
+    <tr><td port="value"><font color="#000000">value</font></td></tr>
+    <tr><td port="value_type"><font color="#000000">value_type</font></td></tr>
+    </table>>];
+
+LocalFee [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>LocalFee</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="company"><font color="#000000">company</font></td></tr>
+    <tr><td port="fee_type"><font color="#000000">fee_type</font></td></tr>
+    <tr><td port="is_active"><font color="#000000">is_active</font></td></tr>
+    <tr><td port="shipping_mode"><font color="#000000">shipping_mode</font></td></tr>
+    <tr><td port="value"><font color="#000000">value</font></td></tr>
+    <tr><td port="value_type"><font color="#000000">value_type</font></td></tr>
+    </table>>];
+
+Currency [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>Currency</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="code"><font color="#000000">code</font></td></tr>
+    <tr><td port="is_active"><font color="#000000">is_active</font></td></tr>
+    <tr><td port="is_main"><font color="#000000">is_main</font></td></tr>
+    </table>>];
+
+Port [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>Port</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="code"><font color="#000000">code</font></td></tr>
+    <tr><td port="coordinates"><font color="#808080">coordinates</font></td></tr>
+    <tr><td port="country"><font color="#808080">country</font></td></tr>
+    <tr><td port="iata"><font color="#808080">iata</font></td></tr>
+    <tr><td port="is_active"><font color="#000000">is_active</font></td></tr>
+    <tr><td port="name"><font color="#000000">name</font></td></tr>
+    <tr><td port="port_or_airport"><font color="#000000">port_or_airport</font></td></tr>
+    <tr><td port="timezone"><font color="#808080">timezone</font></td></tr>
+    </table>>];
+
+ExchangeRate [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>ExchangeRate</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="billing_exchange_rate"><font color="#808080">billing_exchange_rate</font></td></tr>
+    <tr><td port="currency"><font color="#000000">currency</font></td></tr>
+    <tr><td port="is_platforms"><font color="#000000">is_platforms</font></td></tr>
+    <tr><td port="rate"><font color="#000000">rate</font></td></tr>
+    <tr><td port="spread"><font color="#000000">spread</font></td></tr>
+    </table>>];
+
+BillingExchangeRate [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>BillingExchangeRate</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="company"><font color="#000000">company</font></td></tr>
+    <tr><td port="date"><font color="#000000">date</font></td></tr>
+    </table>>];
+
+ClientPlatformSetting [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>ClientPlatformSetting</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="enable_booking_fee_payment"><font color="#000000">enable_booking_fee_payment</font></td></tr>
+    <tr><td port="hide_carrier_name"><font color="#000000">hide_carrier_name</font></td></tr>
+    <tr><td port="number_of_bids"><font color="#000000">number_of_bids</font></td></tr>
+    <tr><td port="number_of_days"><font color="#000000">number_of_days</font></td></tr>
+    <tr><td port="number_of_results"><font color="#000000">number_of_results</font></td></tr>
+    </table>>];
+
+GeneralSetting [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>GeneralSetting</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="export_deadline_days"><font color="#000000">export_deadline_days</font></td></tr>
+    <tr><td port="import_deadline_days"><font color="#000000">import_deadline_days</font></td></tr>
+    <tr><td port="number_of_days_request_can_stay"><font color="#000000">number_of_days_request_can_stay</font></td></tr>
+    <tr><td port="show_freight_forwarder_name"><font color="#000000">show_freight_forwarder_name</font></td></tr>
+    </table>>];
+
+AirTrackingSetting [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>AirTrackingSetting</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="password"><font color="#000000">password</font></td></tr>
+    <tr><td port="pima"><font color="#000000">pima</font></td></tr>
+    <tr><td port="url"><font color="#000000">url</font></td></tr>
+    <tr><td port="user"><font color="#000000">user</font></td></tr>
+    </table>>];
+
+SeaTrackingSetting [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>SeaTrackingSetting</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="api_key"><font color="#000000">api_key</font></td></tr>
+    <tr><td port="url"><font color="#000000">url</font></td></tr>
+    </table>>];
+
+PixApiSetting [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>PixApiSetting</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="bank_account"><font color="#000000">bank_account</font></td></tr>
+    <tr><td port="base_url"><font color="#000000">base_url</font></td></tr>
+    <tr><td port="basic_token"><font color="#000000">basic_token</font></td></tr>
+    <tr><td port="client_id"><font color="#000000">client_id</font></td></tr>
+    <tr><td port="client_secret"><font color="#000000">client_secret</font></td></tr>
+    <tr><td port="cob_uri"><font color="#000000">cob_uri</font></td></tr>
+    <tr><td port="developer_key"><font color="#000000">developer_key</font></td></tr>
+    <tr><td port="token_uri"><font color="#000000">token_uri</font></td></tr>
+    </table>>];
+
+Country [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>Country</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="code"><font color="#000000">code</font></td></tr>
+    <tr><td port="currency"><font color="#808080">currency</font></td></tr>
+    <tr><td port="is_active"><font color="#000000">is_active</font></td></tr>
+    <tr><td port="is_main"><font color="#000000">is_main</font></td></tr>
+    <tr><td port="name"><font color="#000000">name</font></td></tr>
+    </table>>];
+
+Chat [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>Chat</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="date_created"><font color="#000000">date_created</font></td></tr>
+    <tr><td port="operation"><font color="#808080">operation</font></td></tr>
+    <tr><td port="users"><font color="#000000">users</font></td></tr>
+    </table>>];
+
+ChatPermission [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>ChatPermission</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="chat"><font color="#000000">chat</font></td></tr>
+    <tr><td port="has_perm_to_read"><font color="#000000">has_perm_to_read</font></td></tr>
+    <tr><td port="has_perm_to_write"><font color="#000000">has_perm_to_write</font></td></tr>
+    <tr><td port="is_online"><font color="#000000">is_online</font></td></tr>
+    <tr><td port="unread_messages"><font color="#000000">unread_messages</font></td></tr>
+    <tr><td port="user"><font color="#000000">user</font></td></tr>
+    </table>>];
+
+Message [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>Message</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="chat"><font color="#000000">chat</font></td></tr>
+    <tr><td port="date_created"><font color="#000000">date_created</font></td></tr>
+    <tr><td port="text"><font color="#000000">text</font></td></tr>
+    <tr><td port="user"><font color="#000000">user</font></td></tr>
+    </table>>];
+
+MessageFile [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>MessageFile</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="file"><font color="#000000">file</font></td></tr>
+    <tr><td port="message"><font color="#808080">message</font></td></tr>
+    </table>>];
+
+Notification [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>Notification</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="action_path"><font color="#000000">action_path</font></td></tr>
+    <tr><td port="date_created"><font color="#000000">date_created</font></td></tr>
+    <tr><td port="object_id"><font color="#808080">object_id</font></td></tr>
+    <tr><td port="section"><font color="#000000">section</font></td></tr>
+    <tr><td port="text"><font color="#000000">text</font></td></tr>
+    <tr><td port="users"><font color="#000000">users</font></td></tr>
+    </table>>];
+
+NotificationSeen [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>NotificationSeen</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="is_viewed"><font color="#000000">is_viewed</font></td></tr>
+    <tr><td port="notification"><font color="#000000">notification</font></td></tr>
+    <tr><td port="user"><font color="#000000">user</font></td></tr>
+    </table>>];
+
+Ticket [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>Ticket</b></td></tr>
+    <tr><td port="id"><font color="#0000ff">id</font></td></tr>
+    <tr><td port="aceid"><font color="#808080">aceid</font></td></tr>
+    <tr><td port="category"><font color="#000000">category</font></td></tr>
+    <tr><td port="chat"><font color="#000000">chat</font></td></tr>
+    <tr><td port="description"><font color="#000000">description</font></td></tr>
+    <tr><td port="status"><font color="#000000">status</font></td></tr>
+    <tr><td port="topic"><font color="#000000">topic</font></td></tr>
+    </table>>];
+
+
+
+
+LogEntry:content_type -> ContentType:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    content_type_id"
+];
+    
+
+LogEntry:user -> CustomUser:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    user_id"
+];
+    
+
+
+Permission:content_type -> ContentType:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    content_type_id"
+];
+    
+
+Permission:group -> Group:permissions [
+      dir=both
+      arrowhead=oinvodot
+      arrowtail=oinvodot
+          color="green"
+];
+    
+
+Permission:user -> CustomUser:user_permissions [
+      dir=both
+      arrowhead=oinvodot
+      arrowtail=oinvodot
+          color="green"
+];
+    
+
+
+Group:permissions -> Permission:group [
+      dir=both
+      arrowhead=oinvodot
+      arrowtail=oinvodot
+          color="green"
+];
+    
+
+Group:user -> CustomUser:groups [
+      dir=both
+      arrowhead=oinvodot
+      arrowtail=oinvodot
+          color="green"
+];
+    
+
+Group:users -> Role:groups [
+      dir=both
+      arrowhead=oinvodot
+      arrowtail=oinvodot
+          color="green"
+];
+    
+
+
+
+
+
+
+CustomUser:chats -> Chat:users [
+      dir=both
+      arrowhead=oinvodot
+      arrowtail=oinvodot
+          color="green"
+];
+    
+
+CustomUser:companies -> Company:users [
+      dir=both
+      arrowhead=oinvodot
+      arrowtail=oinvodot
+          color="green"
+];
+    
+
+CustomUser:groups -> Group:user [
+      dir=both
+      arrowhead=oinvodot
+      arrowtail=oinvodot
+          color="green"
+];
+    
+
+CustomUser:notifications -> Notification:users [
+      dir=both
+      arrowhead=oinvodot
+      arrowtail=oinvodot
+          color="green"
+];
+    
+
+CustomUser:user_permissions -> Permission:user [
+      dir=both
+      arrowhead=oinvodot
+      arrowtail=oinvodot
+          color="green"
+];
+    
+
+
+Company:users -> CustomUser:companies [
+      dir=both
+      arrowhead=oinvodot
+      arrowtail=oinvodot
+          color="green"
+];
+    
+
+
+EmailNotificationSetting:user -> CustomUser:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=teedot
+      taillabel="    user_id"
+          color="blue"
+];
+    
+
+
+
+SignUpToken:user -> CustomUser:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    user_id"
+];
+    
+
+
+Role:company -> Company:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    company_id"
+];
+    
+
+Role:groups -> Group:users [
+      dir=both
+      arrowhead=oinvodot
+      arrowtail=oinvodot
+          color="green"
+];
+    
+
+Role:user -> CustomUser:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    user_id"
+];
+    
+
+
+BankAccount:company -> Company:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    company_id"
+];
+    
+
+
+Shipper:company -> Company:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    company_id"
+];
+    
+
+
+Review:operation -> Booking:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=teedot
+      taillabel="    operation_id"
+          color="blue"
+];
+    
+
+Review:reviewer -> CustomUser:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    reviewer_id"
+];
+    
+
+
+Surcharge:additional_surcharges -> AdditionalSurcharge:surcharges [
+      dir=both
+      arrowhead=oinvodot
+      arrowtail=oinvodot
+          color="green"
+];
+    
+
+Surcharge:carrier -> Carrier:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    carrier_id"
+];
+    
+
+Surcharge:company -> Company:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    company_id"
+];
+    
+
+Surcharge:container_types -> ContainerType:surcharges [
+      dir=both
+      arrowhead=oinvodot
+      arrowtail=oinvodot
+          color="green"
+];
+    
+
+Surcharge:location -> Port:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    location_id"
+];
+    
+
+Surcharge:rates -> Rate:surcharges [
+      dir=both
+      arrowhead=oinvodot
+      arrowtail=oinvodot
+          color="green"
+];
+    
+
+Surcharge:shipping_mode -> ShippingMode:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    shipping_mode_id"
+];
+    
+
+
+UsageFee:container_type -> ContainerType:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    container_type_id"
+];
+    
+
+UsageFee:currency -> Currency:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    currency_id"
+];
+    
+
+UsageFee:surcharge -> Surcharge:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    surcharge_id"
+];
+    
+
+UsageFee:updated_by -> CustomUser:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    updated_by_id"
+];
+    
+
+
+Charge:additional_surcharge -> AdditionalSurcharge:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    additional_surcharge_id"
+];
+    
+
+Charge:currency -> Currency:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    currency_id"
+];
+    
+
+Charge:surcharge -> Surcharge:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    surcharge_id"
+];
+    
+
+Charge:updated_by -> CustomUser:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    updated_by_id"
+];
+    
+
+
+AdditionalSurcharge:shipping_mode -> ShippingMode:additional_surcharges [
+      dir=both
+      arrowhead=oinvodot
+      arrowtail=oinvodot
+          color="green"
+];
+    
+
+AdditionalSurcharge:surcharges -> Surcharge:additional_surcharges [
+      dir=both
+      arrowhead=oinvodot
+      arrowtail=oinvodot
+          color="green"
+];
+    
+
+
+FreightRate:carrier -> Carrier:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    carrier_id"
+];
+    
+
+FreightRate:company -> Company:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    company_id"
+];
+    
+
+FreightRate:destination -> Port:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    destination_id"
+];
+    
+
+FreightRate:origin -> Port:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    origin_id"
+];
+    
+
+FreightRate:quotes -> Quote:freight_rates [
+      dir=both
+      arrowhead=oinvodot
+      arrowtail=oinvodot
+          color="green"
+];
+    
+
+FreightRate:shipping_mode -> ShippingMode:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    shipping_mode_id"
+];
+    
+
+
+Rate:container_type -> ContainerType:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    container_type_id"
+];
+    
+
+Rate:currency -> Currency:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    currency_id"
+];
+    
+
+Rate:freight_rate -> FreightRate:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    freight_rate_id"
+];
+    
+
+Rate:surcharges -> Surcharge:rates [
+      dir=both
+      arrowhead=oinvodot
+      arrowtail=oinvodot
+          color="green"
+];
+    
+
+Rate:updated_by -> CustomUser:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    updated_by_id"
+];
+    
+
+
+Booking:agent_contact_person -> CustomUser:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    agent_contact_person_id"
+];
+    
+
+Booking:client_contact_person -> CustomUser:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    client_contact_person_id"
+];
+    
+
+Booking:freight_rate -> FreightRate:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    freight_rate_id"
+];
+    
+
+Booking:original_booking -> Booking:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    original_booking_id"
+];
+    
+
+Booking:release_type -> ReleaseType:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    release_type_id"
+];
+    
+
+Booking:shipper -> Shipper:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    shipper_id"
+];
+    
+
+
+CancellationReason:agent_contact_person -> CustomUser:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    agent_contact_person_id"
+];
+    
+
+CancellationReason:booking -> Booking:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    booking_id"
+];
+    
+
+
+CargoGroup:booking -> Booking:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    booking_id"
+];
+    
+
+CargoGroup:container_type -> ContainerType:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    container_type_id"
+];
+    
+
+CargoGroup:packaging_type -> PackagingType:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    packaging_type_id"
+];
+    
+
+CargoGroup:quote -> Quote:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    quote_id"
+];
+    
+
+
+Quote:company -> Company:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    company_id"
+];
+    
+
+Quote:destination -> Port:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    destination_id"
+];
+    
+
+Quote:freight_rates -> FreightRate:quotes [
+      dir=both
+      arrowhead=oinvodot
+      arrowtail=oinvodot
+          color="green"
+];
+    
+
+Quote:origin -> Port:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    origin_id"
+];
+    
+
+Quote:shipping_mode -> ShippingMode:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    shipping_mode_id"
+];
+    
+
+
+Status:company -> Company:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    company_id"
+];
+    
+
+Status:freight_rate -> FreightRate:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    freight_rate_id"
+];
+    
+
+Status:quote -> Quote:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    quote_id"
+];
+    
+
+
+ShipmentDetails:booking -> Booking:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    booking_id"
+];
+    
+
+
+Transaction:booking -> Booking:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    booking_id"
+];
+    
+
+
+
+Track:booking -> Booking:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    booking_id"
+];
+    
+
+Track:created_by -> CustomUser:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    created_by_id"
+];
+    
+
+Track:status -> TrackStatus:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    status_id"
+];
+    
+
+
+TrackStatus:direction -> Direction:trackstatus [
+      dir=both
+      arrowhead=oinvodot
+      arrowtail=oinvodot
+          color="green"
+];
+    
+
+TrackStatus:shipping_mode -> ShippingMode:tracking_statuses [
+      dir=both
+      arrowhead=oinvodot
+      arrowtail=oinvodot
+          color="green"
+];
+    
+
+
+Direction:trackstatus -> TrackStatus:direction [
+      dir=both
+      arrowhead=oinvodot
+      arrowtail=oinvodot
+          color="green"
+];
+    
+
+
+
+ShippingMode:additional_surcharges -> AdditionalSurcharge:shipping_mode [
+      dir=both
+      arrowhead=oinvodot
+      arrowtail=oinvodot
+          color="green"
+];
+    
+
+ShippingMode:packaging_types -> PackagingType:shipping_modes [
+      dir=both
+      arrowhead=oinvodot
+      arrowtail=oinvodot
+          color="green"
+];
+    
+
+ShippingMode:shipping_type -> ShippingType:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    shipping_type_id"
+];
+    
+
+ShippingMode:tracking_statuses -> TrackStatus:shipping_mode [
+      dir=both
+      arrowhead=oinvodot
+      arrowtail=oinvodot
+          color="green"
+];
+    
+
+
+PackagingType:shipping_modes -> ShippingMode:packaging_types [
+      dir=both
+      arrowhead=oinvodot
+      arrowtail=oinvodot
+          color="green"
+];
+    
+
+
+ContainerType:shipping_mode -> ShippingMode:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    shipping_mode_id"
+];
+    
+
+ContainerType:surcharges -> Surcharge:container_types [
+      dir=both
+      arrowhead=oinvodot
+      arrowtail=oinvodot
+          color="green"
+];
+    
+
+
+
+
+Carrier:shipping_type -> ShippingType:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    shipping_type_id"
+];
+    
+
+
+
+GlobalFee:shipping_mode -> ShippingMode:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    shipping_mode_id"
+];
+    
+
+
+LocalFee:company -> Company:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    company_id"
+];
+    
+
+LocalFee:shipping_mode -> ShippingMode:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    shipping_mode_id"
+];
+    
+
+
+
+Port:country -> Country:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    country_id"
+];
+    
+
+
+ExchangeRate:billing_exchange_rate -> BillingExchangeRate:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    billing_exchange_rate_id"
+];
+    
+
+ExchangeRate:currency -> Currency:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    currency_id"
+];
+    
+
+
+BillingExchangeRate:company -> Company:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    company_id"
+];
+    
+
+
+
+
+
+
+PixApiSetting:bank_account -> BankAccount:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=teedot
+      taillabel="    bank_account_id"
+          color="blue"
+];
+    
+
+
+Country:currency -> Currency:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    currency_id"
+];
+    
+
+
+Chat:operation -> Booking:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=teedot
+      taillabel="    operation_id"
+          color="blue"
+];
+    
+
+Chat:users -> CustomUser:chats [
+      dir=both
+      arrowhead=oinvodot
+      arrowtail=oinvodot
+          color="green"
+];
+    
+
+
+ChatPermission:chat -> Chat:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    chat_id"
+];
+    
+
+ChatPermission:user -> CustomUser:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    user_id"
+];
+    
+
+
+Message:chat -> Chat:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    chat_id"
+];
+    
+
+Message:user -> CustomUser:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    user_id"
+];
+    
+
+
+MessageFile:message -> Message:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    message_id"
+];
+    
+
+
+Notification:users -> CustomUser:notifications [
+      dir=both
+      arrowhead=oinvodot
+      arrowtail=oinvodot
+          color="green"
+];
+    
+
+
+NotificationSeen:notification -> Notification:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    notification_id"
+];
+    
+
+NotificationSeen:user -> CustomUser:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    user_id"
+];
+    
+
+
+Ticket:chat -> Chat:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=teedot
+      taillabel="    chat_id"
+          color="blue"
+];
+    
+
+
+}

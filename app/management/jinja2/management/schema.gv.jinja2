@@ -1,0 +1,56 @@
+digraph G {
+
+graph [pad="0.5" nodesep="1" ranksep="2" fontname = "helvetica"];
+node [fontname = "helvetica"];
+edge [fontname = "helvetica" labeldistance=3 labelfontcolor="#5959a9" labelfontsize=10 tailclip=false color="black"];
+node [shape=plain]
+rankdir=LR;
+dpi=96;
+
+{% for model in models %}
+{{ model.__name__ }} [label=<
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="8">
+    <tr><td bgcolor="#e0ffe7"><b>{{ model.__name__ }}</b></td></tr>
+    {% for field in fields(model) -%}
+      <tr><td port="{{- field.name -}}"><font color="{{- color(field) -}}">
+          {{- field.name -}}
+      </font></td></tr>
+    {% endfor -%}
+</table>>];
+{% endfor %}
+
+{% for model in models %}
+  {%- for field in fields(model) -%}
+    {%- if field.many_to_one %}
+
+{{ model.__name__ -}}:{{- field.name }} -> {{ field.related_model.__name__ -}}:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=oinvodot
+      taillabel="    {{ field.column }}"
+];
+    {% endif -%}
+      {%- if field.one_to_one %}
+
+{{ model.__name__ -}}:{{- field.name }} -> {{ field.related_model.__name__ -}}:id [
+      dir=both
+      arrowhead=teedot
+      arrowtail=teedot
+      taillabel="    {{ field.column }}"
+          color="blue"
+];
+    {% endif -%}
+      {%- if field.many_to_many %}
+
+{{ model.__name__ -}}:{{- field.name }} -> {{ field.related_model.__name__ -}}:{{ field.remote_field.name }} [
+      dir=both
+      arrowhead=oinvodot
+      arrowtail=oinvodot
+          color="green"
+];
+    {% endif -%}
+  {% endfor %}
+{% endfor %}
+
+}
+

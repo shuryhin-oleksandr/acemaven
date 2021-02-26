@@ -2,7 +2,6 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 
-
 User = get_user_model()
 
 
@@ -56,9 +55,18 @@ class ChatPermission(models.Model):
         on_delete=models.CASCADE,
         related_name='chat_permissions',
     )
+    is_online = models.BooleanField(
+        _('User is online'),
+        default=False,
+    )
+    unread_messages = models.PositiveIntegerField(
+        _('Number of unread messages'),
+        default=0,
+    )
 
-    def __str__(self):
-        return f'{self.user.get_full_name()} permission for chat {self.chat_id}'
+
+def __str__(self):
+    return f'{self.user.get_full_name()} permission for chat {self.chat_id}'
 
 
 class Message(models.Model):
@@ -122,6 +130,7 @@ class Notification(models.Model):
     OPERATIONS = 'operations'
     OPERATIONS_IMPORT = 'operations_import'
     OPERATIONS_EXPORT = 'operations_export'
+    CHATS = 'chats'
     SECTION_CHOICES = (
         (SURCHARGES, 'Surcharges'),
         (FREIGHT_RATES, 'Freight Rates'),
@@ -129,6 +138,7 @@ class Notification(models.Model):
         (OPERATIONS, 'Operations'),
         (OPERATIONS_IMPORT, 'Operations (Imports)'),
         (OPERATIONS_EXPORT, 'Operations (Exports)'),
+        (CHATS, 'Chats'),
     )
 
     BOOKING = 'booking'
@@ -136,12 +146,14 @@ class Notification(models.Model):
     OPERATION = 'operation'
     SURCHARGE = 'surcharge'
     FREIGHT_RATE = 'freight_rate'
+    SUPPORT = 'support'
     ACTION_CHOICES = (
         (BOOKING, 'Booking'),
         (BILLING, 'Billing'),
         (OPERATION, 'Operation'),
         (SURCHARGE, 'Surcharge'),
         (FREIGHT_RATE, 'Freight Rate'),
+        (SUPPORT, 'Support'),
     )
 
     section = models.CharField(
@@ -206,3 +218,40 @@ class NotificationSeen(models.Model):
         _('Is seen by user'),
         default=False,
     )
+
+
+class Ticket(models.Model):
+    """
+    Ticket model for support chat
+    """
+    COMPLETED = 'completed'
+    IN_PROGRESS = 'in_progress'
+    STATUS_CHOICES = (
+        (COMPLETED, 'Completed'),
+        (IN_PROGRESS, 'In progress'),
+    )
+    RATES_AND_SERVICES = 'rates_and_services'
+    REQUESTS = 'requests'
+    BILLING = 'billing'
+    OPERATIONS = 'operations'
+    CATEGORIES_CHOICES = (
+        (OPERATIONS, 'Operations'),
+        (REQUESTS, 'Requests'),
+        (BILLING, 'Billing'),
+        (RATES_AND_SERVICES, 'Rates and services'),
+
+
+    )
+
+    category = models.CharField(_('Categories'),
+                                max_length=20,
+                                choices=CATEGORIES_CHOICES,
+                                default=REQUESTS, )
+    topic = models.TextField('Topic', blank=True, )
+    description = models.TextField('Description', blank=True, )
+    status = models.CharField(_('Status'),
+                              max_length=20,
+                              choices=STATUS_CHOICES,
+                              default=IN_PROGRESS, )
+    chat = models.OneToOneField(Chat, on_delete=models.CASCADE)
+    aceid = models.CharField(_('Operation number'), max_length=20, null=True)

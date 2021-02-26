@@ -17,7 +17,6 @@ from celery.schedules import crontab
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
@@ -58,6 +57,7 @@ INSTALLED_APPS = [
     'app.handling',
     'app.location',
     'app.websockets',
+    'app.management',
 ]
 
 REST_FRAMEWORK = {
@@ -100,6 +100,22 @@ ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [
     {
+        "BACKEND": "django.template.backends.jinja2.Jinja2",
+        "DIRS": [
+            os.path.join(BASE_DIR, "jinja2",)
+        ],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "environment": "app.core.util.templates_utils.build_jinja2_environment",
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+            ],
+        },
+    },
+    {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
             os.path.join(BASE_DIR, 'templates'),
@@ -120,7 +136,6 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 ASGI_APPLICATION = 'config.asgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
@@ -130,7 +145,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
@@ -149,7 +163,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
@@ -235,3 +248,4 @@ CHANNEL_LAYERS = {
         }
     }
 }
+

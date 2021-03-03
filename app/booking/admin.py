@@ -107,13 +107,14 @@ class BookingAdmin(DjangoWithExtraContextAdmin, admin.ModelAdmin):
     def get_extra_context(self, request, **kwargs):
         extra_context = super().get_extra_context(request, **kwargs) or {}
         if 'object_id' in kwargs.keys():
-            booking = Booking.objects.filter(id=kwargs['object_id']).values_list('charges', flat=True).first()
-            extra_context.update({
-                'total_surcharge': booking['total_surcharge'],
-                'totals': booking['totals'],
-                'total_freight_rate': booking['total_freight_rate'],
-                'doc_fee': booking['doc_fee'],
-            })
+            if kwargs['object_id']:
+                booking = Booking.objects.filter(id=kwargs['object_id']).values_list('charges', flat=True).first()
+                extra_context.update({
+                    'total_surcharge': booking['total_surcharge'],
+                    'totals': booking['totals'],
+                    'total_freight_rate': booking['total_freight_rate'],
+                    'doc_fee': booking['doc_fee'],
+                })
         return extra_context
 
 

@@ -21,15 +21,4 @@ class Migration(migrations.Migration):
             name='unread_messages',
             field=models.PositiveIntegerField(default=0, verbose_name='Number of unread messages'),
         ),
-        migrations.CreateModel(
-            name='Ticket',
-            fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('category', models.CharField(choices=[('booking', 'Booking'), ('general', 'General'), ('operations', 'Operations')], default='general', max_length=20, verbose_name='Categories')),
-                ('topic', models.TextField(blank=True, verbose_name='Topic')),
-                ('description', models.TextField(blank=True, verbose_name='Description')),
-                ('status', models.CharField(choices=[('completed', 'Completed'), ('in_progress', 'In progress')], default='in_progress', max_length=20, verbose_name='Status')),
-                ('chat', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='websockets.chat')),
-            ],
-        ),
     ]

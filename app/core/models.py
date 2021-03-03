@@ -540,6 +540,7 @@ class Review(models.Model):
     """
     Model for company reviews from clients.
     """
+    from app.booking.models import Booking
 
     rating = models.PositiveIntegerField(
         _('Company rating from 1 to 10'),
@@ -564,6 +565,12 @@ class Review(models.Model):
     operation = models.OneToOneField(
         'booking.Booking',
         on_delete=models.CASCADE,
+        limit_choices_to=models.Q(status__in=(
+            Booking.CONFIRMED,
+            Booking.CANCELED_BY_CLIENT,
+            Booking.CANCELED_BY_AGENT,
+            Booking.CANCELED_BY_SYSTEM,
+        )),
     )
 
     class Meta:

@@ -482,6 +482,9 @@ class Currency(models.Model):
     def __str__(self):
         return f'{self.code}'
 
+    class Meta:
+        verbose_name_plural = 'Сurrencies'
+
 
 class Port(gis_models.Model):
     """
@@ -731,7 +734,7 @@ class PixApiSetting(models.Model):
         _('Pix api token uri'),
         max_length=256,
     )
-    cob_uri = models.CharField(
+    qr_cob_uri = models.CharField(
         _('Pix api cob uri'),
         max_length=256,
     )

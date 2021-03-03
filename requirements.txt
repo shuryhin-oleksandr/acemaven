@@ -20,3 +20,4 @@ django-tabbed-admin==1.0.4
 django-debug-toolbar==3.1.1
 jinja2==2.11.3
 Delorean==1.0.0
+django-with-extra-context-admin==0.1.0

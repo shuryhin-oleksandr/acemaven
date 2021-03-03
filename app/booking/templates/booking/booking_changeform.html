@@ -1,0 +1,72 @@
+{% extends 'admin/change_form.html' %}
+
+{% block submit_buttons_bottom %}
+    <fieldset class="module aligned">
+        <div class="form-row field-charges">
+            <div style="display: flex; align-items: flex-start;">
+                <label class="required" for="id_charges">Charge calculations:</label>
+                {% if doc_fee %}
+                <table border="1" style="display: inline-block;">
+                   <caption style="white-space: nowrap;">Doc fee</caption>
+
+                       <tr>
+                           {% for key in  doc_fee.keys %}
+                           <th valign="top" style="text-align: center">{{ key }}</th>
+                           {% endfor %}
+                       </tr>
+                       <tr>
+                            {% for value in  doc_fee.values %}
+                           <td valign="top" bgcolor="#f0f0f0" style="text-align: center">{{ value }}</td>
+                                {% endfor %}
+                       </tr>
+                </table>
+                {% endif %}
+
+                <table border="1" style="display: inline-block;">
+                   <caption style="white-space: nowrap;">Total surcharge</caption>
+                       <tr>
+                       {% for key in  total_surcharge.keys %}
+                           <th style="text-align: center">{{ key }}</th>
+                       {% endfor %}
+                       </tr>
+                       <tr>
+                        {% for value in  total_surcharge.values %}
+                           <td valign="top" bgcolor="#f0f0f0" style="text-align: center">{{ value }}</td>
+                           {% endfor %}
+                       </tr>
+
+                </table>
+
+                <table border="1" style="display: inline-block;">
+                   <caption style="white-space: nowrap;">Total freight rate</caption>
+                       <tr>
+                        {% for key in total_freight_rate.keys %}
+                           <th style="text-align: center">{{ key }}</th>
+                        {% endfor %}
+                       </tr>
+                       <tr>
+                           {% for value in total_freight_rate.values %}
+                           <td valign="top" bgcolor="#f0f0f0" style="text-align: center">{{ value }}</td>
+                           {% endfor %}
+                       </tr>
+                </table>
+
+                <table border="1" style="display: inline-block;">
+                   <caption style="white-space: nowrap;">Totals</caption>
+                    <tr>
+                    {% for key in  totals.keys %}
+                        <th style="text-align: center">{{ key }}</th>
+                   {% endfor %}
+                    </tr>
+                        <tr>
+                    {% for value in  totals.values %}
+                        <td valign="top" bgcolor="#f0f0f0" style="text-align: center">{{ value }}</td>
+                   {% endfor %}
+                    </tr>
+                </table>
+
+            </div>
+        </div>
+    </fieldset>
+                            {{ block.super }}
+{% endblock %}

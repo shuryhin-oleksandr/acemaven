@@ -36,3 +36,6 @@ class Country(models.Model):
         if self.is_main:
             Country.objects.all().update(is_main=False)
         super(Country, self).save(*args, **kwargs)
+
+    class Meta:
+        verbose_name_plural = 'Countries'

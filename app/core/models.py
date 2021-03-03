@@ -7,7 +7,6 @@ from django.contrib.auth.models import AbstractUser, Group
 from django.core.validators import RegexValidator, MinValueValidator, MaxValueValidator
 from django.utils.translation import gettext_lazy as _
 
-
 tax_id_validator = RegexValidator(
     regex=r'^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$',
     message='Invalid format. Must be: 00.000.000/0000-00'
@@ -215,6 +214,9 @@ class Company(models.Model):
             operation__agent_contact_person__companies=self,
             approved=True,
         )
+
+    class Meta:
+        verbose_name_plural = 'Companies'
 
 
 class EmailNotificationSetting(models.Model):

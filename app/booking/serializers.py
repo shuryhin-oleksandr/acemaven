@@ -9,14 +9,14 @@ from django.db.utils import ProgrammingError
 from django.utils import timezone
 
 from app.booking.models import Surcharge, UsageFee, Charge, AdditionalSurcharge, FreightRate, Rate, CargoGroup, Quote, \
-    Booking, Status, ShipmentDetails, CancellationReason, Track, TrackStatus
+    Booking, Status, ShipmentDetails, CancellationReason, Track, TrackStatus, Transaction
 from app.booking.tasks import send_awb_number_to_air_tracking_api
 from app.booking.utils import rate_surcharges_filter, calculate_freight_rate_charges, get_fees, generate_aceid, \
     create_message_for_track, get_shipping_type_titles
 from app.core.models import Shipper
 from app.core.serializers import ShipperSerializer, BankAccountBaseSerializer
 from app.core.utils import get_average_company_rating
-from app.handling.models import ClientPlatformSetting, Currency, GeneralSetting, BillingExchangeRate
+from app.handling.models import ClientPlatformSetting, Currency, GeneralSetting, BillingExchangeRate, PixApiSetting
 from app.handling.serializers import ContainerTypesSerializer, CurrencySerializer, CarrierBaseSerializer, \
     PortSerializer, ShippingModeBaseSerializer, PackagingTypeBaseSerializer, ReleaseTypeSerializer
 from app.location.models import Country
@@ -24,6 +24,7 @@ from app.websockets.models import Notification
 from app.websockets.tasks import create_chat_for_operation, send_email
 from app.websockets.tasks import create_and_assign_notification
 from config import settings
+from app.core.util.payment import payment_operation
 
 try:
     MAIN_COUNTRY_CODE = Country.objects.filter(is_main=True).first().code
@@ -643,10 +644,12 @@ class BookingSerializer(serializers.ModelSerializer):
                                                         booking_fee=booking_fee,
                                                         service_fee=service_fee,
                                                         calculate_fees=calculate_fees, )
-                if result.get('pay_to_book', {}).get('pay_to_book', 0) == 0:
+                pay_to_book = result.get('pay_to_book', {}).get('pay_to_book', 0)
+                if pay_to_book == 0:
                     validated_data['is_paid'] = True
                     validated_data['status'] = Booking.REQUEST_RECEIVED
                     result.pop('pay_to_book', None)
+
                 validated_data['charges'] = result
                 validated_data['aceid'] = generate_aceid(freight_rate, company)
                 booking = super().create(validated_data)
@@ -685,6 +688,9 @@ class BookingSerializer(serializers.ModelSerializer):
             users_emails = [user.email, ]
             send_email.delay(client_text, users_emails, object_id=f'{settings.DOMAIN_ADDRESS}booking_request/{booking.id}')
         else:
+            # Transaction.objects.create(booking=booking, charge=pay_to_book)
+            # qr_code = payment_operation(pay_to_book)
+
             message_body = 'A new Booking Request is pending of Booking Fee payment to be sent.'
             users_ids = list(
                 company.users.filter(role__groups__name__in=('master', 'billing')).values_list('id', flat=True)

@@ -810,6 +810,9 @@ class ShipmentDetails(models.Model):
         null=True,
     )
 
+    class Meta:
+        verbose_name_plural = 'Shipment Details'
+
 
 class Transaction(models.Model):
     """
@@ -942,6 +945,9 @@ class TrackStatus(models.Model):
         _('Add the status after changing shipment details'),
         default=False,
     )
+
+    class Meta:
+        verbose_name_plural = 'Track statuses'
 
 
 class Direction(models.Model):

@@ -154,13 +154,15 @@ class CompanyAdmin(TabbedModelAdmin):
     tab_fee = (
         LocalFeeInline,
     )
-
+    def get_queryset(self, request):
+        return super().get_queryset(request)
     tabs = (
         ('Company', tab_company),
         ('Fees', tab_fee),
     )
 
     search_fields = ('id', 'name',)
+
 
 
 @admin.register(SignUpRequest)

@@ -24,7 +24,7 @@ from app.websockets.models import Notification
 from app.websockets.tasks import create_chat_for_operation, send_email
 from app.websockets.tasks import create_and_assign_notification
 from config import settings
-from app.core.util.payment import payment_operation
+from app.core.util.payment import payment_operation, get_qr_code
 
 try:
     MAIN_COUNTRY_CODE = Country.objects.filter(is_main=True).first().code
@@ -589,6 +589,7 @@ class BookingSerializer(serializers.ModelSerializer):
         write_only=True,
         required=False
     )
+    qr_code = serializers.SerializerMethodField()
 
     class Meta:
         model = Booking
@@ -603,7 +604,11 @@ class BookingSerializer(serializers.ModelSerializer):
             'shipper',
             'existing_shipper',
             'cargo_groups',
+            'qr_code',
         )
+
+    def get_qr_code(self, obj):
+        return obj.transaction.qr_code
 
     def create(self, validated_data):
         user = self.context['request'].user
@@ -688,8 +693,8 @@ class BookingSerializer(serializers.ModelSerializer):
             users_emails = [user.email, ]
             send_email.delay(client_text, users_emails, object_id=f'{settings.DOMAIN_ADDRESS}booking_request/{booking.id}')
         else:
-            # Transaction.objects.create(booking=booking, charge=pay_to_book)
-            # qr_code = payment_operation(pay_to_book)
+            qr_code = get_qr_code(pay_to_book)
+            Transaction.objects.create(booking=booking, charge=pay_to_book, qr_code=qr_code)
 
             message_body = 'A new Booking Request is pending of Booking Fee payment to be sent.'
             users_ids = list(

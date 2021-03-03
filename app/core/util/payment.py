@@ -89,7 +89,9 @@ def get_credentials():
         return response_json.get('access_token')
 
 
-def get_qr_code(amount, txid, token):
+def get_qr_code(amount):
+    token = get_credentials()
+    txid = get_random_string(35)
     response = requests.put(
         f'https://api.hm.bb.com.br/pix/v1/cobqrcode/{txid}?gw-dev-app-key=d27b377907ffab40136ee17da0050e56b941a5b4',
         data=json.dumps({
@@ -118,7 +120,7 @@ def get_qr_code(amount, txid, token):
         return 'Have some problems getting QR-code'
 
 
-def change_amount(new_amount, token, txid):
+def change_amount(new_amount, txid, token):
     response = requests.patch(
         f'https://api.hm.bb.com.br/pix/v1/cob/{txid}?gw-dev-app-key=d27b377907ffab40136ee17da0050e56b941a5b4',
         data=json.dumps({
@@ -129,16 +131,26 @@ def change_amount(new_amount, token, txid):
             'content-type': 'application/json',
             'authorization': f'Bearer {token}'}
     )
-    if response.status_code == 200:
-        response_json = response.json()
-        return response_json
-    else:
-        return 'Errors with changing amount'
+    return response.json()
 
 
-def payment_operation(pay_to_book):
+def review_payment(txid, token):
+    response = requests.get(
+        f'https://api.hm.bb.com.br/pix/v1/cob/{txid}?gw-dev-app-key=d27b377907ffab40136ee17da0050e56b941a5b4',
+        headers={
+            'content-type': 'application/json',
+            'authorization': f'Bearer {token}'}
+    )
+    return response.json()
+
+
+def payment_operation(pay_to_book, new_amount):
     token = get_credentials()
     if token:
         txid = get_random_string(35)
         if qr_code := get_qr_code(pay_to_book, txid, token):
-            return qr_code
+            print("QR-code:", qr_code)
+            review = review_payment(txid, token)
+            print("Review payment:", review)
+            change = change_amount(new_amount, txid, token)
+            print("Change amount:", change)

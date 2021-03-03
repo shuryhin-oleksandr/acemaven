@@ -851,6 +851,11 @@ class Transaction(models.Model):
         related_name='transactions',
         null=True,
     )
+    qr_code = models.CharField(
+        _('QR code '),
+        max_length=200,
+        null=True,
+    )
 
 
 class PaymentData(models.Model):

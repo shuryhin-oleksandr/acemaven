@@ -7,7 +7,7 @@
                 <label class="required" for="id_charges">Charge calculations:</label>
                 {% if doc_fee %}
                 <table border="1" style="display: inline-block;">
-                   <caption style="white-space: nowrap;">Doc fee</caption>
+                   <caption style="white-space: nowrap; text-align: center">Doc fee</caption>
 
                        <tr>
                            {% for key in  doc_fee.keys %}
@@ -23,7 +23,7 @@
                 {% endif %}
 
                 <table border="1" style="display: inline-block;">
-                   <caption style="white-space: nowrap;">Total surcharge</caption>
+                   <caption style="white-space: nowrap; text-align: center;">Total surcharge</caption>
                        <tr>
                        {% for key in  total_surcharge.keys %}
                            <th style="text-align: center">{{ key }}</th>
@@ -38,7 +38,7 @@
                 </table>
 
                 <table border="1" style="display: inline-block;">
-                   <caption style="white-space: nowrap;">Total freight rate</caption>
+                   <caption style="white-space: nowrap; text-align: center;">Total freight rate</caption>
                        <tr>
                         {% for key in total_freight_rate.keys %}
                            <th style="text-align: center">{{ key }}</th>
@@ -52,7 +52,7 @@
                 </table>
 
                 <table border="1" style="display: inline-block;">
-                   <caption style="white-space: nowrap; background-color: black;">Totals</caption>
+                   <caption style="white-space: nowrap; background-color: black; text-align: center;">Totals</caption>
                     <tr>
                     {% for key in  totals.keys %}
                         <th style="text-align: center">{{ key }}</th>

@@ -89,9 +89,8 @@ def get_credentials():
         return response_json.get('access_token')
 
 
-def get_qr_code(amount):
+def get_qr_code(amount, txid):
     token = get_credentials()
-    txid = get_random_string(35)
     response = requests.put(
         f'https://api.hm.bb.com.br/pix/v1/cobqrcode/{txid}?gw-dev-app-key=d27b377907ffab40136ee17da0050e56b941a5b4',
         data=json.dumps({

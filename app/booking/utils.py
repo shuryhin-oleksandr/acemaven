@@ -55,16 +55,20 @@ def rate_surcharges_filter(rate, company, temporary=False):
         'shipping_mode': freight_rate.shipping_mode,
     }
     start_date_fields = {
+        'start_date__lt': rate.start_date,
+        'expiration_date__gte': rate.start_date,
+    }
+    mid_date_field = {
         'start_date__gte': rate.start_date,
-        'start_date__lte': rate.expiration_date,
+        'expiration_date__lte': rate.expiration_date,
     }
     end_date_fields = {
-        'expiration_date__gte': rate.start_date,
-        'expiration_date__lte': rate.expiration_date,
+        'start_date__lte': rate.expiration_date,
+        'expiration_date__gt': rate.expiration_date,
     }
     surcharges = Surcharge.objects.filter(
         Q(**filter_fields),
-        Q(Q(**start_date_fields), Q(**end_date_fields), _connector='OR'),
+        Q(Q(**start_date_fields), Q(**end_date_fields), Q(**mid_date_field), _connector='OR'),
         company=company,
         is_archived=False,
     )
@@ -475,7 +479,7 @@ def freight_rate_search(data, company=None):
         freight_rates = freight_rates.filter(
             company=company,
         )
-
+    freight_rates = freight_rates.distinct()
     return freight_rates, shipping_mode
 
 

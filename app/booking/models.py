@@ -830,7 +830,7 @@ class Transaction(models.Model):
         (EXPIRED, 'Transaction expired'),
     )
 
-    transaction_id = models.CharField(
+    txid = models.CharField(
         _('Transaction identifier'),
         max_length=35,
     )

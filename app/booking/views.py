@@ -322,16 +322,20 @@ class FreightRateViesSet(PermissionClassByActionMixin,
             'shipping_mode': data['shipping_mode'],
         }
         start_date_fields = {
+            'start_date__lt': start_date,
+            'expiration_date__gte': start_date,
+        }
+        mid_date_field = {
             'start_date__gte': start_date,
-            'start_date__lte': expiration_date,
+            'expiration_date__lte': expiration_date,
         }
         end_date_fields = {
-            'expiration_date__gte': start_date,
-            'expiration_date__lte': expiration_date,
+            'start_date__lte': expiration_date,
+            'expiration_date__gt': expiration_date,
         }
         surcharge = Surcharge.objects.filter(
             Q(**filter_fields),
-            Q(Q(**start_date_fields), Q(**end_date_fields), _connector='OR'),
+            Q(Q(**start_date_fields), Q(**end_date_fields), Q(**mid_date_field), _connector='OR'),
             company=user.get_company(),
             temporary=False,
             is_archived=False,

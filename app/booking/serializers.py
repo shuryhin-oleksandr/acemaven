@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
 from django.db import transaction
-from django.db.models import Min, Q
+from django.db.models import Min
 from django.db.utils import ProgrammingError
 from django.utils import timezone
 
@@ -16,7 +16,7 @@ from app.booking.utils import rate_surcharges_filter, calculate_freight_rate_cha
 from app.core.models import Shipper
 from app.core.serializers import ShipperSerializer, BankAccountBaseSerializer
 from app.core.utils import get_average_company_rating
-from app.handling.models import ClientPlatformSetting, Currency, GeneralSetting, BillingExchangeRate, PixApiSetting
+from app.handling.models import ClientPlatformSetting, Currency, GeneralSetting, BillingExchangeRate
 from app.handling.serializers import ContainerTypesSerializer, CurrencySerializer, CarrierBaseSerializer, \
     PortSerializer, ShippingModeBaseSerializer, PackagingTypeBaseSerializer, ReleaseTypeSerializer
 from app.location.models import Country
@@ -24,7 +24,6 @@ from app.websockets.models import Notification
 from app.websockets.tasks import create_chat_for_operation, send_email
 from app.websockets.tasks import create_and_assign_notification
 from config import settings
-from app.core.util.payment import payment_operation, get_qr_code
 
 try:
     MAIN_COUNTRY_CODE = Country.objects.filter(is_main=True).first().code
@@ -86,6 +85,16 @@ class UsageFeeSerializer(UserUpdateMixin, serializers.ModelSerializer):
             'charge',
         )
 
+class TransactionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Transaction
+        fields = (
+            'txid',
+            'status',
+            'charge',
+            'booking',
+            'qr_code',
+        )
 
 class UsageFeeEditSerializer(UserFullNameGetMixin, UsageFeeSerializer):
     container_type = ContainerTypesSerializer()
@@ -589,7 +598,7 @@ class BookingSerializer(serializers.ModelSerializer):
         write_only=True,
         required=False
     )
-    qr_code = serializers.SerializerMethodField()
+    transactions = TransactionSerializer(many=True)
 
     class Meta:
         model = Booking
@@ -604,11 +613,8 @@ class BookingSerializer(serializers.ModelSerializer):
             'shipper',
             'existing_shipper',
             'cargo_groups',
-            'qr_code',
+            'transactions',
         )
-
-    def get_qr_code(self, obj):
-        return obj.transaction.qr_code
 
     def create(self, validated_data):
         user = self.context['request'].user
@@ -693,8 +699,9 @@ class BookingSerializer(serializers.ModelSerializer):
             users_emails = [user.email, ]
             send_email.delay(client_text, users_emails, object_id=f'{settings.DOMAIN_ADDRESS}booking_request/{booking.id}')
         else:
-            qr_code = get_qr_code(pay_to_book)
-            Transaction.objects.create(booking=booking, charge=pay_to_book, qr_code=qr_code)
+            # txid = get_random_string(35)
+            # qr_code = get_qr_code(pay_to_book, txid)
+            # Transaction.objects.create(txid=txid, booking=booking, charge=pay_to_book, qr_code=qr_code)
 
             message_body = 'A new Booking Request is pending of Booking Fee payment to be sent.'
             users_ids = list(

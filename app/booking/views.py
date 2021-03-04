@@ -8,7 +8,7 @@ from rest_framework.response import Response
 
 from django.contrib.auth import get_user_model
 from django.db import transaction
-from django.db.models import CharField, Case, When, Value, Q, Count
+from django.db.models import CharField, Case, When, Value, Q, Count, Min
 from django.db.utils import ProgrammingError
 from django.utils import timezone
 
@@ -369,6 +369,11 @@ class FreightRateViesSet(PermissionClassByActionMixin,
 
         for freight_rate in freight_rates:
             freight_rate_dict = FreightRateSearchListSerializer(freight_rate).data
+            if container_type_ids_list:
+                expiration_date = freight_rate.rates.filter(container_type__id__in=container_type_ids_list).aggregate(
+                    date=Min('expiration_date')).get('date').strftime('%d/%m/%Y')
+                freight_rate_dict['expiration_date'] = expiration_date
+
             result = calculate_freight_rate_charges(freight_rate,
                                                     freight_rate_dict,
                                                     cargo_groups,

@@ -15,7 +15,7 @@ from app.booking.utils import rate_surcharges_filter, calculate_freight_rate_cha
     create_message_for_track, get_shipping_type_titles
 from app.core.models import Shipper
 from app.core.serializers import ShipperSerializer, BankAccountBaseSerializer
-from app.core.utils import get_average_company_rating
+from app.core.utils import get_average_company_rating, get_random_string
 from app.handling.models import ClientPlatformSetting, Currency, GeneralSetting, BillingExchangeRate
 from app.handling.serializers import ContainerTypesSerializer, CurrencySerializer, CarrierBaseSerializer, \
     PortSerializer, ShippingModeBaseSerializer, PackagingTypeBaseSerializer, ReleaseTypeSerializer
@@ -24,6 +24,7 @@ from app.websockets.models import Notification
 from app.websockets.tasks import create_chat_for_operation, send_email
 from app.websockets.tasks import create_and_assign_notification
 from config import settings
+from core.util.payment import get_qr_code
 
 try:
     MAIN_COUNTRY_CODE = Country.objects.filter(is_main=True).first().code
@@ -598,7 +599,7 @@ class BookingSerializer(serializers.ModelSerializer):
         write_only=True,
         required=False
     )
-    transactions = TransactionSerializer(many=True)
+    transactions = TransactionSerializer(many=True, read_only=True)
 
     class Meta:
         model = Booking
@@ -699,9 +700,9 @@ class BookingSerializer(serializers.ModelSerializer):
             users_emails = [user.email, ]
             send_email.delay(client_text, users_emails, object_id=f'{settings.DOMAIN_ADDRESS}booking_request/{booking.id}')
         else:
-            # txid = get_random_string(35)
-            # qr_code = get_qr_code(pay_to_book, txid)
-            # Transaction.objects.create(txid=txid, booking=booking, charge=pay_to_book, qr_code=qr_code)
+            txid = get_random_string(35)
+            qr_code = get_qr_code(pay_to_book, txid)
+            Transaction.objects.create(txid=txid, booking=booking, charge=pay_to_book, qr_code=qr_code)
 
             message_body = 'A new Booking Request is pending of Booking Fee payment to be sent.'
             users_ids = list(
@@ -1300,6 +1301,7 @@ class OperationBillingBaseSerializer(serializers.ModelSerializer):
     shipping_type = serializers.CharField(source='freight_rate.shipping_mode.shipping_type.title')
     shipping_mode = serializers.CharField(source='freight_rate.shipping_mode.title')
     status = serializers.SerializerMethodField()
+    transactions = TransactionSerializer(many=True, read_only=True)
 
     class Meta:
         model = Booking
@@ -1314,6 +1316,7 @@ class OperationBillingBaseSerializer(serializers.ModelSerializer):
             'status',
             'payment_due_by',
             'automatic_tracking',
+            'transactions',
         )
 
     def get_status(self, obj):

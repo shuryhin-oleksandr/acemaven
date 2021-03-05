@@ -856,6 +856,10 @@ class Transaction(models.Model):
         max_length=200,
         null=True,
     )
+    response = models.JSONField(
+        _('Response from getting payment'),
+        null=True,
+    )
 
 
 class PaymentData(models.Model):

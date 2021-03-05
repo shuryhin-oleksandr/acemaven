@@ -23,3 +23,6 @@
     Choose country and make it main for platform. Choose main and addtitional currencies. Add exchange rates. 
     Config the client platform and general settings.
     Config air and sea tracking api details.
+
+# Bank account settings:
+    Add Pix Setting to your Bank Account.

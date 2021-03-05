@@ -5,7 +5,6 @@ from django.contrib.gis.db import models as gis_models
 from django.core.validators import MinValueValidator, RegexValidator
 from django.utils.translation import gettext_lazy as _
 
-
 api_key_validator = RegexValidator(
     regex=r'^(\w|\d){4}-(\w|\d){4}-(\w|\d){4}-(\w|\d){4}-(\w|\d){4}$',
     message='Invalid format. Must be: 0000-0000-0000-0000',
@@ -537,7 +536,7 @@ class Port(gis_models.Model):
     )
 
     class Meta:
-        ordering = ('code', )
+        ordering = ('code',)
 
     def __str__(self):
         return self.display_name
@@ -750,6 +749,12 @@ class PixApiSetting(models.Model):
     basic_token = models.TextField(
         _('Basic token value'),
     )
+
+    is_prod = models.BooleanField(
+        _('Production environment is active'),
+        default=False,
+    )
+
     bank_account = models.OneToOneField(
         'core.BankAccount',
         on_delete=models.CASCADE,

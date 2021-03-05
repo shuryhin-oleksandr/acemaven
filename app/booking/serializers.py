@@ -10,13 +10,13 @@ from django.utils import timezone
 
 from app.booking.models import Surcharge, UsageFee, Charge, AdditionalSurcharge, FreightRate, Rate, CargoGroup, Quote, \
     Booking, Status, ShipmentDetails, CancellationReason, Track, TrackStatus, Transaction
-from app.booking.tasks import send_awb_number_to_air_tracking_api
+from app.booking.tasks import send_awb_number_to_air_tracking_api, check_payment
 from app.booking.utils import rate_surcharges_filter, calculate_freight_rate_charges, get_fees, generate_aceid, \
     create_message_for_track, get_shipping_type_titles
-from app.core.models import Shipper
+from app.core.models import Shipper, BankAccount
 from app.core.serializers import ShipperSerializer, BankAccountBaseSerializer
 from app.core.utils import get_average_company_rating, get_random_string
-from app.handling.models import ClientPlatformSetting, Currency, GeneralSetting, BillingExchangeRate
+from app.handling.models import ClientPlatformSetting, Currency, GeneralSetting, BillingExchangeRate, PixApiSetting
 from app.handling.serializers import ContainerTypesSerializer, CurrencySerializer, CarrierBaseSerializer, \
     PortSerializer, ShippingModeBaseSerializer, PackagingTypeBaseSerializer, ReleaseTypeSerializer
 from app.location.models import Country
@@ -24,7 +24,7 @@ from app.websockets.models import Notification
 from app.websockets.tasks import create_chat_for_operation, send_email
 from app.websockets.tasks import create_and_assign_notification
 from config import settings
-from core.util.payment import get_qr_code
+from app.core.util.payment import get_qr_code
 
 try:
     MAIN_COUNTRY_CODE = Country.objects.filter(is_main=True).first().code
@@ -698,16 +698,28 @@ class BookingSerializer(serializers.ModelSerializer):
                 object_id=booking.id,
             )
             users_emails = [user.email, ]
-            send_email.delay(client_text, users_emails, object_id=f'{settings.DOMAIN_ADDRESS}booking_request/{booking.id}')
+            send_email.delay(client_text, users_emails,
+                             object_id=f'{settings.DOMAIN_ADDRESS}booking_request/{booking.id}')
         else:
-            txid = get_random_string(35)
-            qr_code = get_qr_code(pay_to_book, txid)
+            bank_account = BankAccount.objects.filter(is_default=True, is_platforms=True).first()
+            pix_settings = bank_account.pix_api
+            txid = get_random_string(34)
+            qr_code = get_qr_code(amount=pay_to_book, txid=txid, pix_key=pix_settings.bank_account.pix_key,
+                                  qr_cob_uri=pix_settings.qr_cob_uri, developer_key=pix_settings.developer_key,
+                                  token_uri=pix_settings.token_uri, client_id=pix_settings.client_id,
+                                  client_secret=pix_settings.client_secret, basic_token=pix_settings.basic_token)
             Transaction.objects.create(txid=txid, booking=booking, charge=pay_to_book, qr_code=qr_code)
 
-            message_body = 'A new Booking Request is pending of Booking Fee payment to be sent.'
             users_ids = list(
                 company.users.filter(role__groups__name__in=('master', 'billing')).values_list('id', flat=True)
             )
+
+            check_payment.delay(txid=txid, booking_id=booking.id, token_uri=pix_settings.token_uri,
+                                client_id=pix_settings.client_id, client_secret=pix_settings.client_secret,
+                                basic_token=pix_settings.basic_token, base_url=pix_settings.base_url,
+                                developer_key=pix_settings.developer_key, users_ids=users_ids)
+
+            message_body = 'A new Booking Request is pending of Booking Fee payment to be sent.'
             create_and_assign_notification.delay(
                 Notification.REQUESTS,
                 message_body,
@@ -982,7 +994,7 @@ class TrackSerializer(serializers.ModelSerializer):
                     Notification.OPERATION,
                     object_id=booking.id,
                 )
-                emails =[booking.agent_contact_person.email, booking.client_contact_person.email, ]
+                emails = [booking.agent_contact_person.email, booking.client_contact_person.email, ]
                 send_email.delay(message_body, emails,
                                  object_id=f'{settings.DOMAIN_ADDRESS}shipment_departed/{booking.id}')
 
@@ -1301,7 +1313,6 @@ class OperationBillingBaseSerializer(serializers.ModelSerializer):
     shipping_type = serializers.CharField(source='freight_rate.shipping_mode.shipping_type.title')
     shipping_mode = serializers.CharField(source='freight_rate.shipping_mode.title')
     status = serializers.SerializerMethodField()
-    transactions = TransactionSerializer(many=True, read_only=True)
 
     class Meta:
         model = Booking

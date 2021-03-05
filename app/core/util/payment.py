@@ -69,17 +69,17 @@ result = [
 ]
 
 
-def get_credentials():
+def get_credentials(token_uri, client_id, client_secret, basic_token):
     response = requests.post(
-        'https://oauth.hm.bb.com.br/oauth/token',
+        f'{token_uri}',
         headers={
             'content-type': 'application/x-www-form-urlencoded',
-            'authorization': 'Basic ZXlKcFpDSTZJamt3WW1NMVlUZ3RObUU0TXkwMFkyRXpMU0lzSW1OdlpHbG5iMUIxWW14cFkyRmtiM0lpT2pBc0ltTnZaR2xuYjFOdlpuUjNZWEpsSWpveE1qSTNNQ3dpYzJWeGRXVnVZMmxoYkVsdWMzUmhiR0ZqWVc4aU9qRjk6ZXlKcFpDSTZJakZoTURKaFptWXRNMkl6TnkwME5HSXpMV0V3T0RndFpUUTJNVEZoTmprMU9HWXlNRGN6Tm1JNE4yUXRObVU0SWl3aVkyOWthV2R2VUhWaWJHbGpZV1J2Y2lJNk1Dd2lZMjlrYVdkdlUyOW1kSGRoY21VaU9qRXlNamN3TENKelpYRjFaVzVqYVdGc1NXNXpkR0ZzWVdOaGJ5STZNU3dpYzJWeGRXVnVZMmxoYkVOeVpXUmxibU5wWVd3aU9qRXNJbUZ0WW1sbGJuUmxJam9pYUc5dGIyeHZaMkZqWVc4aUxDSnBZWFFpT2pFMk1EZzNOemczTVRrMU5UZDk=',
+            'authorization': f'Basic {basic_token}',
         },
         data={
             'grant_type': 'client_credentials',
-            'client_id': 'eyJpZCI6IjkwYmM1YTgtNmE4My00Y2EzLSIsImNvZGlnb1B1YmxpY2Fkb3IiOjAsImNvZGlnb1NvZnR3YXJlIjoxMjI3MCwic2VxdWVuY2lhbEluc3RhbGFjYW8iOjF9',
-            'client_secret': 'eyJpZCI6IjFhMDJhZmYtM2IzNy00NGIzLWEwODgtZTQ2MTFhNjk1OGYyMDczNmI4N2QtNmU4IiwiY29kaWdvUHVibGljYWRvciI6MCwiY29kaWdvU29mdHdhcmUiOjEyMjcwLCJzZXF1ZW5jaWFsSW5zdGFsYWNhbyI6MSwic2VxdWVuY2lhbENyZWRlbmNpYWwiOjEsImFtYmllbnRlIjoiaG9tb2xvZ2FjYW8iLCJpYXQiOjE2MDg3Nzg3MTk1NTd9',
+            'client_id': f'{client_id}',
+            'client_secret': f'{client_secret}',
             'scope': 'cob.write cob.read pix.read pix.write',
         }
     )
@@ -89,10 +89,11 @@ def get_credentials():
         return response_json.get('access_token')
 
 
-def get_qr_code(amount, txid):
-    token = get_credentials()
+def get_qr_code(amount, txid, pix_key, qr_cob_uri, developer_key, token_uri, client_id, client_secret,
+                basic_token, is_prod=False):
+    token = get_credentials(token_uri, client_id, client_secret, basic_token)
     response = requests.put(
-        f'https://api.hm.bb.com.br/pix/v1/cobqrcode/{txid}?gw-dev-app-key=d27b377907ffab40136ee17da0050e56b941a5b4',
+        f'{qr_cob_uri}{txid}?gw{"-dev" if not is_prod else ""}-app-key={developer_key}',
         data=json.dumps({
             "calendario": {
                 "criacao": "2021-2-1T13:09:39.9200140000",
@@ -106,7 +107,7 @@ def get_qr_code(amount, txid):
             "valor": {
                 "original": f"{amount}"
             },
-            "chave": "testqrcode01@bb.com.br",
+            "chave": f"{pix_key}",
             "solicitacaoPagador": "Cobrança dos serviços prestados."
         }),
         headers={
@@ -119,9 +120,9 @@ def get_qr_code(amount, txid):
         return 'Have some problems getting QR-code'
 
 
-def change_amount(new_amount, txid, token):
+def change_amount(base_url, new_amount, developer_key, txid, token, is_prod=False):
     response = requests.patch(
-        f'https://api.hm.bb.com.br/pix/v1/cob/{txid}?gw-dev-app-key=d27b377907ffab40136ee17da0050e56b941a5b4',
+        f'{base_url}{txid}?gw{"-dev" if not is_prod else ""}-app-key={developer_key}',
         data=json.dumps({
             "valor": {
                 "original": f"{new_amount}"
@@ -133,23 +134,15 @@ def change_amount(new_amount, txid, token):
     return response.json()
 
 
-def review_payment(txid, token):
+def review_payment(base_url, developer_key, txid, token_uri, client_id, client_secret, basic_token, is_prod=False):
+    token = get_credentials(token_uri, client_id, client_secret, basic_token)
     response = requests.get(
-        f'https://api.hm.bb.com.br/pix/v1/cob/{txid}?gw-dev-app-key=d27b377907ffab40136ee17da0050e56b941a5b4',
+        f'{base_url}{txid}?gw{"-dev" if not is_prod else ""}-app-key={developer_key}',
         headers={
             'content-type': 'application/json',
             'authorization': f'Bearer {token}'}
     )
-    return response.json()
-
-
-def payment_operation(pay_to_book, new_amount):
-    token = get_credentials()
-    if token:
-        txid = get_random_string(35)
-        if qr_code := get_qr_code(pay_to_book, txid, token):
-            print("QR-code:", qr_code)
-            review = review_payment(txid, token)
-            print("Review payment:", review)
-            change = change_amount(new_amount, txid, token)
-            print("Change amount:", change)
+    try:
+        return response.json(), response.status_code
+    except Exception:
+        return "Invalid json"

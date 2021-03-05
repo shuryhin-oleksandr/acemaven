@@ -8,9 +8,8 @@ from django.http import HttpResponseRedirect
 
 from app.core.models import CustomUser, Company, BankAccount, Role, SignUpRequest, SignUpToken, Review
 
-from app.handling.models import LocalFee
+from app.handling.models import LocalFee, PixApiSetting
 from app.core.tasks import create_company_empty_fees
-
 
 MASTER_ACCOUNT_FIELDS = ['email', 'first_name', 'last_name', 'master_phone', 'position', ]
 EXCLUDE_FIELDS = ['id', 'approved', *MASTER_ACCOUNT_FIELDS]
@@ -18,8 +17,8 @@ EXCLUDE_FIELDS = ['id', 'approved', *MASTER_ACCOUNT_FIELDS]
 
 class LocalFeeInline(admin.TabularInline):
     template = 'core/local_fee_inline_tabular.html'
-    fields = ('shipping_mode', 'value_type', 'value', 'is_active', )
-    readonly_fields = ('shipping_mode', )
+    fields = ('shipping_mode', 'value_type', 'value', 'is_active',)
+    readonly_fields = ('shipping_mode',)
     radio_fields = {'value_type': admin.VERTICAL}
     model = LocalFee
     extra = 0
@@ -48,6 +47,11 @@ class BankAccountInline(admin.TabularInline):
     extra = 0
 
 
+class PixApiSettingInline(admin.StackedInline):
+    model = PixApiSetting
+    extra = 0
+
+
 @admin.register(SignUpToken)
 class SignUpTokenAdmin(admin.ModelAdmin):
     list_display = (
@@ -62,6 +66,7 @@ class BankAccountAdmin(admin.ModelAdmin):
         'bank_name',
         'is_default',
     )
+    inlines = [PixApiSettingInline, ]
     fieldsets = (
         (None, {
             'fields': (
@@ -82,6 +87,17 @@ class BankAccountAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         obj.is_platforms = True
         obj.save()
+        if not hasattr(BankAccount.objects.first(), 'pix_api'):
+            PixApiSetting.objects.create(
+                # base_url='https://api.hm.bb.com.br/pix/v1/cob/',
+                # token_uri='https://oauth.hm.bb.com.br/oauth/token',
+                # qr_cob_uri='https://api.hm.bb.com.br/pix/v1/cobqrcode/',
+                # client_id='eyJpZCI6IjkwYmM1YTgtNmE4My00Y2EzLSIsImNvZGlnb1B1YmxpY2Fkb3IiOjAsImNvZGlnb1NvZnR3YXJlIjoxMjI3MCwic2VxdWVuY2lhbEluc3RhbGFjYW8iOjF9',
+                # client_secret='eyJpZCI6IjFhMDJhZmYtM2IzNy00NGIzLWEwODgtZTQ2MTFhNjk1OGYyMDczNmI4N2QtNmU4IiwiY29kaWdvUHVibGljYWRvciI6MCwiY29kaWdvU29mdHdhcmUiOjEyMjcwLCJzZXF1ZW5jaWFsSW5zdGFsYWNhbyI6MSwic2VxdWVuY2lhbENyZWRlbmNpYWwiOjEsImFtYmllbnRlIjoiaG9tb2xvZ2FjYW8iLCJpYXQiOjE2MDg3Nzg3MTk1NTd9',
+                # developer_key='d27b377907ffab40136ee17da0050e56b941a5b4',
+                # basic_token='ZXlKcFpDSTZJamt3WW1NMVlUZ3RObUU0TXkwMFkyRXpMU0lzSW1OdlpHbG5iMUIxWW14cFkyRmtiM0lpT2pBc0ltTnZaR2xuYjFOdlpuUjNZWEpsSWpveE1qSTNNQ3dpYzJWeGRXVnVZMmxoYkVsdWMzUmhiR0ZqWVc4aU9qRjk6ZXlKcFpDSTZJakZoTURKaFptWXRNMkl6TnkwME5HSXpMV0V3T0RndFpUUTJNVEZoTmprMU9HWXlNRGN6Tm1JNE4yUXRObVU0SWl3aVkyOWthV2R2VUhWaWJHbGpZV1J2Y2lJNk1Dd2lZMjlrYVdkdlUyOW1kSGRoY21VaU9qRXlNamN3TENKelpYRjFaVzVqYVdGc1NXNXpkR0ZzWVdOaGJ5STZNU3dpYzJWeGRXVnVZMmxoYkVOeVpXUmxibU5wWVd3aU9qRXNJbUZ0WW1sbGJuUmxJam9pYUc5dGIyeHZaMkZqWVc4aUxDSnBZWFFpT2pFMk1EZzNOemczTVRrMU5UZDk=',
+                bank_account_id=obj.id,
+            )
 
 
 @admin.register(Role)
@@ -154,15 +170,16 @@ class CompanyAdmin(TabbedModelAdmin):
     tab_fee = (
         LocalFeeInline,
     )
+
     def get_queryset(self, request):
         return super().get_queryset(request)
+
     tabs = (
         ('Company', tab_company),
         ('Fees', tab_fee),
     )
 
     search_fields = ('id', 'name',)
-
 
 
 @admin.register(SignUpRequest)
@@ -218,7 +235,8 @@ class SignUpRequestAdmin(admin.ModelAdmin):
                         obj.approved = True
                         obj.save()
                         transaction.on_commit(lambda: create_company_empty_fees.delay(company.id))
-                    token = SignUpToken.objects.filter(user=get_user_model().objects.filter(email=obj.email).first()).first().token
+                    token = SignUpToken.objects.filter(
+                        user=get_user_model().objects.filter(email=obj.email).first()).first().token
                     self.message_user(request, "Company saved. Link to register master account was sent.")
                     self.message_user(request, f"Registration link - 192.168.1.33:8000/create-account?token={token}")
                     # TODO: Do not push test user message and token.

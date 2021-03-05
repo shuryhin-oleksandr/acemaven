@@ -519,6 +519,12 @@ class QuoteViesSet(PermissionClassByActionMixin,
                     ]
                     main_currency_code = Currency.objects.filter(is_main=True).first().code
 
+                    if container_type_ids_list:
+                        expiration_date = freight_rate.rates.filter(
+                            container_type__id__in=container_type_ids_list).aggregate(
+                            date=Min('expiration_date')).get('date').strftime('%d/%m/%Y')
+                        freight_rate_dict['expiration_date'] = expiration_date
+
                     result = calculate_freight_rate_charges(freight_rate,
                                                             freight_rate_dict,
                                                             cargo_groups,
@@ -647,13 +653,19 @@ class BookingViesSet(PermissionClassByActionMixin,
                 cargo_group_serializer.is_valid(raise_exception=True)
                 self.perform_create(cargo_group_serializer)
 
+        freight_rate_dict = FreightRateSearchListSerializer(instance.freight_rate).data
         main_currency_code = Currency.objects.filter(is_main=True).first().code
         container_type_ids_list = [
             group.get('container_type') for group in cargo_groups if 'container_type' in group
         ]
         try:
+            if container_type_ids_list:
+                expiration_date = instance.freight_rate.rates.filter(
+                    container_type__id__in=container_type_ids_list).aggregate(
+                    date=Min('expiration_date')).get('date').strftime('%d/%m/%Y')
+                freight_rate_dict['expiration_date'] = expiration_date
             new_charges = calculate_freight_rate_charges(instance.freight_rate,
-                                                         {},
+                                                         freight_rate_dict,
                                                          cargo_groups,
                                                          instance.freight_rate.shipping_mode,
                                                          main_currency_code,
@@ -846,12 +858,18 @@ class OperationViewSet(PermissionClassByActionMixin,
         serializer.is_valid(raise_exception=True)
         data = serializer.data
 
+        freight_rate_dict = FreightRateSearchListSerializer(operation.freight_rate).data
         cargo_groups = data.get('cargo_groups')
         container_type_ids_list = [group.get('container_type') for group in cargo_groups if 'container_type' in group]
         main_currency_code = Currency.objects.filter(is_main=True).first().code
         number_of_documents = data.get('number_of_documents')
+        if container_type_ids_list:
+            expiration_date = operation.freight_rate.rates.filter(
+                container_type__id__in=container_type_ids_list).aggregate(
+                date=Min('expiration_date')).get('date').strftime('%d/%m/%Y')
+            freight_rate_dict['expiration_date'] = expiration_date
         result = calculate_freight_rate_charges(operation.freight_rate,
-                                                {},
+                                                freight_rate_dict,
                                                 cargo_groups,
                                                 operation.freight_rate.shipping_mode,
                                                 main_currency_code,

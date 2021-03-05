@@ -87,15 +87,8 @@ class BankAccountAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         obj.is_platforms = True
         obj.save()
-        if not hasattr(BankAccount.objects.first(), 'pix_api'):
+        if hasattr(BankAccount.objects.first(), 'pix_api'):
             PixApiSetting.objects.create(
-                # base_url='https://api.hm.bb.com.br/pix/v1/cob/',
-                # token_uri='https://oauth.hm.bb.com.br/oauth/token',
-                # qr_cob_uri='https://api.hm.bb.com.br/pix/v1/cobqrcode/',
-                # client_id='eyJpZCI6IjkwYmM1YTgtNmE4My00Y2EzLSIsImNvZGlnb1B1YmxpY2Fkb3IiOjAsImNvZGlnb1NvZnR3YXJlIjoxMjI3MCwic2VxdWVuY2lhbEluc3RhbGFjYW8iOjF9',
-                # client_secret='eyJpZCI6IjFhMDJhZmYtM2IzNy00NGIzLWEwODgtZTQ2MTFhNjk1OGYyMDczNmI4N2QtNmU4IiwiY29kaWdvUHVibGljYWRvciI6MCwiY29kaWdvU29mdHdhcmUiOjEyMjcwLCJzZXF1ZW5jaWFsSW5zdGFsYWNhbyI6MSwic2VxdWVuY2lhbENyZWRlbmNpYWwiOjEsImFtYmllbnRlIjoiaG9tb2xvZ2FjYW8iLCJpYXQiOjE2MDg3Nzg3MTk1NTd9',
-                # developer_key='d27b377907ffab40136ee17da0050e56b941a5b4',
-                # basic_token='ZXlKcFpDSTZJamt3WW1NMVlUZ3RObUU0TXkwMFkyRXpMU0lzSW1OdlpHbG5iMUIxWW14cFkyRmtiM0lpT2pBc0ltTnZaR2xuYjFOdlpuUjNZWEpsSWpveE1qSTNNQ3dpYzJWeGRXVnVZMmxoYkVsdWMzUmhiR0ZqWVc4aU9qRjk6ZXlKcFpDSTZJakZoTURKaFptWXRNMkl6TnkwME5HSXpMV0V3T0RndFpUUTJNVEZoTmprMU9HWXlNRGN6Tm1JNE4yUXRObVU0SWl3aVkyOWthV2R2VUhWaWJHbGpZV1J2Y2lJNk1Dd2lZMjlrYVdkdlUyOW1kSGRoY21VaU9qRXlNamN3TENKelpYRjFaVzVqYVdGc1NXNXpkR0ZzWVdOaGJ5STZNU3dpYzJWeGRXVnVZMmxoYkVOeVpXUmxibU5wWVd3aU9qRXNJbUZ0WW1sbGJuUmxJam9pYUc5dGIyeHZaMkZqWVc4aUxDSnBZWFFpT2pFMk1EZzNOemczTVRrMU5UZDk=',
                 bank_account_id=obj.id,
             )
 

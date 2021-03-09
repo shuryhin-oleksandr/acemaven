@@ -2,8 +2,6 @@ import json
 
 import requests
 
-from app.core.utils import get_random_string
-
 result = [
     {'status': 'ATIVA', 'calendario': {'criacao': '2021-02-05T05:32:59.91-03:00', 'expiracao': '86400'},
      'location': 'qrcodepix-h.bb.com.br/pix/v2/34b93368-aeb0-4b90-bd8f-4f5fbfc7af76',
@@ -97,7 +95,7 @@ def get_qr_code(amount, txid, pix_key, qr_cob_uri, developer_key, token_uri, cli
         data=json.dumps({
             "calendario": {
                 "criacao": "2021-2-1T13:09:39.9200140000",
-                "expiracao": "86400"
+                "expiracao": "259200"
             },
             "txid": f"{txid}",
             "devedor": {
@@ -143,6 +141,7 @@ def review_payment(base_url, developer_key, txid, token_uri, client_id, client_s
             'authorization': f'Bearer {token}'}
     )
     try:
-        return response.json(), response.status_code
-    except Exception:
-        return "Invalid json"
+        data = response.json()
+    except ValueError:
+        data = "Invalid json"
+    return data, response.status_code

@@ -1,7 +1,7 @@
 from django_with_extra_context_admin.admin import DjangoWithExtraContextAdmin
 
 from app.booking.models import Surcharge, AdditionalSurcharge, FreightRate, TrackStatus, Direction, Booking, \
-    CargoGroup, ShipmentDetails
+    CargoGroup, ShipmentDetails, Transaction
 
 import logging
 
@@ -35,11 +35,21 @@ class FreightRateAdmin(admin.ModelAdmin):
     pass
 
 
+@admin.register(Transaction)
+class TransactionAdmin(admin.ModelAdmin):
+    pass
+
+
+class TransactionInline(admin.StackedInline):
+    model = Transaction
+    extra = 0
+
+
 @admin.register(Booking)
 class BookingAdmin(DjangoWithExtraContextAdmin, admin.ModelAdmin):
     search_fields = ('aceid',)
     django_with_extra_context_admin_view_name = False
-    inlines = (ShipmentDetailsInline, CargoGroupInline,)
+    inlines = (ShipmentDetailsInline, CargoGroupInline, TransactionInline)
     readonly_fields = ('date_created', 'date_accepted_by_agent',)
     change_form_template = 'booking/booking_changeform.html'
     list_display = (

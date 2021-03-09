@@ -50,7 +50,7 @@ def check_payment(txid, base_url, developer_key, booking_id, token_uri, client_i
                         Notification.REQUESTS,
                         message_body,
                         [client_contact_person_id, ],
-                        Notification.BILLING,
+                        Notification.OPERATIONS,
                         booking_id,
                     )
                     send_email.delay(message_body, [client_contact_person_email, ],
@@ -96,7 +96,7 @@ def check_payment(txid, base_url, developer_key, booking_id, token_uri, client_i
             user_id = booking.client_contact_person_id
             user_email = booking.client_contact_person.email
             message_body = f'Have some problems with payment on booking number {booking_id}, ' \
-                           f'please, contact support team'
+                           f'please, contact support team.'
             create_and_assign_notification(
                 Notification.REQUESTS,
                 message_body,

@@ -21,3 +21,4 @@ django-debug-toolbar==3.1.1
 jinja2==2.11.3
 Delorean==1.0.0
 django-with-extra-context-admin==0.1.0
+django-silk=0.5.2

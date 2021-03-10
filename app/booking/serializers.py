@@ -4,19 +4,19 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
 from django.db import transaction
-from django.db.models import Min, Q
+from django.db.models import Min
 from django.db.utils import ProgrammingError
 from django.utils import timezone
 
 from app.booking.models import Surcharge, UsageFee, Charge, AdditionalSurcharge, FreightRate, Rate, CargoGroup, Quote, \
-    Booking, Status, ShipmentDetails, CancellationReason, Track, TrackStatus
-from app.booking.tasks import send_awb_number_to_air_tracking_api
+    Booking, Status, ShipmentDetails, CancellationReason, Track, TrackStatus, Transaction
+from app.booking.tasks import send_awb_number_to_air_tracking_api, check_payment
 from app.booking.utils import rate_surcharges_filter, calculate_freight_rate_charges, get_fees, generate_aceid, \
     create_message_for_track, get_shipping_type_titles
-from app.core.models import Shipper
+from app.core.models import Shipper, BankAccount
 from app.core.serializers import ShipperSerializer, BankAccountBaseSerializer
-from app.core.utils import get_average_company_rating
-from app.handling.models import ClientPlatformSetting, Currency, GeneralSetting, BillingExchangeRate
+from app.core.utils import get_average_company_rating, get_random_string
+from app.handling.models import ClientPlatformSetting, Currency, GeneralSetting, BillingExchangeRate, PixApiSetting
 from app.handling.serializers import ContainerTypesSerializer, CurrencySerializer, CarrierBaseSerializer, \
     PortSerializer, ShippingModeBaseSerializer, PackagingTypeBaseSerializer, ReleaseTypeSerializer
 from app.location.models import Country
@@ -24,6 +24,7 @@ from app.websockets.models import Notification
 from app.websockets.tasks import create_chat_for_operation, send_email
 from app.websockets.tasks import create_and_assign_notification
 from config import settings
+from app.core.util.payment import get_qr_code
 
 try:
     MAIN_COUNTRY_CODE = Country.objects.filter(is_main=True).first().code
@@ -85,6 +86,16 @@ class UsageFeeSerializer(UserUpdateMixin, serializers.ModelSerializer):
             'charge',
         )
 
+class TransactionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Transaction
+        fields = (
+            'txid',
+            'status',
+            'charge',
+            'booking',
+            'qr_code',
+        )
 
 class UsageFeeEditSerializer(UserFullNameGetMixin, UsageFeeSerializer):
     container_type = ContainerTypesSerializer()
@@ -588,6 +599,7 @@ class BookingSerializer(serializers.ModelSerializer):
         write_only=True,
         required=False
     )
+    transactions = TransactionSerializer(many=True, read_only=True)
 
     class Meta:
         model = Booking
@@ -602,6 +614,7 @@ class BookingSerializer(serializers.ModelSerializer):
             'shipper',
             'existing_shipper',
             'cargo_groups',
+            'transactions',
         )
 
     def create(self, validated_data):
@@ -626,13 +639,19 @@ class BookingSerializer(serializers.ModelSerializer):
             group.get('container_type') for group in changed_cargo_groups if 'container_type' in group
         ]
         freight_rate = validated_data.get('freight_rate')
+        freight_rate_dict = FreightRateSearchListSerializer(freight_rate).data
         booking_fee, service_fee = get_fees(company, freight_rate.shipping_mode)
         number_of_documents = validated_data.get('number_of_documents')
         calculate_fees = ClientPlatformSetting.load().enable_booking_fee_payment
         try:
             with transaction.atomic():
+                if container_type_ids_list:
+                    expiration_date = freight_rate.rates.filter(
+                        container_type__id__in=container_type_ids_list).aggregate(
+                        date=Min('expiration_date')).get('date').strftime('%d/%m/%Y')
+                    freight_rate_dict['expiration_date'] = expiration_date
                 result = calculate_freight_rate_charges(freight_rate,
-                                                        {},
+                                                        freight_rate_dict,
                                                         changed_cargo_groups,
                                                         freight_rate.shipping_mode,
                                                         main_currency_code,
@@ -643,10 +662,12 @@ class BookingSerializer(serializers.ModelSerializer):
                                                         booking_fee=booking_fee,
                                                         service_fee=service_fee,
                                                         calculate_fees=calculate_fees, )
-                if result.get('pay_to_book', {}).get('pay_to_book', 0) == 0:
+                pay_to_book = result.get('pay_to_book', {}).get('pay_to_book', 0)
+                if pay_to_book == 0:
                     validated_data['is_paid'] = True
                     validated_data['status'] = Booking.REQUEST_RECEIVED
                     result.pop('pay_to_book', None)
+
                 validated_data['charges'] = result
                 validated_data['aceid'] = generate_aceid(freight_rate, company)
                 booking = super().create(validated_data)
@@ -683,12 +704,28 @@ class BookingSerializer(serializers.ModelSerializer):
                 object_id=booking.id,
             )
             users_emails = [user.email, ]
-            send_email.delay(client_text, users_emails, object_id=f'{settings.DOMAIN_ADDRESS}booking_request/{booking.id}')
+            send_email.delay(client_text, users_emails,
+                             object_id=f'{settings.DOMAIN_ADDRESS}booking_request/{booking.id}')
         else:
-            message_body = 'A new Booking Request is pending of Booking Fee payment to be sent.'
+            bank_account = BankAccount.objects.filter(is_default=True, is_platforms=True).first()
+            pix_settings = bank_account.pix_api
+            txid = get_random_string(34)
+            qr_code = get_qr_code(amount=pay_to_book, txid=txid, pix_key=pix_settings.bank_account.pix_key,
+                                  qr_cob_uri=pix_settings.qr_cob_uri, developer_key=pix_settings.developer_key,
+                                  token_uri=pix_settings.token_uri, client_id=pix_settings.client_id,
+                                  client_secret=pix_settings.client_secret, basic_token=pix_settings.basic_token)
+            Transaction.objects.create(txid=txid, booking=booking, charge=pay_to_book, qr_code=qr_code)
+
+            check_payment.delay(txid=txid, booking_id=booking.id, token_uri=pix_settings.token_uri,
+                                client_id=pix_settings.client_id, client_secret=pix_settings.client_secret,
+                                basic_token=pix_settings.basic_token, base_url=pix_settings.base_url,
+                                developer_key=pix_settings.developer_key,)
+
             users_ids = list(
                 company.users.filter(role__groups__name__in=('master', 'billing')).values_list('id', flat=True)
             )
+
+            message_body = 'A new Booking Request is pending of Booking Fee payment to be sent.'
             create_and_assign_notification.delay(
                 Notification.REQUESTS,
                 message_body,
@@ -963,7 +1000,7 @@ class TrackSerializer(serializers.ModelSerializer):
                     Notification.OPERATION,
                     object_id=booking.id,
                 )
-                emails =[booking.agent_contact_person.email, booking.client_contact_person.email, ]
+                emails = [booking.agent_contact_person.email, booking.client_contact_person.email, ]
                 send_email.delay(message_body, emails,
                                  object_id=f'{settings.DOMAIN_ADDRESS}shipment_departed/{booking.id}')
 
@@ -1067,14 +1104,20 @@ class OperationSerializer(serializers.ModelSerializer):
             group.get('container_type') for group in changed_cargo_groups if 'container_type' in group
         ]
         freight_rate = validated_data.get('freight_rate')
+        freight_rate_dict = FreightRateSearchListSerializer(freight_rate).data
         original_booking = validated_data.get('original_booking')
         validated_data['status'] = original_booking.status
         validated_data['agent_contact_person'] = original_booking.agent_contact_person
         validated_data['client_contact_person'] = original_booking.client_contact_person
         try:
             with transaction.atomic():
+                if container_type_ids_list:
+                    expiration_date = freight_rate.rates.filter(
+                        container_type__id__in=container_type_ids_list).aggregate(
+                        date=Min('expiration_date')).get('date').strftime('%d/%m/%Y')
+                    freight_rate_dict['expiration_date'] = expiration_date
                 result = calculate_freight_rate_charges(freight_rate,
-                                                        {},
+                                                        freight_rate_dict,
                                                         changed_cargo_groups,
                                                         freight_rate.shipping_mode,
                                                         main_currency_code,
@@ -1282,6 +1325,8 @@ class OperationBillingBaseSerializer(serializers.ModelSerializer):
     shipping_type = serializers.CharField(source='freight_rate.shipping_mode.shipping_type.title')
     shipping_mode = serializers.CharField(source='freight_rate.shipping_mode.title')
     status = serializers.SerializerMethodField()
+    transactions = TransactionSerializer(many=True, read_only=True)
+    freight_rate = FreightRateSearchListSerializer()
 
     class Meta:
         model = Booking
@@ -1296,6 +1341,9 @@ class OperationBillingBaseSerializer(serializers.ModelSerializer):
             'status',
             'payment_due_by',
             'automatic_tracking',
+            'transactions',
+            'freight_rate',
+            'number_of_documents',
         )
 
     def get_status(self, obj):

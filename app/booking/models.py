@@ -810,6 +810,9 @@ class ShipmentDetails(models.Model):
         null=True,
     )
 
+    class Meta:
+        verbose_name_plural = 'Shipment Details'
+
 
 class Transaction(models.Model):
     """
@@ -827,7 +830,7 @@ class Transaction(models.Model):
         (EXPIRED, 'Transaction expired'),
     )
 
-    transaction_id = models.CharField(
+    txid = models.CharField(
         _('Transaction identifier'),
         max_length=35,
     )
@@ -846,6 +849,15 @@ class Transaction(models.Model):
         'Booking',
         on_delete=models.SET_NULL,
         related_name='transactions',
+        null=True,
+    )
+    qr_code = models.CharField(
+        _('QR code '),
+        max_length=200,
+        null=True,
+    )
+    response = models.JSONField(
+        _('Response from getting payment'),
         null=True,
     )
 
@@ -942,6 +954,9 @@ class TrackStatus(models.Model):
         _('Add the status after changing shipment details'),
         default=False,
     )
+
+    class Meta:
+        verbose_name_plural = 'Track statuses'
 
 
 class Direction(models.Model):

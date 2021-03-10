@@ -8,9 +8,8 @@ from django.http import HttpResponseRedirect
 
 from app.core.models import CustomUser, Company, BankAccount, Role, SignUpRequest, SignUpToken, Review
 
-from app.handling.models import LocalFee
+from app.handling.models import LocalFee, PixApiSetting
 from app.core.tasks import create_company_empty_fees
-
 
 MASTER_ACCOUNT_FIELDS = ['email', 'first_name', 'last_name', 'master_phone', 'position', ]
 EXCLUDE_FIELDS = ['id', 'approved', *MASTER_ACCOUNT_FIELDS]
@@ -18,8 +17,8 @@ EXCLUDE_FIELDS = ['id', 'approved', *MASTER_ACCOUNT_FIELDS]
 
 class LocalFeeInline(admin.TabularInline):
     template = 'core/local_fee_inline_tabular.html'
-    fields = ('shipping_mode', 'value_type', 'value', 'is_active', )
-    readonly_fields = ('shipping_mode', )
+    fields = ('shipping_mode', 'value_type', 'value', 'is_active',)
+    readonly_fields = ('shipping_mode',)
     radio_fields = {'value_type': admin.VERTICAL}
     model = LocalFee
     extra = 0
@@ -48,6 +47,11 @@ class BankAccountInline(admin.TabularInline):
     extra = 0
 
 
+class PixApiSettingInline(admin.StackedInline):
+    model = PixApiSetting
+    extra = 0
+
+
 @admin.register(SignUpToken)
 class SignUpTokenAdmin(admin.ModelAdmin):
     list_display = (
@@ -62,6 +66,7 @@ class BankAccountAdmin(admin.ModelAdmin):
         'bank_name',
         'is_default',
     )
+    inlines = [PixApiSettingInline, ]
     fieldsets = (
         (None, {
             'fields': (
@@ -82,6 +87,10 @@ class BankAccountAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         obj.is_platforms = True
         obj.save()
+        if hasattr(BankAccount.objects.first(), 'pix_api'):
+            PixApiSetting.objects.create(
+                bank_account_id=obj.id,
+            )
 
 
 @admin.register(Role)
@@ -155,6 +164,9 @@ class CompanyAdmin(TabbedModelAdmin):
         LocalFeeInline,
     )
 
+    def get_queryset(self, request):
+        return super().get_queryset(request)
+
     tabs = (
         ('Company', tab_company),
         ('Fees', tab_fee),
@@ -216,7 +228,8 @@ class SignUpRequestAdmin(admin.ModelAdmin):
                         obj.approved = True
                         obj.save()
                         transaction.on_commit(lambda: create_company_empty_fees.delay(company.id))
-                    token = SignUpToken.objects.filter(user=get_user_model().objects.filter(email=obj.email).first()).first().token
+                    token = SignUpToken.objects.filter(
+                        user=get_user_model().objects.filter(email=obj.email).first()).first().token
                     self.message_user(request, "Company saved. Link to register master account was sent.")
                     self.message_user(request, f"Registration link - 192.168.1.33:8000/create-account?token={token}")
                     # TODO: Do not push test user message and token.

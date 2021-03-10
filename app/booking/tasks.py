@@ -10,12 +10,14 @@ from django.db.models import Q, Case, When, Value, CharField
 from django.db.utils import ProgrammingError
 from django.utils import timezone
 
-from app.booking.models import Quote, Booking, Track, CancellationReason, Surcharge, FreightRate, ShipmentDetails
+from app.booking.models import Quote, Booking, Track, CancellationReason, Surcharge, FreightRate, ShipmentDetails, \
+    Transaction
 from app.booking.utils import sea_event_codes
 from app.handling.models import ClientPlatformSetting, AirTrackingSetting, SeaTrackingSetting, GeneralSetting
 from app.location.models import Country
 from app.websockets.tasks import create_and_assign_notification, send_email
 from app.websockets.models import Notification
+from app.core.util.payment import review_payment
 
 logger = logging.getLogger("acemaven.task.logging")
 
@@ -23,6 +25,86 @@ try:
     MAIN_COUNTRY_CODE = Country.objects.filter(is_main=True).first().code
 except (ProgrammingError, AttributeError):
     MAIN_COUNTRY_CODE = 'BR'
+
+
+@celery_app.task(name='check_payment')
+def check_payment(txid, base_url, developer_key, booking_id, token_uri, client_id, client_secret, basic_token, ):
+    response, status_code = review_payment(base_url, developer_key, txid, token_uri, client_id, client_secret,
+                                           basic_token)
+    Transaction.objects.filter(txid=txid).update(response=response)
+
+    if isinstance(response, dict):
+        booking = Booking.objects.filter(id=booking_id).first()
+        if status_code == 200:
+            if 'pix' in response.keys() and response['status'] == 'CONCLUIDA':
+                check_charge = response['pix'][0]['valor']['original'] == Transaction.objects.filter(
+                    booking=booking_id).values_list('charge', flat=True).first()
+                if check_charge:
+                    booking.update(is_paid=True, status=Booking.REQUEST_RECEIVED)
+
+                    client_contact_person_id = booking.client_contact_person_id
+                    client_contact_person_email = booking.client_contact_person.email
+
+                    message_body = f'Payment on booking number {booking_id} is success'
+                    create_and_assign_notification(
+                        Notification.REQUESTS,
+                        message_body,
+                        [client_contact_person_id, ],
+                        Notification.OPERATIONS,
+                        booking_id,
+                    )
+                    send_email.delay(message_body, [client_contact_person_email, ],
+                                     object_id=f'{settings.DOMAIN_ADDRESS}payment_success/{booking.id}')
+
+                    agent_text = 'A new booking request has been received.'
+                    ff_company = booking.freight_rate.company
+                    users_ids = list(
+                        ff_company.users.filter(role__groups__name__in=('master', 'agent')).values_list('id', flat=True)
+                    )
+                    create_and_assign_notification.delay(
+                        Notification.REQUESTS,
+                        agent_text,
+                        users_ids,
+                        Notification.BOOKING,
+                        object_id=booking.id,
+                    )
+                    agent_emails = list(
+                        ff_company.users.filter(role__groups__name__in=('master', 'agent')).values_list('email',
+                                                                                                        flat=True)
+                    )
+                    send_email.delay(agent_text, agent_emails,
+                                     object_id=f'{settings.DOMAIN_ADDRESS}new_booking/{booking.id}')
+
+                    client_text = f'The booking request has been sent to "{ff_company.name}".'
+                    create_and_assign_notification.delay(
+                        Notification.REQUESTS,
+                        client_text,
+                        [client_contact_person_id, ],
+                        Notification.OPERATION,
+                        object_id=booking.id,
+                    )
+                    users_emails = [client_contact_person_email, ]
+                    send_email.delay(client_text, users_emails,
+                                     object_id=f'{settings.DOMAIN_ADDRESS}booking_request/{booking.id}')
+
+                else:
+                    check_payment.apply_async(countdown=7200, expires=259200)
+            else:
+                check_payment.apply_async(countdown=7200, expires=259200)
+        else:
+
+            user_id = booking.client_contact_person_id
+            user_email = booking.client_contact_person.email
+            message_body = f'Have some problems with payment on booking number {booking_id}, ' \
+                           f'please, contact support team.'
+            create_and_assign_notification(
+                Notification.REQUESTS,
+                message_body,
+                [user_id, ],
+                Notification.BILLING,
+                booking_id,
+            )
+            send_email(message_body, [user_email, ], object_id=f'{settings.DOMAIN_ADDRESS}booking/{booking.id}')
 
 
 @celery_app.task(name='archive_quotes')
@@ -189,7 +271,8 @@ def track_confirmed_sea_operations():
                                 Notification.OPERATION,
                                 object_id=operation.id,
                             )
-                            send_email.delay(message_body, [operation.agent_contact_person.email, operation.client_contact_person.email, ],
+                            send_email.delay(message_body, [operation.agent_contact_person.email,
+                                                            operation.client_contact_person.email, ],
                                              object_id=f'{settings.DOMAIN_ADDRESS}operation/{operation.id}')
 
                     event['location'] = next(

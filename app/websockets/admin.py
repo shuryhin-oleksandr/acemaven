@@ -7,6 +7,7 @@ from django.contrib import admin
 
 @admin.register(Ticket)
 class TicketChatAdmin(admin.ModelAdmin):
+    readonly_fields = ('topic', 'description', 'category', 'chat',)
     change_form_template = 'websockets/model_changeform.html'
     list_display = (
         'category',
@@ -14,7 +15,6 @@ class TicketChatAdmin(admin.ModelAdmin):
         'description',
         'status',
         'chat',
-        'aceid',
         'unread_messages',
     )
     field_order = (
@@ -42,7 +42,8 @@ class TicketChatAdmin(admin.ModelAdmin):
 
     def unread_messages(self, obj):
         if ChatPermission.objects.filter(chat_id=obj.chat_id, user_id=self.request.user.id):
-            response = ChatPermission.objects.filter(chat_id=obj.chat_id, user_id=self.request.user.id).values_list('unread_messages', flat=True).first()
+            response = ChatPermission.objects.filter(chat_id=obj.chat_id, user_id=self.request.user.id).values_list(
+                'unread_messages', flat=True).first()
         else:
             response = "You are not in chat"
         return response

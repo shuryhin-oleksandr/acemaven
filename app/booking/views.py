@@ -33,7 +33,7 @@ from app.booking.utils import date_format, wm_calculate, freight_rate_search, ca
     get_fees, surcharge_search, make_copy_of_surcharge, make_copy_of_freight_rate, \
     apply_operation_select_prefetch_related
 from app.core.mixins import PermissionClassByActionMixin
-from app.core.models import Company
+from app.core.models import Company, BankAccount
 from app.core.permissions import IsMasterOrAgent, IsClientCompany, IsAgentCompany
 from app.core.serializers import ReviewBaseSerializer
 from app.handling.models import Port, Currency, ClientPlatformSetting
@@ -41,6 +41,7 @@ from app.location.models import Country
 from app.websockets.models import Notification
 from app.websockets.tasks import create_and_assign_notification, reassign_confirmed_operation_notifications, \
     delete_accepted_booking_notifications, send_email
+from app.booking.tasks import change_charge
 from config import settings
 
 try:
@@ -352,7 +353,7 @@ class FreightRateViesSet(PermissionClassByActionMixin,
         data = serializer.data
 
         cargo_groups = data.get('cargo_groups')
-        container_type_ids_list = [group.get('container_type') for group in cargo_groups if 'container_type' in group]
+        container_type_ids_list = [group.get('container_type') for group in cargo_groups if group.get('container_type')]
         date_from = date_format(data.get('date_from'))
         date_to = date_format(data.get('date_to'))
         freight_rates, shipping_mode = freight_rate_search(data)
@@ -370,7 +371,8 @@ class FreightRateViesSet(PermissionClassByActionMixin,
         for freight_rate in freight_rates:
             freight_rate_dict = FreightRateSearchListSerializer(freight_rate).data
             if container_type_ids_list:
-                expiration_date = freight_rate.rates.filter(container_type__id__in=container_type_ids_list).aggregate(
+                condition = {} if not shipping_mode.has_freight_containers else {'container_type__id__in': container_type_ids_list}
+                expiration_date = freight_rate.rates.filter(**condition).aggregate(
                     date=Min('expiration_date')).get('date').strftime('%d/%m/%Y')
                 freight_rate_dict['expiration_date'] = expiration_date
 
@@ -515,13 +517,14 @@ class QuoteViesSet(PermissionClassByActionMixin,
                     freight_rate_dict = FreightRateSearchListSerializer(freight_rate).data
                     cargo_groups = CargoGroupSerializer(quote.quote_cargo_groups, many=True).data
                     container_type_ids_list = [
-                        group.get('container_type') for group in cargo_groups if 'container_type' in group
+                        group.get('container_type') for group in cargo_groups if group.get('container_type')
                     ]
                     main_currency_code = Currency.objects.filter(is_main=True).first().code
 
                     if container_type_ids_list:
-                        expiration_date = freight_rate.rates.filter(
-                            container_type__id__in=container_type_ids_list).aggregate(
+                        condition = {} if not freight_rate.shipping_mode.has_freight_containers else {
+                            'container_type__id__in': container_type_ids_list}
+                        expiration_date = freight_rate.rates.filter(**condition).aggregate(
                             date=Min('expiration_date')).get('date').strftime('%d/%m/%Y')
                         freight_rate_dict['expiration_date'] = expiration_date
 
@@ -630,6 +633,7 @@ class BookingViesSet(PermissionClassByActionMixin,
 
     @transaction.atomic
     def update(self, request, *args, **kwargs):
+        company = self.request.user.get_company()
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
         data = request.data
@@ -656,25 +660,46 @@ class BookingViesSet(PermissionClassByActionMixin,
         freight_rate_dict = FreightRateSearchListSerializer(instance.freight_rate).data
         main_currency_code = Currency.objects.filter(is_main=True).first().code
         container_type_ids_list = [
-            group.get('container_type') for group in cargo_groups if 'container_type' in group
+            group.get('container_type') for group in cargo_groups if group.get('container_type')
         ]
+        booking_fee, service_fee = get_fees(company, instance.freight_rate.shipping_mode)
+        calculate_fees = ClientPlatformSetting.load().enable_booking_fee_payment
         try:
             if container_type_ids_list:
-                expiration_date = instance.freight_rate.rates.filter(
-                    container_type__id__in=container_type_ids_list).aggregate(
+                condition = {} if not instance.freight_rate.shipping_mode.has_freight_containers else {
+                    'container_type__id__in': container_type_ids_list}
+                expiration_date = instance.freight_rate.rates.filter(**condition).aggregate(
                     date=Min('expiration_date')).get('date').strftime('%d/%m/%Y')
                 freight_rate_dict['expiration_date'] = expiration_date
-            new_charges = calculate_freight_rate_charges(instance.freight_rate,
-                                                         freight_rate_dict,
-                                                         cargo_groups,
-                                                         instance.freight_rate.shipping_mode,
-                                                         main_currency_code,
-                                                         instance.date_from,
-                                                         instance.date_to,
-                                                         container_type_ids_list,
-                                                         number_of_documents=instance.number_of_documents, )
+
+            kwargs = {'freight_rate': instance.freight_rate,
+                      'freight_rate_dict': freight_rate_dict,
+                      'cargo_groups': cargo_groups,
+                      'shipping_mode': instance.freight_rate.shipping_mode,
+                      'main_currency_code': main_currency_code,
+                      'date_from': instance.date_from,
+                      'date_to': instance.date_to,
+                      'container_type_ids_list': container_type_ids_list,
+                      'number_of_documents': instance.number_of_documents,}
+
+            if not instance.is_paid:
+                kwargs.update(booking_fee=booking_fee, service_fee=service_fee, calculate_fees=calculate_fees)
+            new_charges = calculate_freight_rate_charges(**kwargs)
             instance.charges = new_charges
             instance.save()
+
+            if not instance.is_paid:
+                bank_account = BankAccount.objects.filter(is_default=True, is_platforms=True).first()
+                pix_settings = bank_account.pix_api
+                txid = instance.transactions.values_list('txid', flat=True).first()
+                new_charge = new_charges.get('pay_to_book').get('pay_to_book')
+                change_charge.delay(base_url=pix_settings.base_url, new_amount=new_charge,
+                                    developer_key=pix_settings.developer_key, txid=txid,
+                                    is_prod=pix_settings.is_prod, booking_id=instance.id,
+                                    token_uri=pix_settings.token_uri, client_id=pix_settings.client_id,
+                                    client_secret=pix_settings.client_secret, basic_token=pix_settings.basic_token,
+                                    )
+
         except AttributeError:
             return Response(
                 data={'error': 'date_from or date_to mismatch with surcharges or freight rate dates.'},
@@ -860,12 +885,13 @@ class OperationViewSet(PermissionClassByActionMixin,
 
         freight_rate_dict = FreightRateSearchListSerializer(operation.freight_rate).data
         cargo_groups = data.get('cargo_groups')
-        container_type_ids_list = [group.get('container_type') for group in cargo_groups if 'container_type' in group]
+        container_type_ids_list = [group.get('container_type') for group in cargo_groups if group.get('container_type')]
         main_currency_code = Currency.objects.filter(is_main=True).first().code
         number_of_documents = data.get('number_of_documents')
         if container_type_ids_list:
-            expiration_date = operation.freight_rate.rates.filter(
-                container_type__id__in=container_type_ids_list).aggregate(
+            condition = {} if not operation.freight_rate.shipping_mode.has_freight_containers else {
+                'container_type__id__in': container_type_ids_list}
+            expiration_date = operation.freight_rate.rates.filter(**condition).aggregate(
                 date=Min('expiration_date')).get('date').strftime('%d/%m/%Y')
             freight_rate_dict['expiration_date'] = expiration_date
         result = calculate_freight_rate_charges(operation.freight_rate,

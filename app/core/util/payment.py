@@ -1,6 +1,7 @@
 import json
 
 import requests
+from rest_framework import serializers
 
 result = [
     {'status': 'ATIVA', 'calendario': {'criacao': '2021-02-05T05:32:59.91-03:00', 'expiracao': '86400'},
@@ -112,13 +113,14 @@ def get_qr_code(amount, txid, pix_key, qr_cob_uri, developer_key, token_uri, cli
             'content-type': 'application/json',
             'authorization': f'Bearer {token}'}
     )
-    if qr_code := response.json()['textoImagemQRcode']:
+    if qr_code := response.json().get('textoImagemQRcode'):
         return qr_code
     else:
-        return 'Have some problems getting QR-code'
+        raise serializers.ValidationError({'error': 'Some issues occurred during payment process, please contact support or retry.'})
 
 
-def change_amount(base_url, new_amount, developer_key, txid, token, is_prod=False):
+def change_amount(base_url, new_amount, developer_key, txid, is_prod, token_uri, client_id, client_secret, basic_token):
+    token = get_credentials(token_uri, client_id, client_secret, basic_token)
     response = requests.patch(
         f'{base_url}{txid}?gw{"-dev" if not is_prod else ""}-app-key={developer_key}',
         data=json.dumps({
@@ -129,7 +131,11 @@ def change_amount(base_url, new_amount, developer_key, txid, token, is_prod=Fals
             'content-type': 'application/json',
             'authorization': f'Bearer {token}'}
     )
-    return response.json()
+    try:
+        data = response.json()
+    except ValueError:
+        data = "Invalid json"
+    return data, response.status_code
 
 
 def review_payment(base_url, developer_key, txid, token_uri, client_id, client_secret, basic_token, is_prod=False):

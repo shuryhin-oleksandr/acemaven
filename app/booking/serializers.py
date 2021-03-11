@@ -617,6 +617,7 @@ class BookingSerializer(serializers.ModelSerializer):
             'transactions',
         )
 
+    @transaction.atomic
     def create(self, validated_data):
         user = self.context['request'].user
         company = user.get_company()
@@ -636,7 +637,7 @@ class BookingSerializer(serializers.ModelSerializer):
         changed_cargo_groups = CargoGroupSerializer(cargo_groups, many=True).data
         main_currency_code = Currency.objects.filter(is_main=True).first().code
         container_type_ids_list = [
-            group.get('container_type') for group in changed_cargo_groups if 'container_type' in group
+            group.get('container_type') for group in changed_cargo_groups if group.get('container_type')
         ]
         freight_rate = validated_data.get('freight_rate')
         freight_rate_dict = FreightRateSearchListSerializer(freight_rate).data
@@ -646,8 +647,9 @@ class BookingSerializer(serializers.ModelSerializer):
         try:
             with transaction.atomic():
                 if container_type_ids_list:
-                    expiration_date = freight_rate.rates.filter(
-                        container_type__id__in=container_type_ids_list).aggregate(
+                    condition = {} if not freight_rate.shipping_mode.has_freight_containers else {
+                        'container_type__id__in': container_type_ids_list}
+                    expiration_date = freight_rate.rates.filter(**condition).aggregate(
                         date=Min('expiration_date')).get('date').strftime('%d/%m/%Y')
                     freight_rate_dict['expiration_date'] = expiration_date
                 result = calculate_freight_rate_charges(freight_rate,
@@ -1101,7 +1103,7 @@ class OperationSerializer(serializers.ModelSerializer):
         number_of_documents = validated_data.get('number_of_documents')
         main_currency_code = Currency.objects.filter(is_main=True).first().code
         container_type_ids_list = [
-            group.get('container_type') for group in changed_cargo_groups if 'container_type' in group
+            group.get('container_type') for group in changed_cargo_groups if group.get('container_type')
         ]
         freight_rate = validated_data.get('freight_rate')
         freight_rate_dict = FreightRateSearchListSerializer(freight_rate).data
@@ -1112,8 +1114,9 @@ class OperationSerializer(serializers.ModelSerializer):
         try:
             with transaction.atomic():
                 if container_type_ids_list:
-                    expiration_date = freight_rate.rates.filter(
-                        container_type__id__in=container_type_ids_list).aggregate(
+                    condition = {} if not freight_rate.shipping_mode.has_freight_containers else {
+                        'container_type__id__in': container_type_ids_list}
+                    expiration_date = freight_rate.rates.filter(**condition).aggregate(
                         date=Min('expiration_date')).get('date').strftime('%d/%m/%Y')
                     freight_rate_dict['expiration_date'] = expiration_date
                 result = calculate_freight_rate_charges(freight_rate,

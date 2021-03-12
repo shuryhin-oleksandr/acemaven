@@ -17,7 +17,7 @@ from app.booking.filters import SurchargeFilterSet, FreightRateFilterSet, QuoteF
     TrackStatusFilterSet, OperationBillingFilterSet
 from app.booking.mixins import FeeGetQuerysetMixin
 from app.booking.models import Surcharge, UsageFee, Charge, FreightRate, Rate, Quote, Booking, Status, \
-    ShipmentDetails, CancellationReason, CargoGroup, Track, TrackStatus, PaymentData
+    ShipmentDetails, CancellationReason, CargoGroup, Track, TrackStatus, PaymentData, Transaction
 from app.booking.serializers import SurchargeSerializer, SurchargeEditSerializer, SurchargeListSerializer, \
     SurchargeRetrieveSerializer, UsageFeeSerializer, ChargeSerializer, FreightRateListSerializer, \
     SurchargeCheckDatesSerializer, FreightRateEditSerializer, FreightRateSerializer, FreightRateRetrieveSerializer, \
@@ -348,6 +348,9 @@ class FreightRateViesSet(PermissionClassByActionMixin,
 
     @action(methods=['post'], detail=False, url_path='search')
     def freight_rate_search_and_calculate(self, request, *args, **kwargs):
+        company = request.user.get_company()
+        if company.disabled:
+            return Response(data=[], status=status.HTTP_200_OK)
         serializer = FreightRateSearchSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.data
@@ -363,7 +366,6 @@ class FreightRateViesSet(PermissionClassByActionMixin,
         calculate_fees = client_platform_settings.enable_booking_fee_payment
         freight_rates = freight_rates.order_by('transit_time').distinct()[:number_of_results]
 
-        company = request.user.get_company()
         booking_fee, service_fee = get_fees(company, shipping_mode)
         main_currency_code = Currency.objects.filter(is_main=True).first().code
         results = []
@@ -463,8 +465,9 @@ class QuoteViesSet(PermissionClassByActionMixin,
         user = request.user
         company = user.get_company()
 
-        queryset = self.get_queryset().filter(is_active=True).exclude(statuses__status=Status.REJECTED,
-                                                                      statuses__company=company)
+        queryset = self.get_queryset().filter(is_active=True, company__disabled=False)\
+                                      .exclude(statuses__status=Status.REJECTED,
+                                               statuses__company=company)
         submitted_air = queryset.filter(shipping_mode__shipping_type__title='air',
                                         statuses__status=Status.SUBMITTED,
                                         freight_rates__company=company)
@@ -693,6 +696,7 @@ class BookingViesSet(PermissionClassByActionMixin,
                 pix_settings = bank_account.pix_api
                 txid = instance.transactions.values_list('txid', flat=True).first()
                 new_charge = new_charges.get('pay_to_book').get('pay_to_book')
+                instance.transactions.filter(booking=instance.id, status=Transaction.OPENED).update(charge=new_charge)
                 change_charge.delay(base_url=pix_settings.base_url, new_amount=new_charge,
                                     developer_key=pix_settings.developer_key, txid=txid,
                                     is_prod=pix_settings.is_prod, booking_id=instance.id,

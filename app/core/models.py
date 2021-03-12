@@ -147,6 +147,11 @@ class Company(models.Model):
         (CLIENT, 'Client'),
     )
 
+    disabled = models.BooleanField(
+        _('Disable functionality'),
+        default=False
+    )
+
     type = models.CharField(
         _('Company Type'),
         max_length=100,

@@ -1,7 +1,10 @@
 import datetime
 import logging
+from decimal import Decimal
+
 import requests
 from django.contrib.auth import get_user_model
+from django.utils.timezone import now
 
 from app.core.models import Company
 from config import settings
@@ -37,10 +40,13 @@ def check_payment(txid, base_url, developer_key, booking_id, token_uri, client_i
         booking = Booking.objects.filter(id=booking_id).first()
         if status_code == 200:
             if 'pix' in response.keys() and response['status'] == 'CONCLUIDA':
-                check_charge = response['pix'][0]['valor']['original'] == Transaction.objects.filter(
+                check_charge = Decimal(response['pix'][0]['valor']) == Transaction.objects.filter(
                     booking=booking_id).values_list('charge', flat=True).first()
                 if check_charge:
-                    booking.update(is_paid=True, status=Booking.REQUEST_RECEIVED)
+                    booking.is_paid = True
+                    booking.status = Booking.REQUEST_RECEIVED
+                    booking.save()
+                    booking.transactions.filter(status=Transaction.OPENED).update(status=Transaction.FINISHED)
 
                     client_contact_person_id = booking.client_contact_person_id
                     client_contact_person_email = booking.client_contact_person.email
@@ -86,11 +92,20 @@ def check_payment(txid, base_url, developer_key, booking_id, token_uri, client_i
                     users_emails = [client_contact_person_email, ]
                     send_email(client_text, users_emails,
                                object_id=f'{settings.DOMAIN_ADDRESS}booking_request/{booking.id}')
+                    print("Payment success")
 
                 else:
-                    check_payment.apply_async((txid, base_url, developer_key, booking_id, token_uri, client_id, client_secret, basic_token,), countdown=7200, expires=259200)
+                    print("Charge not match")
+                    check_payment.apply_async((txid, base_url, developer_key, booking_id, token_uri,
+                                              client_id, client_secret, basic_token,),
+                                              eta=now() + datetime.timedelta(seconds=7200),
+                                              expires=259200)
             else:
-                check_payment.apply_async((txid, base_url, developer_key, booking_id, token_uri, client_id, client_secret, basic_token,), countdown=7200, expires=259200)
+                print("No pix/status in response")
+                check_payment.apply_async((txid, base_url, developer_key, booking_id, token_uri,
+                                          client_id, client_secret, basic_token,),
+                                          eta=now() + datetime.timedelta(seconds=7200),
+                                          expires=259200)
         else:
 
             user_id = booking.client_contact_person_id

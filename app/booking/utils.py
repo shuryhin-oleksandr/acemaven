@@ -100,7 +100,7 @@ def wm_calculate(data, shipping_type=None):
 
 
 def add_currency_value(totals, code, subtotal):
-    totals[code] = totals[code] + subtotal if code in totals else subtotal
+    totals[code] = round((totals[code] + subtotal), 1) if code in totals else round(subtotal, 1)
 
 
 def calculate_additional_surcharges(totals,
@@ -449,7 +449,9 @@ def freight_rate_search(data, company=None):
         .filter(**data,
                 is_active=True,
                 temporary=False,
-                is_archived=False,)
+                is_archived=False,
+                company__disabled=False
+                )
 
     queryset = []
 

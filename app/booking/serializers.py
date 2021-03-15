@@ -680,7 +680,7 @@ class BookingSerializer(serializers.ModelSerializer):
         except Exception as error:
             raise serializers.ValidationError({'error': error})
         if booking.is_paid:
-            agent_text = 'A new booking request has been received.'
+            agent_text = f'A new booking request on number {booking.aceid} has been received.'
             ff_company = booking.freight_rate.company
             users_ids = list(
                 ff_company.users.filter(role__groups__name__in=('master', 'agent')).values_list('id', flat=True)
@@ -697,7 +697,7 @@ class BookingSerializer(serializers.ModelSerializer):
             )
             send_email.delay(agent_text, agent_emails, object_id=f'{settings.DOMAIN_ADDRESS}new_booking/{booking.id}')
 
-            client_text = f'The booking request has been sent to "{ff_company.name}".'
+            client_text = f'The booking request on number {booking.aceid} has been sent to "{ff_company.name}".'
             create_and_assign_notification.delay(
                 Notification.REQUESTS,
                 client_text,
@@ -717,7 +717,6 @@ class BookingSerializer(serializers.ModelSerializer):
                                   token_uri=pix_settings.token_uri, client_id=pix_settings.client_id,
                                   client_secret=pix_settings.client_secret, basic_token=pix_settings.basic_token)
             Transaction.objects.create(txid=txid, booking=booking, charge=pay_to_book, qr_code=qr_code)
-
             check_payment.delay(txid=txid, booking_id=booking.id, token_uri=pix_settings.token_uri,
                                 client_id=pix_settings.client_id, client_secret=pix_settings.client_secret,
                                 basic_token=pix_settings.basic_token, base_url=pix_settings.base_url,
@@ -727,7 +726,8 @@ class BookingSerializer(serializers.ModelSerializer):
                 company.users.filter(role__groups__name__in=('master', 'billing')).values_list('id', flat=True)
             )
 
-            message_body = 'A new Booking Request is pending of Booking Fee payment to be sent.'
+            message_body = f'A new Booking Request on number {booking.aceid} ' \
+                           f'is pending of Booking Fee payment to be sent.'
             create_and_assign_notification.delay(
                 Notification.REQUESTS,
                 message_body,

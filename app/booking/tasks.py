@@ -52,17 +52,17 @@ def check_payment(txid, base_url, developer_key, booking_id, token_uri, client_i
                     client_contact_person_email = booking.client_contact_person.email
 
                     message_body = f'Payment on booking number {booking.aceid} is success'
-                    create_and_assign_notification(
+                    create_and_assign_notification.delay(
                         Notification.REQUESTS,
                         message_body,
                         [client_contact_person_id, ],
                         Notification.OPERATION,
                         booking_id,
                     )
-                    send_email(message_body, [client_contact_person_email, ],
+                    send_email.delay(message_body, [client_contact_person_email, ],
                                object_id=f'{settings.DOMAIN_ADDRESS}payment_success/{booking.id}')
 
-                    agent_text = 'A new booking request has been received.'
+                    agent_text = f'A new booking request {booking.aceid} has been received.'
                     ff_company = booking.freight_rate.company
                     users_ids = list(
                         ff_company.users.filter(role__groups__name__in=('master', 'agent')).values_list('id', flat=True)
@@ -78,10 +78,10 @@ def check_payment(txid, base_url, developer_key, booking_id, token_uri, client_i
                         ff_company.users.filter(role__groups__name__in=('master', 'agent')).values_list('email',
                                                                                                         flat=True)
                     )
-                    send_email(agent_text, agent_emails,
+                    send_email.delay(agent_text, agent_emails,
                                object_id=f'{settings.DOMAIN_ADDRESS}new_booking/{booking.id}')
 
-                    client_text = f'The booking request has been sent to "{ff_company.name}".'
+                    client_text = f'The booking request {booking.aceid} has been sent to "{ff_company.name}".'
                     create_and_assign_notification.delay(
                         Notification.REQUESTS,
                         client_text,
@@ -90,7 +90,7 @@ def check_payment(txid, base_url, developer_key, booking_id, token_uri, client_i
                         object_id=booking.id,
                     )
                     users_emails = [client_contact_person_email, ]
-                    send_email(client_text, users_emails,
+                    send_email.delay(client_text, users_emails,
                                object_id=f'{settings.DOMAIN_ADDRESS}booking_request/{booking.id}')
                     print("Payment success")
 
@@ -104,22 +104,29 @@ def check_payment(txid, base_url, developer_key, booking_id, token_uri, client_i
                 print("No pix/status in response")
                 check_payment.apply_async((txid, base_url, developer_key, booking_id, token_uri,
                                           client_id, client_secret, basic_token,),
-                                          eta=now() + datetime.timedelta(seconds=7200),
+                                          eta=now() + datetime.timedelta(days=1),
                                           expires=259200)
         else:
-
             user_id = booking.client_contact_person_id
             user_email = booking.client_contact_person.email
             message_body = f'Have some problems with payment on booking number {booking.aceid}, ' \
                            f'please, contact support team.'
-            create_and_assign_notification(
+            create_and_assign_notification.delay(
                 Notification.REQUESTS,
                 message_body,
                 [user_id, ],
                 Notification.BILLING,
                 booking_id,
             )
-            send_email(message_body, [user_email, ], object_id=f'{settings.DOMAIN_ADDRESS}booking/{booking.id}')
+            send_email.delay(message_body, [user_email, ], object_id=f'{settings.DOMAIN_ADDRESS}booking/{booking.id}')
+
+
+@celery_app.task(name='test')
+def test():
+    print('test')
+    test.apply_async(eta=now() + datetime.timedelta(days=1),
+                                          expires=259200)
+
 
 
 @celery_app.task(name='change_charge')
@@ -134,26 +141,26 @@ def change_charge(base_url, new_amount, developer_key, txid, is_prod, booking_id
     if isinstance(response, dict):
         if status_code == 201:
             message_body = f'Update charge on booking number {booking.aceid} is success'
-            create_and_assign_notification(
+            create_and_assign_notification.delay(
                 Notification.OPERATIONS,
                 message_body,
                 [client_contact_person_id, ],
                 Notification.OPERATION,
                 booking_id,
             )
-            send_email(message_body, [client_contact_person_email, ],
+            send_email.delay(message_body, [client_contact_person_email, ],
                        object_id=f'{settings.DOMAIN_ADDRESS}update_payment_success/{booking.id}')
         else:
             message_body = f'Have some problems with updating charge on booking number {booking.aceid}, ' \
                            f'please, contact support team.'
-            create_and_assign_notification(
+            create_and_assign_notification.delay(
                 Notification.OPERATIONS,
                 message_body,
                 [client_contact_person_id, ],
                 Notification.BILLING,
                 booking_id,
             )
-            send_email(message_body, [client_contact_person_email, ],
+            send_email.delay(message_body, [client_contact_person_email, ],
                        object_id=f'{settings.DOMAIN_ADDRESS}update_payment_problems/{booking.id}')
 
 

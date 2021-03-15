@@ -51,7 +51,7 @@ INSTALLED_APPS = [
     'tabbed_admin',
     'debug_toolbar',
     'channels',
-    'silk',
+    'admin_reorder',
 
     'app.core',
     'app.booking',
@@ -91,10 +91,10 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'admin_reorder.middleware.ModelAdminReorder',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'silk.middleware.SilkyMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
@@ -251,3 +251,47 @@ CHANNEL_LAYERS = {
     }
 }
 
+# Model order in admin panel
+ADMIN_REORDER = (
+
+    {'app': 'location',
+     'label': 'AceMaven Service Revenue Settings',
+     'models': ('handling.LocalFee', 'handling.GlobalFee')
+     },
+
+    {'app': 'core',
+     'label': 'Accounts and Billing',
+     'models': ('core.BankAccount', 'handling.ExchangeRate', 'booking.Transaction')
+     },
+
+    {'app': 'booking',
+     'label': 'Sections',
+     'models': ('booking.Booking', 'core.Company')
+     },
+
+    {'app': 'handling',
+     'label': 'Platform setting',
+     'models': ('handling.GeneralSetting', 'handling.ClientPlatformSetting',
+                'location.Country', 'handling.Currency')
+     },
+
+    {'app': 'websockets',
+     'label': 'Ticket section',
+     'models': ('websockets.Ticket', 'core.SignUpRequest', 'core.Review')
+     },
+
+    {'app': 'websockets',
+     'label': 'Special settings on platform (for superuser)',
+     'models': ('core.CustomUser', 'core.Role', 'core.SignUpToken', 'auth.Group',
+                'handling.AirTrackingSetting', 'handling.Airline',
+                'handling.Carrier', 'handling.ContainerType',
+                'handling.IMOClass', 'handling.PackagingType',
+                'handling.Port', 'handling.ReleaseType',
+                'handling.SeaTrackingSetting', 'handling.ShippingMode',
+                'handling.ShippingType', 'booking.AdditionalSurcharge',
+                'booking.Direction', 'booking.FreightRate',
+                'booking.Surcharge', 'booking.TrackStatus',)
+     },
+
+
+)

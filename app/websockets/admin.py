@@ -51,3 +51,9 @@ class TicketChatAdmin(admin.ModelAdmin):
     def get_list_display(self, request):
         self.request = request
         return self.list_display
+
+    def get_readonly_fields(self, request, obj=None):
+        if 'add' in request.META['PATH_INFO']:
+            return ()
+        else:
+            return self.readonly_fields

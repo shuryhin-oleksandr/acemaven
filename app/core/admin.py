@@ -62,6 +62,11 @@ class SignUpTokenAdmin(admin.ModelAdmin):
 
 @admin.register(BankAccount)
 class BankAccountAdmin(admin.ModelAdmin):
+    readonly_fields = ('bank_name',
+                       'bank_number',
+                       'branch',
+                       'number',
+                       'pix_key',)
     list_display = (
         'bank_name',
         'is_default',
@@ -91,6 +96,12 @@ class BankAccountAdmin(admin.ModelAdmin):
             PixApiSetting.objects.create(
                 bank_account_id=obj.id,
             )
+
+    def get_readonly_fields(self, request, obj=None):
+        if 'add' in request.META['PATH_INFO']:
+            return ()
+        else:
+            return self.readonly_fields
 
 
 @admin.register(Role)
@@ -177,6 +188,9 @@ class CompanyAdmin(TabbedModelAdmin):
 
 @admin.register(SignUpRequest)
 class SignUpRequestAdmin(admin.ModelAdmin):
+    readonly_fields = ['type', 'name', 'address_line_first', 'address_line_second', 'state', 'city', 'zip_code',
+                       'phone', 'tax_id', 'employees_number', 'website', 'email', 'first_name', 'last_name',
+                       'master_phone', 'position']
     change_form_template = 'core/sign_up_request_changeform.html'
     list_display = (
         'name',
@@ -239,9 +253,20 @@ class SignUpRequestAdmin(admin.ModelAdmin):
             return HttpResponseRedirect(".")
         return super().response_change(request, obj)
 
+    def get_readonly_fields(self, request, obj=None):
+        if 'add' in request.META['PATH_INFO']:
+            return ()
+        else:
+            return self.readonly_fields
+
 
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
+    readonly_fields = ('operation',
+                       'rating',
+                       'comment',
+                       'date_created',
+                       'reviewer')
     change_form_template = 'core/review_changeform.html'
     list_display = (
         'operation',
@@ -280,3 +305,9 @@ class ReviewAdmin(admin.ModelAdmin):
                 self.message_user(request, "Review successfully approved.")
             return HttpResponseRedirect(".")
         return super().response_change(request, obj)
+
+    def get_readonly_fields(self, request, obj=None):
+        if 'add' in request.META['PATH_INFO']:
+            return ()
+        else:
+            return self.readonly_fields

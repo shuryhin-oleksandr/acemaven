@@ -394,7 +394,7 @@ class Role(models.Model):
         on_delete=models.CASCADE,
     )
     groups = models.ManyToManyField(
-        Group,
+            Group,
         verbose_name=_('groups'),
         help_text=_(
             'The groups this user belongs to. A user will get all permissions '

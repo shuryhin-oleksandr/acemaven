@@ -23,7 +23,8 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 
-
+admin.autodiscover()
+admin.site.enable_nav_sidebar = False
 admin.site.site_header = 'Acemaven admin'
 admin.site.site_title = 'System Management'
 admin.site.index_title = 'Acemaven system management'
@@ -59,5 +60,4 @@ if settings.DEBUG:
         url(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
         url(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
         url(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
-        url(r'^silk/', include('silk.urls'), name='silk'),
     ]

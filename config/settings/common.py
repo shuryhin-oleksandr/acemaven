@@ -254,7 +254,7 @@ CHANNEL_LAYERS = {
 # Model order in admin panel
 ADMIN_REORDER = (
 
-    {'app': 'location',
+    {'app': 'handling',
      'label': 'AceMaven Service Revenue Settings',
      'models': ('handling.LocalFee', 'handling.GlobalFee')
      },

@@ -5,7 +5,7 @@ from app.booking.models import Surcharge, AdditionalSurcharge, FreightRate, Trac
 
 import logging
 
-from django.contrib import admin
+from django.contrib import admin, messages
 
 from app.websockets.models import Chat
 
@@ -76,6 +76,7 @@ class TransactionInline(admin.StackedInline):
 
 @admin.register(Booking)
 class BookingAdmin(DjangoWithExtraContextAdmin, admin.ModelAdmin):
+
     search_fields = ('aceid',)
     django_with_extra_context_admin_view_name = False
     inlines = (ShipmentDetailsInline, CargoGroupInline, TransactionInline)
@@ -146,7 +147,11 @@ class BookingAdmin(DjangoWithExtraContextAdmin, admin.ModelAdmin):
         return obj.freight_rate.carrier.title
 
     def messages(self, obj):
-        return Chat.objects.filter(operation=obj).values_list('chat_messages__text', flat=True)
+        chat = Chat.objects.filter(operation=obj).order_by('chat_messages__date_created')\
+                                                 .values_list('chat_messages__user__email',
+                                                              'chat_messages__text',
+                                                              'chat_messages__date_created',)
+        return chat
 
     def get_readonly_fields(self, request, obj=None):
         if 'add' in request.META['PATH_INFO']:

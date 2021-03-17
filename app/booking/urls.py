@@ -30,6 +30,6 @@ urlpatterns += [
     path('calculate/', WMCalculateView.as_view()),
     path('champ-tracking/', TrackView.as_view()),
     path('pix-api-hook/', PixApiView.as_view()),
-    path('support-chat/<int:chat_id>/', OperationChatView.as_view(), name='operation-chat'),
+    path('<int:booking>/operation-chat/<int:chat_id>/', OperationChatView.as_view(), name='operation-chat'),
     path('js/', IndexView.as_view(), name='js'),
 ]

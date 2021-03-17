@@ -46,7 +46,7 @@ from app.websockets.tasks import create_and_assign_notification, reassign_confir
     delete_accepted_booking_notifications, send_email
 from app.booking.tasks import change_charge
 from config import settings
-from core.util.get_jwt_token import get_jwt_token
+from app.core.util.get_jwt_token import get_jwt_token
 
 try:
     MAIN_COUNTRY_CODE = Country.objects.filter(is_main=True).first().code
@@ -1109,6 +1109,7 @@ class OperationChatView(TemplateView):
     def get_context_data(self, *args, **kwargs):
         user = self.request.user
         chat_id = self.kwargs['chat_id']
+        operation = self.kwargs['booking']
         ctx = super().get_context_data(**kwargs)
         ctx.update(
             {

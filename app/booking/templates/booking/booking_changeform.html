@@ -73,11 +73,10 @@
             </div>
         </div>
     </fieldset>
-
                             {{ block.super }}
-
+    {% if chat %}
         <div class="submit-row">
             <input type="submit" value="Open chat" name="_open_chat">
         </div>
-
+    {% endif %}
 {% endblock %}

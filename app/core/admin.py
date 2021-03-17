@@ -1,4 +1,5 @@
 from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.models import Group
 from tabbed_admin import TabbedModelAdmin
 
 from django.contrib import admin
@@ -155,6 +156,13 @@ class CustomUserAdmin(UserAdmin):
 
     def company(self, obj):
         return obj.get_company()
+
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
+        if db_field.name == "groups":
+            kwargs["queryset"] = Group.objects.filter(name__in=['master', 'billing', 'support',])
+        return super(CustomUserAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
+
+
 
 
 @admin.register(Company)

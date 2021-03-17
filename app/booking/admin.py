@@ -53,7 +53,7 @@ class TransactionAdmin(admin.ModelAdmin):
         'booking_number',
         'status',
     )
-    readonly_fields = ('response', 'response', 'booking', 'charge', 'txid', 'qr_code')
+    readonly_fields = ('response', 'booking', 'charge', 'txid', 'qr_code')
 
     def booking_number(self, obj):
         return obj.booking.aceid

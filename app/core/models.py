@@ -80,7 +80,7 @@ class CustomUser(AbstractUser):
     """
 
     username_validator = None
-    username = None
+    username = models.TextField(null=True, blank=True)
 
     email = models.EmailField(
         _('email address'),
@@ -394,7 +394,7 @@ class Role(models.Model):
         on_delete=models.CASCADE,
     )
     groups = models.ManyToManyField(
-            Group,
+        Group,
         verbose_name=_('groups'),
         help_text=_(
             'The groups this user belongs to. A user will get all permissions '

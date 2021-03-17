@@ -1,5 +1,8 @@
 from datetime import datetime
 
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from django.views.generic import TemplateView
 from django_filters import rest_framework
 from rest_framework import mixins, viewsets, filters, status, generics, views
 from rest_framework.decorators import action
@@ -38,11 +41,12 @@ from app.core.permissions import IsMasterOrAgent, IsClientCompany, IsAgentCompan
 from app.core.serializers import ReviewBaseSerializer
 from app.handling.models import Port, Currency, ClientPlatformSetting
 from app.location.models import Country
-from app.websockets.models import Notification
+from app.websockets.models import Notification, Chat
 from app.websockets.tasks import create_and_assign_notification, reassign_confirmed_operation_notifications, \
     delete_accepted_booking_notifications, send_email
 from app.booking.tasks import change_charge
 from config import settings
+from core.util.get_jwt_token import get_jwt_token
 
 try:
     MAIN_COUNTRY_CODE = Country.objects.filter(is_main=True).first().code
@@ -373,7 +377,8 @@ class FreightRateViesSet(PermissionClassByActionMixin,
         for freight_rate in freight_rates:
             freight_rate_dict = FreightRateSearchListSerializer(freight_rate).data
             if container_type_ids_list:
-                condition = {} if not shipping_mode.has_freight_containers else {'container_type__id__in': container_type_ids_list}
+                condition = {} if not shipping_mode.has_freight_containers else {
+                    'container_type__id__in': container_type_ids_list}
                 expiration_date = freight_rate.rates.filter(**condition).aggregate(
                     date=Min('expiration_date')).get('date').strftime('%d/%m/%Y')
                 freight_rate_dict['expiration_date'] = expiration_date
@@ -465,9 +470,9 @@ class QuoteViesSet(PermissionClassByActionMixin,
         user = request.user
         company = user.get_company()
 
-        queryset = self.get_queryset().filter(is_active=True, company__disabled=False)\
-                                      .exclude(statuses__status=Status.REJECTED,
-                                               statuses__company=company)
+        queryset = self.get_queryset().filter(is_active=True, company__disabled=False) \
+            .exclude(statuses__status=Status.REJECTED,
+                     statuses__company=company)
         submitted_air = queryset.filter(shipping_mode__shipping_type__title='air',
                                         statuses__status=Status.SUBMITTED,
                                         freight_rates__company=company)
@@ -683,7 +688,7 @@ class BookingViesSet(PermissionClassByActionMixin,
                       'date_from': instance.date_from,
                       'date_to': instance.date_to,
                       'container_type_ids_list': container_type_ids_list,
-                      'number_of_documents': instance.number_of_documents,}
+                      'number_of_documents': instance.number_of_documents, }
 
             if not instance.is_paid:
                 kwargs.update(booking_fee=booking_fee, service_fee=service_fee, calculate_fees=calculate_fees)
@@ -1089,3 +1094,26 @@ class TrackStatusViewSet(mixins.ListModelMixin,
     permission_classes = (IsAuthenticated,)
     filter_class = TrackStatusFilterSet
     filter_backends = (rest_framework.DjangoFilterBackend,)
+
+
+class IndexView(TemplateView):
+    template_name = "booking/index.js"
+    content_type = "application/javascript"
+
+
+@method_decorator(login_required, name='dispatch')
+class OperationChatView(TemplateView):
+    template_name = "booking/index.html"
+    model = Chat
+
+    def get_context_data(self, *args, **kwargs):
+        user = self.request.user
+        chat_id = self.kwargs['chat_id']
+        ctx = super().get_context_data(**kwargs)
+        ctx.update(
+            {
+                "chat_id": chat_id,
+                "token": get_jwt_token(user),
+            }
+        )
+        return ctx

@@ -74,26 +74,10 @@
         </div>
     </fieldset>
 
-    {% if messages %}
-    <fieldset class="module aligned">
-        <div class="form-row field-charges">
-            <div style="display: flex; align-items: flex-start;">
-                <label class="required" for="id_charges">Operation chat:</label>
-                <table border="1" style="display: inline-block;">
-                   <caption style="white-space: nowrap; text-align: center">Messages</caption>
-                    {% for message in messages %}
-                       <tr>
-
-                           <td valign="top" style="text-align: center">{{ message.0 }}</td>
-                           <td valign="top" bgcolor="#f0f0f0" style="text-align: center">{{ message.1 }}</td>
-                           <td valign="top" bgcolor="#f0f0f0" style="text-align: center">{{ message.2 }}</td>
-
-                       </tr>
-                    {% endfor %}
-                </table>
-            </div>
-        </div>
-    </fieldset>
-    {% endif %}
                             {{ block.super }}
+
+        <div class="submit-row">
+            <input type="submit" value="Open chat" name="_open_chat">
+        </div>
+
 {% endblock %}

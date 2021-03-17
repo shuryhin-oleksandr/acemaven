@@ -1,9 +1,10 @@
+from django.contrib.auth.admin import UserAdmin
 from tabbed_admin import TabbedModelAdmin
 
 from django.contrib import admin
 from django.contrib.auth import get_user_model
-from django.db import transaction
-from django.forms import model_to_dict
+from django.db import transaction, models
+from django.forms import model_to_dict, Textarea
 from django.http import HttpResponseRedirect
 
 from app.core.models import CustomUser, Company, BankAccount, Role, SignUpRequest, SignUpToken, Review
@@ -113,7 +114,12 @@ class RoleAdmin(admin.ModelAdmin):
 
 
 @admin.register(CustomUser)
-class CustomUserAdmin(admin.ModelAdmin):
+class CustomUserAdmin(UserAdmin):
+    readonly_fields = ('date_joined', 'last_login',)
+    formfield_overrides = {
+        models.TextField: {'widget': Textarea(attrs={'rows': 1, 'cols': 50})},
+    }
+    ordering = ('email',)
     list_display = (
         'id',
         'first_name',
@@ -127,8 +133,24 @@ class CustomUserAdmin(admin.ModelAdmin):
         'last_name',
         'email',
     )
-    inlines = (
-        RoleInline,
+
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('email', 'password1', 'password2')}
+         ),
+    )
+
+    fieldsets = (
+        ('User info', {
+            'fields': (
+                'email',
+                'password',
+                'first_name',
+                'last_name',
+                'groups',
+            ),
+        }),
     )
 
     def company(self, obj):

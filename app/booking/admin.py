@@ -1,3 +1,5 @@
+from django.shortcuts import redirect
+from django.urls import reverse_lazy
 from django_with_extra_context_admin.admin import DjangoWithExtraContextAdmin
 
 from app.booking.models import Surcharge, AdditionalSurcharge, FreightRate, TrackStatus, Direction, Booking, \
@@ -76,7 +78,6 @@ class TransactionInline(admin.StackedInline):
 
 @admin.register(Booking)
 class BookingAdmin(DjangoWithExtraContextAdmin, admin.ModelAdmin):
-
     search_fields = ('aceid',)
     django_with_extra_context_admin_view_name = False
     inlines = (ShipmentDetailsInline, CargoGroupInline, TransactionInline)
@@ -146,11 +147,14 @@ class BookingAdmin(DjangoWithExtraContextAdmin, admin.ModelAdmin):
     def carrier(self, obj):
         return obj.freight_rate.carrier.title
 
+    def chat(self, obj):
+        return Chat.objects.filter(operation=obj)
+
     def messages(self, obj):
-        chat = Chat.objects.filter(operation=obj).order_by('chat_messages__date_created')\
-                                                 .values_list('chat_messages__user__email',
-                                                              'chat_messages__text',
-                                                              'chat_messages__date_created',)
+        chat = Chat.objects.filter(operation=obj).order_by('chat_messages__date_created') \
+            .values_list('chat_messages__user__email',
+                         'chat_messages__text',
+                         'chat_messages__date_created', )
         return chat
 
     def get_readonly_fields(self, request, obj=None):
@@ -169,9 +173,20 @@ class BookingAdmin(DjangoWithExtraContextAdmin, admin.ModelAdmin):
                     'totals': booking['totals'],
                     'total_freight_rate': booking['total_freight_rate'],
                     'doc_fee': booking['doc_fee'],
-                    'messages': self.messages(kwargs['object_id'])
+                    'messages': self.messages(kwargs['object_id']),
+                    'chat': self.chat(kwargs['object_id']) if self.chat(kwargs['object_id']) else None
                 })
         return extra_context
+
+    def response_change(self, request, obj):
+        if "_open_chat" in request.POST:
+            if not Chat.objects.filter(operation=obj.id).first():
+                chat = Chat.objects.create()
+            else:
+                chat = Chat.objects.filter(operation=obj.id).first()
+            operation_chat = Chat.objects.filter(id=chat.id).update(operation=obj.id)
+            url = reverse_lazy("booking:operation-chat", kwargs=dict(chat_id=operation_chat))
+            return redirect(url)
 
 
 @admin.register(TrackStatus)

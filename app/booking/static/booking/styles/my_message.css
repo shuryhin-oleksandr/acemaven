@@ -1,0 +1,66 @@
+.myMessageWrapper {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    flex-direction: row-reverse;
+    justify-content: flex-start;
+    margin-bottom: 30px;
+}
+
+.myMessageWrapper:hover .deleteMessageWrap{
+    opacity: 1;
+}
+
+.myPhotoWrapper {
+    width: 40px;
+    height: 40px;
+    border-radius: 100px;
+    margin-right: 19px;
+    margin-left: 19px;
+}
+
+.userPhoto {
+    width: 40px;
+    height: 40px;
+    border-radius: 100px;
+}
+
+.myTextContent {
+    font-family: "Helvetica Reg", sans-serif;
+    font-size: 16px;
+    line-height: 18.34px;
+    color: white;
+    background-color: rgba(17, 91, 134, .7);
+    padding: 15px 29px 15px 24px;
+    border-radius: 20px 0 20px 20px;
+}
+
+.myFileMessageContent {
+    font-family: "Helvetica Reg", sans-serif;
+    font-size: 16px;
+    line-height: 18.34px;
+    color: white;
+    background-color: rgba(17, 91, 134, .7);
+    padding: 15px 29px 15px 24px;
+    border-radius: 20px 0 20px 20px;
+    display: flex;
+    align-items: center;
+}
+
+.myFileMessageContent span {
+    margin-left: 10px
+}
+
+.deleteMessageWrap {
+    opacity: 0;
+    transition: .3s;
+}
+
+.deleteMessageWrapImg {
+    padding: 0 20px;
+    box-sizing: content-box;
+}
+
+.deleteMessageWrap:hover {
+    cursor: pointer;
+}

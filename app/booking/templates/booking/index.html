@@ -1,0 +1,110 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static "booking/styles/index.css" %}" media="screen">
+    <link rel="stylesheet" href="{% static "booking/styles/file_message.css" %}" media="screen">
+    <link rel="stylesheet" href="{% static "booking/styles/my_message.css" %}" media="screen">
+    <link rel="stylesheet" href="{% static "booking/styles/opponent_message.css" %}" media="screen">
+    <link rel="stylesheet" href="{% static "booking/styles/typing_message.css" %}" media="screen">
+    <title>Admin Support</title>
+</head>
+
+<body>
+    <div class="chatWrapper">
+        <div class="chatInner">
+            <div class="chatContent">
+                <!-- <div class="myMessageWrapper">
+                    <div class="myPhotoWrapper">
+                        <img src="./icons/defaultUserPhoto.svg" alt="" class='userPhoto'>
+                    </div>
+                    <div class="myTextContent">
+
+                    </div>
+                    <div class="localTimeWrapper" style="margin-right: 25px;">
+                        <div class="localTimeContent">
+                        </div>
+                        <div class="deleteMessageWrap">
+                            <img src="./icons/delete_gray.svg" alt="" class="deleteMessageWrapImg">
+                        </div>
+                    </div>
+                </div>
+                <div class="opponentMessageWrapper">
+                    <div class="opponentPhotoWrapper">
+                        <img src="./icons/defaultUserPhoto.svg" alt="">
+                    </div>
+                    <div class="opponentTextContent">
+                        Котики рулят!)
+                    </div>
+                    <div class="localTimeWrapper" style="margin-left: 25px;">
+                        <div class="localTimeContent">
+                        </div>
+                    </div>
+                </div>
+                <div class="opponentMessageWrapper">
+                    <div class="opponentPhotoWrapper">
+                        <img src="./icons/defaultUserPhoto.svg" alt="" class='userPhoto'>
+                    </div>
+                    <div class="typingIconWrapper">
+                        <img src="./icons/giphy.gif" alt="">
+                    </div>
+                </div>
+                <div class="myFileMessageWrapper">
+                    <div class="myFilePhotoWrapper">
+                        <img src="./icons/defaultUserPhoto.svg" alt="">
+                    </div>
+                    <div class="myFileMessageContent">
+                        <div class="iconWrapper">
+                            <img src="./icons/upload-file-svgrepo-com.svg" alt="">
+                        </div>
+                    </div>
+                    <div class="localTimeWrapper" style="margin-right: 25px;">
+                        <div class="localTimeContent">
+                        </div>
+                        <div class="deleteMessageWrap">
+                            <img src="./icons/delete_gray.svg" alt="" class="deleteMessageWrapImg">
+                        </div>
+                    </div>
+                </div>
+                <div class="opponentFileMessageWrapper">
+                    <div class="opponentFilePhotoWrapper">
+                        <img src="./icons/defaultUserPhoto.svg" alt="">
+                    </div>
+                    <div class="opponentFileMessageContent">
+                        <div class="iconWrapper">
+                            <img src="./icons/upload-file-svgrepo-com.svg" alt="">
+                        </div>
+                    </div>
+                </div> -->
+            </div>
+            <div style="display: flex; align-items: center">
+                <div class='messageInputWrapper'>
+                    <div class="uploaderWrapper">
+                        <label for="upload" class="labelUpload">
+                            <img src="{% static "booking/icons/paper-clip-svgrepo-com.svg" %}" alt="">
+                        </label>
+                        <input type="file" id="upload" class="uploadInput">
+                    </div>
+                    <input type="text" class="messageInput" placeholder="Message...">
+                    <div class="sendIconWrapper">
+                        <img src="{% static "booking/icons/send_mesage.svg" %}" alt="">
+                    </div>
+                </div>
+                <!-- <div class="photoWrapper">
+                    <img src="./icons/defaultUserPhoto.svg" alt="" id='image_input'>
+                </div> -->
+            </div>
+        </div>
+    </div>
+    <script>
+        const CHAT_ID = '{{chat_id | safe}}';
+        let my_id = {{ user.id | safe }};
+        const TOKEN = '{{ token  | safe }}';
+    </script>
+    <script type="text/javascript" src="{% url 'booking:js' %}">
+    </script>
+</body>
+{{ user.sess }}
+</html>

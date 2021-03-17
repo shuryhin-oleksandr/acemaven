@@ -1,0 +1,37 @@
+.typingMessageWrapper {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    margin-bottom: 30px;
+}
+
+.typingPhotoWrapper {
+    width: 40px;
+    height: 40px;
+    border-radius: 100px;
+    margin-right: 19px;
+    margin-left: 0;
+}
+
+.typingPhotoWrapper img {
+    width: 40px;
+    height: 40px;
+    border-radius: 100px;
+}
+
+.typingIconWrapper {
+    background-color: rgba(26, 184, 230, .4);
+    padding: 15px 29px 15px 24px;
+    border-radius: 0 20px 20px 20px;
+    height: 50px;
+    width: 100px;
+    position: relative;
+}
+
+.typingIconWrapper img {
+    width: 75px;
+    position: absolute;
+    top: -12px;
+    left: 12px;
+}

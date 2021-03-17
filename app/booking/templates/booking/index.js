@@ -28,7 +28,7 @@ let myMessageRender = (messages) => {
                         myMessageWrapper.classList.add('myMessageWrapper')
 
                         myMessageWrapper.innerHTML = ` <div class="myPhotoWrapper">
-                <img width="40" height="40" src=${m.photo ? m.photo : "{% static 'booking/icons/defaultUserPhoto.svg' %}"} alt="" class='userPhoto'>
+                <img width="40" height="40" src=${m.photo ? m.photo : "{% static 'icons/defaultUserPhoto.svg' %}"} alt="" class='userPhoto'>
             </div>
             ${m.content 
                 ?  `<div class="myTextContent">
@@ -36,7 +36,7 @@ let myMessageRender = (messages) => {
                     </div>`
                 : `<div class="myFileMessageContent">
                         <a class="iconWrapper" href=${m.files[0]} target='_blank'>
-                            <img src="{% static 'booking/icons/upload-file-svgrepo-com.svg' %}" alt="">
+                            <img src="{% static 'icons/upload-file-svgrepo-com.svg' %}" alt="">
                         </a>
                         <span>${m.files[0].split('/').reverse()[0]}</span>  
                     </div>`
@@ -46,7 +46,7 @@ let myMessageRender = (messages) => {
                 ${time}
                 </div>
                 <div class="deleteMessageWrap" id=${m.id}>
-                    <img width="15" height="15" src="{% static 'booking/icons/delete_gray.svg' %}" alt="" class="deleteMessageWrapImg">
+                    <img width="15" height="15" src="{% static 'icons/delete_gray.svg' %}" alt="" class="deleteMessageWrapImg">
                 </div>
             </div>`
             fragment.appendChild(myMessageWrapper)
@@ -55,7 +55,7 @@ let myMessageRender = (messages) => {
             let oppponentMessageWrapper = document.createElement('div')
             oppponentMessageWrapper.classList.add('opponentMessageWrapper')
             oppponentMessageWrapper.innerHTML = ` <div class="opponentPhotoWrapper">
-                <img src=${m.photo ? m.photo : "{% static 'booking/icons/defaultUserPhoto.svg' %}"} alt="" class='userPhoto'>
+                <img src=${m.photo ? m.photo : "{% static 'icons/defaultUserPhoto.svg' %}"} alt="" class='userPhoto'>
             </div>
             ${m.content 
                 ? `<div class="opponentTextContent">
@@ -63,7 +63,7 @@ let myMessageRender = (messages) => {
                     </div>`
                 : `<div class="opponentFileMessageContent">
                         <a class="iconWrapper" href=${m.files[0]} target='_blank'>
-                            <img src="{% static 'booking/icons/upload-file-svgrepo-com.svg' %}" alt="">
+                            <img src="{% static 'icons/upload-file-svgrepo-com.svg' %}" alt="">
                         </a>
                         <span>${m.files[0].split('/').reverse()[0]}</span>  
                     </div>`
@@ -100,7 +100,7 @@ let newMessageRender = (message) => {
             myMessageWrapper.classList.add('myMessageWrapper')
 
             myMessageWrapper.innerHTML = ` <div class="myPhotoWrapper">
-                <img width="40" height="40" src=${message.photo ? message.photo : "{% static 'booking/icons/defaultUserPhoto.svg' %}"} alt="" class='userPhoto'>
+                <img width="40" height="40" src=${message.photo ? message.photo : "{% static 'icons/defaultUserPhoto.svg' %}"} alt="" class='userPhoto'>
             </div>
             ${message.content 
                 ?  `<div class="myTextContent">
@@ -108,7 +108,7 @@ let newMessageRender = (message) => {
                     </div>`
                 : `<div class="myFileMessageContent">
                         <a class="iconWrapper" href=${'http://' + message.files[0].split('://')[1]} target='_blank'>
-                            <img src="{% static 'booking/icons/upload-file-svgrepo-com.svg' %}" alt="">
+                            <img src="{% static 'icons/upload-file-svgrepo-com.svg' %}" alt="">
                         </a>
                         <span>${message.files[0].split('/').reverse()[0]}</span>  
                     </div>`
@@ -118,7 +118,7 @@ let newMessageRender = (message) => {
                 ${time}
                 </div>
                 <div class="deleteMessageWrap" id=${message.id}>
-                    <img width="15" height="15" src="{% static 'booking/icons/delete_gray.svg' %}" alt="" class="deleteMessageWrapImg">
+                    <img width="15" height="15" src="{% static 'icons/delete_gray.svg' %}" alt="" class="deleteMessageWrapImg">
                 </div>
             </div>`
 
@@ -132,7 +132,7 @@ let newMessageRender = (message) => {
         let opponentMessageWrapper = document.createElement('div')
         opponentMessageWrapper.classList.add('opponentMessageWrapper')
         opponentMessageWrapper.innerHTML = ` <div class="opponentPhotoWrapper">
-                <img src=${message.photo ? message.photo : "{% static 'booking/icons/defaultUserPhoto.svg' %}"} alt="" class='userPhoto'>
+                <img src=${message.photo ? message.photo : "{% static 'icons/defaultUserPhoto.svg' %}"} alt="" class='userPhoto'>
             </div>
             ${message.content 
                 ? `<div class="opponentTextContent">
@@ -140,7 +140,7 @@ let newMessageRender = (message) => {
                     </div>`
                 : `<div class="opponentFileMessageContent">
                         <a class="iconWrapper" href=${'http://' + message.files[0].split('://')[1]} target='_blank'>
-                            <img src="{% static 'booking/icons/upload-file-svgrepo-com.svg' %}" alt="">
+                            <img src="{% static 'icons/upload-file-svgrepo-com.svg' %}" alt="">
                         </a>
                         <span>${message.files[0].split('/').reverse()[0]}</span> 
                     </div>`
@@ -205,10 +205,10 @@ const typingGifRender = (res) => {
 
         opponentMessageWrapper.innerHTML = `
             <div class="typingPhotoWrapper">
-                    <img src=${res.photo ? res.photo:"{% static 'booking/icons/defaultUserPhoto.svg' %}" } alt="" class='userPhoto'>
+                    <img src=${res.photo ? res.photo:"{% static 'icons/defaultUserPhoto.svg' %}" } alt="" class='userPhoto'>
                 </div>
                 <div class="typingIconWrapper">
-                    <img src="{% static 'booking/icons/giphy.gif' %}" alt="">
+                    <img src="{% static 'icons/giphy.gif' %}" alt="">
                 </div>
                `
 

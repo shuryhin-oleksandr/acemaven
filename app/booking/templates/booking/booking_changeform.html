@@ -1,6 +1,11 @@
 {% extends 'admin/change_form.html' %}
 
 {% block submit_buttons_bottom %}
+    <style>
+        ul.messagelist {
+            display: none;
+        }
+    </style>
     <fieldset class="module aligned">
         <div class="form-row field-charges">
             <div style="display: flex; align-items: flex-start;">
@@ -69,4 +74,9 @@
         </div>
     </fieldset>
                             {{ block.super }}
+    {% if chat %}
+        <div class="submit-row">
+            <input type="submit" value="Open chat" name="_open_chat">
+        </div>
+    {% endif %}
 {% endblock %}

@@ -15,7 +15,10 @@ from pathlib import Path
 from celery.schedules import crontab
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
+
+PROJECT_DIR = Path(__file__).parent.resolve()
+BASE_DIR = PROJECT_DIR.parent.resolve()
+REPO_DIR = BASE_DIR.parent.resolve()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
@@ -51,7 +54,7 @@ INSTALLED_APPS = [
     'tabbed_admin',
     'debug_toolbar',
     'channels',
-    'silk',
+    'admin_reorder',
 
     'app.core',
     'app.booking',
@@ -91,10 +94,10 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'admin_reorder.middleware.ModelAdminReorder',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'silk.middleware.SilkyMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
@@ -182,8 +185,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
-STATIC_ROOT = BASE_DIR / 'static'
-STATIC_URL = '/static/'
+
+STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_ROOT = REPO_DIR / ".static"
+STATIC_URL = '/assets/'
 MEDIA_ROOT = BASE_DIR / 'media'
 MEDIA_URL = '/media/'
 
@@ -251,3 +256,47 @@ CHANNEL_LAYERS = {
     }
 }
 
+# Model order in admin panel
+ADMIN_REORDER = (
+
+    {'app': 'handling',
+     'label': 'AceMaven Service Revenue Settings',
+     'models': ('handling.LocalFee', 'handling.GlobalFee')
+     },
+
+    {'app': 'core',
+     'label': 'Accounts and Billing',
+     'models': ('core.BankAccount', 'handling.ExchangeRate', 'booking.Transaction')
+     },
+
+    {'app': 'booking',
+     'label': 'Sections',
+     'models': ('booking.Booking', 'core.Company')
+     },
+
+    {'app': 'handling',
+     'label': 'Platform setting',
+     'models': ('handling.GeneralSetting', 'handling.ClientPlatformSetting',
+                'location.Country', 'handling.Currency')
+     },
+
+    {'app': 'websockets',
+     'label': 'Ticket section',
+     'models': ('websockets.Ticket', 'core.SignUpRequest', 'core.Review')
+     },
+
+    {'app': 'websockets',
+     'label': 'Special settings on platform (for superuser)',
+     'models': ('core.CustomUser', 'core.Role', 'core.SignUpToken', 'auth.Group',
+                'handling.AirTrackingSetting', 'handling.Airline',
+                'handling.Carrier', 'handling.ContainerType',
+                'handling.IMOClass', 'handling.PackagingType',
+                'handling.Port', 'handling.ReleaseType',
+                'handling.SeaTrackingSetting', 'handling.ShippingMode',
+                'handling.ShippingType', 'booking.AdditionalSurcharge',
+                'booking.Direction', 'booking.FreightRate',
+                'booking.Surcharge', 'booking.TrackStatus',)
+     },
+
+
+)

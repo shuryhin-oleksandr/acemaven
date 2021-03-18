@@ -100,7 +100,7 @@ def wm_calculate(data, shipping_type=None):
 
 
 def add_currency_value(totals, code, subtotal):
-    totals[code] = totals[code] + subtotal if code in totals else subtotal
+    totals[code] = round((totals[code] + subtotal), 1) if code in totals else round(subtotal, 1)
 
 
 def calculate_additional_surcharges(totals,
@@ -445,41 +445,38 @@ def freight_rate_search(data, company=None):
     data['rates__surcharges__start_date__lte'] = date_from
     data['rates__surcharges__expiration_date__gte'] = date_to
 
-    freight_rates = FreightRate.objects.filter(
-        **data,
-        is_active=True,
-        temporary=False,
-        is_archived=False,
-    )
+    freight_rates = FreightRate.objects\
+        .filter(**data,
+                is_active=True,
+                temporary=False,
+                is_archived=False,
+                company__disabled=False
+                )
+
+    queryset = []
 
     if shipping_mode.has_freight_containers:
         for container_type_id in container_type_ids_list:
-            freight_rates = freight_rates.filter(
-                rates__rate__isnull=False,
-                rates__container_type__id=container_type_id
-            )
+            queryset.append(freight_rates.filter(rates__rate__isnull=False,
+                                                 rates__container_type__id=container_type_id))
+
     if shipping_mode.has_surcharge_containers:
         for container_type_id in container_type_ids_list:
-            freight_rates = freight_rates.filter(
-                rates__surcharges__usage_fees__charge__isnull=False,
-                rates__surcharges__usage_fees__container_type__id=container_type_id
-            )
+            queryset.append(freight_rates.filter(rates__surcharges__usage_fees__charge__isnull=False,
+                                                 rates__surcharges__usage_fees__container_type__id=container_type_id))
 
     if dangerous_list:
-        freight_rates = freight_rates.filter(
-            rates__surcharges__charges__additional_surcharge__is_dangerous=True,
-            rates__surcharges__charges__charge__isnull=False
-        )
-    if cold_list:
-        freight_rates = freight_rates.filter(
-            rates__surcharges__charges__additional_surcharge__is_cold=True,
-            rates__surcharges__charges__charge__isnull=False
-        )
-    if company:
-        freight_rates = freight_rates.filter(
-            company=company,
-        )
+        queryset.append(freight_rates.filter(rates__surcharges__additional_surcharges__is_dangerous=True,
+                                             rates__surcharges__charges__charge__isnull=False))
 
+    if cold_list:
+        queryset.append(freight_rates.filter(rates__surcharges__additional_surcharges__is_cold=True,
+                                             rates__surcharges__charges__charge__isnull=False))
+
+    if company:
+        queryset.append(freight_rates.filter(company=company,))
+
+    freight_rates = freight_rates.intersection(*queryset)
     return freight_rates, shipping_mode
 
 

@@ -80,7 +80,7 @@ class CustomUser(AbstractUser):
     """
 
     username_validator = None
-    username = None
+    username = models.TextField(null=True, blank=True)
 
     email = models.EmailField(
         _('email address'),
@@ -145,6 +145,11 @@ class Company(models.Model):
     COMPANY_TYPE_CHOICES = (
         (FREIGHT_FORWARDER, 'Freight forwarder'),
         (CLIENT, 'Client'),
+    )
+
+    disabled = models.BooleanField(
+        _('Disable functionality'),
+        default=False
     )
 
     type = models.CharField(

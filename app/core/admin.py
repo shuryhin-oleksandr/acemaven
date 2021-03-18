@@ -1,9 +1,11 @@
+from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.models import Group
 from tabbed_admin import TabbedModelAdmin
 
 from django.contrib import admin
 from django.contrib.auth import get_user_model
-from django.db import transaction
-from django.forms import model_to_dict
+from django.db import transaction, models
+from django.forms import model_to_dict, Textarea
 from django.http import HttpResponseRedirect
 
 from app.core.models import CustomUser, Company, BankAccount, Role, SignUpRequest, SignUpToken, Review
@@ -62,6 +64,11 @@ class SignUpTokenAdmin(admin.ModelAdmin):
 
 @admin.register(BankAccount)
 class BankAccountAdmin(admin.ModelAdmin):
+    readonly_fields = ('bank_name',
+                       'bank_number',
+                       'branch',
+                       'number',
+                       'pix_key',)
     list_display = (
         'bank_name',
         'is_default',
@@ -92,6 +99,12 @@ class BankAccountAdmin(admin.ModelAdmin):
                 bank_account_id=obj.id,
             )
 
+    def get_readonly_fields(self, request, obj=None):
+        if 'add' in request.META['PATH_INFO']:
+            return ()
+        else:
+            return self.readonly_fields
+
 
 @admin.register(Role)
 class RoleAdmin(admin.ModelAdmin):
@@ -102,7 +115,12 @@ class RoleAdmin(admin.ModelAdmin):
 
 
 @admin.register(CustomUser)
-class CustomUserAdmin(admin.ModelAdmin):
+class CustomUserAdmin(UserAdmin):
+    readonly_fields = ('date_joined', 'last_login',)
+    formfield_overrides = {
+        models.TextField: {'widget': Textarea(attrs={'rows': 1, 'cols': 50})},
+    }
+    ordering = ('email',)
     list_display = (
         'id',
         'first_name',
@@ -116,12 +134,35 @@ class CustomUserAdmin(admin.ModelAdmin):
         'last_name',
         'email',
     )
-    inlines = (
-        RoleInline,
+
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('email', 'password1', 'password2')}
+         ),
+    )
+
+    fieldsets = (
+        ('User info', {
+            'fields': (
+                'email',
+                'password',
+                'first_name',
+                'last_name',
+                'groups',
+            ),
+        }),
     )
 
     def company(self, obj):
         return obj.get_company()
+
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
+        if db_field.name == "groups":
+            kwargs["queryset"] = Group.objects.filter(name__in=['master', 'billing', 'support',])
+        return super(CustomUserAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
+
+
 
 
 @admin.register(Company)
@@ -177,6 +218,9 @@ class CompanyAdmin(TabbedModelAdmin):
 
 @admin.register(SignUpRequest)
 class SignUpRequestAdmin(admin.ModelAdmin):
+    readonly_fields = ['type', 'name', 'address_line_first', 'address_line_second', 'state', 'city', 'zip_code',
+                       'phone', 'tax_id', 'employees_number', 'website', 'email', 'first_name', 'last_name',
+                       'master_phone', 'position']
     change_form_template = 'core/sign_up_request_changeform.html'
     list_display = (
         'name',
@@ -239,9 +283,20 @@ class SignUpRequestAdmin(admin.ModelAdmin):
             return HttpResponseRedirect(".")
         return super().response_change(request, obj)
 
+    def get_readonly_fields(self, request, obj=None):
+        if 'add' in request.META['PATH_INFO']:
+            return ()
+        else:
+            return self.readonly_fields
+
 
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
+    readonly_fields = ('operation',
+                       'rating',
+                       'comment',
+                       'date_created',
+                       'reviewer')
     change_form_template = 'core/review_changeform.html'
     list_display = (
         'operation',
@@ -280,3 +335,9 @@ class ReviewAdmin(admin.ModelAdmin):
                 self.message_user(request, "Review successfully approved.")
             return HttpResponseRedirect(".")
         return super().response_change(request, obj)
+
+    def get_readonly_fields(self, request, obj=None):
+        if 'add' in request.META['PATH_INFO']:
+            return ()
+        else:
+            return self.readonly_fields

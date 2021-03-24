@@ -847,7 +847,7 @@ class Transaction(models.Model):
     )
     booking = models.ForeignKey(
         'Booking',
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         related_name='transactions',
         null=True,
     )

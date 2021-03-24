@@ -18,9 +18,13 @@ def process_sign_up_token(user):
 
 
 def master_account_processing(company, master_account_info):
-    user = get_user_model().objects.create(**master_account_info)
-    Role.objects.create(company=company, user=user)
-    user.set_roles(['master'])
+    user = get_user_model().objects.filter(**master_account_info).first()
+    if not user:
+        user = get_user_model().objects.create(**master_account_info)
+    role = Role.objects.filter(company=company, user=user)
+    if not role:
+        Role.objects.create(company=company, user=user)
+        user.set_roles(['master'])
     EmailNotificationSetting.objects.create(user=user)
     process_sign_up_token(user)
 

@@ -183,6 +183,7 @@ class BookingAdmin(DjangoWithExtraContextAdmin, admin.ModelAdmin):
             chat = Chat.objects.filter(operation=obj.id).first()
             url = reverse_lazy("booking:operation-chat", kwargs=dict(booking=obj.id, chat_id=chat.id))
             return redirect(url)
+        return super().response_change(request, obj)
 
 
 @admin.register(TrackStatus)

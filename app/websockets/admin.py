@@ -39,6 +39,7 @@ class TicketChatAdmin(admin.ModelAdmin):
             chat.users.add(user)
             url = reverse_lazy("websockets:support_chat", kwargs=dict(chat_id=obj.chat_id))
             return redirect(url)
+        return super().response_change(request, obj)
 
     def unread_messages(self, obj):
         if ChatPermission.objects.filter(chat_id=obj.chat_id, user_id=self.request.user.id):

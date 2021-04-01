@@ -111,14 +111,14 @@ def check_payment(txid, base_url, developer_key, booking_id, token_uri, client_i
             user_email = booking.client_contact_person.email
             message_body = f'Have some problems with payment on booking number {booking.aceid}, ' \
                            f'please, contact support team.'
-            create_and_assign_notification.delay(
-                Notification.REQUESTS,
-                message_body,
-                [user_id, ],
-                Notification.BILLING,
-                booking_id,
-            )
-            send_email.delay(message_body, [user_email, ], object_id=f'{settings.DOMAIN_ADDRESS}booking/{booking.id}')
+            # create_and_assign_notification.delay(
+            #     Notification.REQUESTS,
+            #     message_body,
+            #     [user_id, ],
+            #     Notification.BILLING,
+            #     booking_id,
+            # )
+            # send_email.delay(message_body, [user_email, ], object_id=f'{settings.DOMAIN_ADDRESS}booking/{booking.id}')
 
 
 @celery_app.task(name='test')

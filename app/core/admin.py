@@ -12,7 +12,7 @@ from app.core.models import CustomUser, Company, BankAccount, Role, SignUpReques
 
 from app.handling.models import LocalFee, PixApiSetting
 from app.core.tasks import create_company_empty_fees
-from core.utils import master_account_processing
+from app.core.utils import master_account_processing
 
 MASTER_ACCOUNT_FIELDS = ['email', 'first_name', 'last_name', 'master_phone', 'position', ]
 EXCLUDE_FIELDS = ['id', 'approved', *MASTER_ACCOUNT_FIELDS]

@@ -266,7 +266,7 @@ ADMIN_REORDER = (
 
     {'app': 'core',
      'label': 'Accounts and Billing',
-     'models': ('core.BankAccount', 'handling.ExchangeRate', 'booking.Transaction')
+     'models': ('core.CustomUser', 'core.BankAccount', 'handling.ExchangeRate', 'booking.Transaction')
      },
 
     {'app': 'booking',
@@ -287,7 +287,7 @@ ADMIN_REORDER = (
 
     {'app': 'websockets',
      'label': 'Special settings on platform (for superuser)',
-     'models': ('core.CustomUser', 'core.Role', 'core.SignUpToken', 'auth.Group',
+     'models': ('core.Role', 'core.SignUpToken', 'auth.Group',
                 'handling.AirTrackingSetting', 'handling.Airline',
                 'handling.Carrier', 'handling.ContainerType',
                 'handling.IMOClass', 'handling.PackagingType',

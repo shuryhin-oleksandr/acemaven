@@ -181,6 +181,8 @@ class BookingAdmin(DjangoWithExtraContextAdmin, admin.ModelAdmin):
     def response_change(self, request, obj):
         if "_open_chat" in request.POST:
             chat = Chat.objects.filter(operation=obj.id).first()
+            user = request.user
+            chat.users.add(user)
             url = reverse_lazy("booking:operation-chat", kwargs=dict(booking=obj.id, chat_id=chat.id))
             return redirect(url)
         return super().response_change(request, obj)

@@ -137,7 +137,7 @@ class ChargeEditSerializer(UserFullNameGetMixin, ChargeSerializer):
 
 class SurchargeListSerializer(serializers.ModelSerializer):
     carrier = serializers.CharField(source='carrier.title')
-    location = serializers.CharField(source='location.display_name')
+    location = serializers.CharField(source='location.code')
     shipping_mode = serializers.CharField(source='shipping_mode.title')
     shipping_type = serializers.CharField(source='shipping_mode.shipping_type.title', initial='')
 
@@ -272,8 +272,8 @@ class RateEditSerializer(UserFullNameGetMixin, RateSerializer):
 
 class FreightRateListSerializer(serializers.ModelSerializer):
     carrier = serializers.CharField(source='carrier.title')
-    origin = serializers.CharField(source='origin.display_name')
-    destination = serializers.CharField(source='destination.display_name')
+    origin = serializers.CharField(source='origin.code')
+    destination = serializers.CharField(source='destination.code')
     shipping_mode = serializers.CharField(source='shipping_mode.title')
     shipping_type = serializers.CharField(source='shipping_mode.shipping_type.title')
     expiration_date = serializers.SerializerMethodField()
@@ -317,7 +317,7 @@ class FreightRateSearchListSerializer(FreightRateListSerializer):
         company_data = dict()
         general_settings = GeneralSetting.load()
         show_freight_forwarder_name = general_settings.show_freight_forwarder_name
-        name = obj.company.name if show_freight_forwarder_name == GeneralSetting.ALL else '*Agent company name'
+        name = obj.company.name if show_freight_forwarder_name == GeneralSetting.ALL else ''
         company_data['name'] = name
         company_data['id'] = obj.company.id
         company_data['rating'] = get_average_company_rating(obj.company)
@@ -668,7 +668,7 @@ class BookingSerializer(serializers.ModelSerializer):
                 if pay_to_book == 0:
                     validated_data['is_paid'] = True
                     validated_data['status'] = Booking.REQUEST_RECEIVED
-                    result.pop('pay_to_book', None)
+                    # result.pop('pay_to_book', None)
 
                 validated_data['charges'] = result
                 validated_data['aceid'] = generate_aceid(freight_rate, company)
@@ -1055,6 +1055,7 @@ class TrackWidgetListSerializer(serializers.ModelSerializer):
         fields = (
             'shipping_type',
             'booking_number',
+            'booking',
             'route',
             'date_created',
             'status',
@@ -1204,7 +1205,9 @@ class OperationListBaseSerializer(GetTrackingInitialMixin, OperationSerializer):
             return None
 
     def get_status(self, obj):
-        if obj.payment_due_by:
+        if obj.status == Booking.COMPLETED:
+            return next(filter(lambda x: x[0] == obj.status, Booking.STATUS_CHOICES), Booking.STATUS_CHOICES[0])[1]
+        elif obj.payment_due_by:
             return 'Awaiting Payment'
         elif (shipment_details := obj.shipment_details.first()) and shipment_details.actual_date_of_departure:
             return 'Shipment in progress'
@@ -1283,6 +1286,7 @@ class OperationRetrieveSerializer(OperationListBaseSerializer):
                         rate_today = round(float(rate.rate) * (1 + float(rate.spread) / 100), 2)
                         result[f'{key} exchange rate'] = rate_today
                     total_today += value * rate_today
+                    result['today_exchange_rate'] = {'currency': main_currency_code, 'exchange_rate': rate_today}
                 result['total_today'] = total_today
         return result
 
@@ -1358,9 +1362,10 @@ class OperationBillingBaseSerializer(serializers.ModelSerializer):
         )
 
     def get_status(self, obj):
-        if change_request_status := obj.change_request_status:
-            return list(filter(lambda x: x[0] == change_request_status, Booking.CHANGE_REQUESTED_CHOICES))[0][1]
+        # if change_request_status := obj.change_request_status:
+        #     return list(filter(lambda x: x[0] == change_request_status, Booking.CHANGE_REQUESTED_CHOICES))[0][1]
         return list(filter(lambda x: x[0] == obj.status, Booking.STATUS_CHOICES))[0][1]
+
 
 
 class OperationBillingAgentListSerializer(OperationBillingBaseSerializer):
@@ -1376,6 +1381,7 @@ class OperationBillingAgentListSerializer(OperationBillingBaseSerializer):
             'client',
             'booking_number',
             'vessel',
+            'date_accepted_by_agent',
         )
 
     def get_booking_number(self, obj):
@@ -1401,6 +1407,7 @@ class OperationBillingClientListSerializer(GetTrackingInitialMixin, OperationBil
             'dates',
             'date_created',
             'shipment_details',
+            'date_accepted_by_agent',
         )
 
     def get_dates(self, obj):

@@ -97,7 +97,7 @@ class CompanyReviewSerializer(serializers.ModelSerializer):
     def get_name(self, obj):
         general_settings = GeneralSetting.load()
         show_freight_forwarder_name = general_settings.show_freight_forwarder_name
-        return obj.name if show_freight_forwarder_name == GeneralSetting.ALL else '*Agent company name'
+        return obj.name if show_freight_forwarder_name == GeneralSetting.ALL else ''
 
     def get_shipping_types(self, obj):
         return obj.freight_rates.\

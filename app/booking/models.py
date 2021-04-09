@@ -414,7 +414,7 @@ class Booking(models.Model):
         _('Date booking created'),
         auto_now_add=True,
     )
-    date_accepted_by_agent = models.DateField(
+    date_accepted_by_agent = models.DateTimeField(
         _('Date booking accepted by an agent'),
         null=True,
     )

@@ -36,14 +36,14 @@ from app.booking.utils import date_format, wm_calculate, freight_rate_search, ca
     get_fees, surcharge_search, make_copy_of_surcharge, make_copy_of_freight_rate, \
     apply_operation_select_prefetch_related
 from app.core.mixins import PermissionClassByActionMixin
-from app.core.models import Company, BankAccount
+from app.core.models import Company, BankAccount, Review
 from app.core.permissions import IsMasterOrAgent, IsClientCompany, IsAgentCompany
 from app.core.serializers import ReviewBaseSerializer
 from app.handling.models import Port, Currency, ClientPlatformSetting
 from app.location.models import Country
 from app.websockets.models import Notification, Chat
 from app.websockets.tasks import create_and_assign_notification, reassign_confirmed_operation_notifications, \
-    delete_accepted_booking_notifications, send_email
+    delete_accepted_booking_notifications, send_email, create_chat_for_operation
 from app.booking.tasks import change_charge
 from config import settings
 from app.core.util.get_jwt_token import get_jwt_token
@@ -693,21 +693,28 @@ class BookingViesSet(PermissionClassByActionMixin,
             if not instance.is_paid:
                 kwargs.update(booking_fee=booking_fee, service_fee=service_fee, calculate_fees=calculate_fees)
             new_charges = calculate_freight_rate_charges(**kwargs)
-            instance.charges = new_charges
-            instance.save()
 
-            if not instance.is_paid:
-                bank_account = BankAccount.objects.filter(is_default=True, is_platforms=True).first()
-                pix_settings = bank_account.pix_api
-                txid = instance.transactions.values_list('txid', flat=True).first()
-                new_charge = new_charges.get('pay_to_book').get('pay_to_book')
-                instance.transactions.filter(booking=instance.id, status=Transaction.OPENED).update(charge=new_charge)
-                change_charge.delay(base_url=pix_settings.base_url, new_amount=new_charge,
-                                    developer_key=pix_settings.developer_key, txid=txid,
-                                    is_prod=pix_settings.is_prod, booking_id=instance.id,
-                                    token_uri=pix_settings.token_uri, client_id=pix_settings.client_id,
-                                    client_secret=pix_settings.client_secret, basic_token=pix_settings.basic_token,
-                                    )
+            try:
+                with transaction.atomic():
+                    instance.charges = new_charges
+                    instance.save()
+
+                    if not instance.is_paid:
+                        bank_account = BankAccount.objects.filter(is_default=True, is_platforms=True).first()
+                        pix_settings = bank_account.pix_api
+                        txid = instance.transactions.values_list('txid', flat=True).first()
+                        new_charge = new_charges.get('pay_to_book').get('pay_to_book')
+                        instance.transactions.filter(booking=instance.id, status=Transaction.OPENED).update(charge=new_charge)
+                        change_charge.delay(base_url=pix_settings.base_url, new_amount=new_charge,
+                                            developer_key=pix_settings.developer_key, txid=txid,
+                                            is_prod=pix_settings.is_prod, booking_id=instance.id,
+                                            token_uri=pix_settings.token_uri, client_id=pix_settings.client_id,
+                                            client_secret=pix_settings.client_secret, basic_token=pix_settings.basic_token,)
+            except ValueError:
+                return Response(
+                    data={'error': 'could not change charge because of error.'},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
 
         except AttributeError:
             return Response(
@@ -837,11 +844,18 @@ class OperationViewSet(PermissionClassByActionMixin,
         operation_id = operation.id
         change_request = operation.change_requests.first()
 
-        chat = operation.chat
-        chat.operation = change_request
-        chat.save()
+        if Chat.objects.filter(id=operation_id):
+            chat = operation.chat
+            chat.operation = change_request
+            chat.save()
+        # else:
+        #     create_chat_for_operation.delay(change_request.id)
+        #     chat = operation.chat
+        #     chat.operation = change_request
+        #     chat.save()
 
         operation.shipment_details.update(booking=change_request)
+        operation.transactions.update(booking=change_request)
         operation.delete()
 
         change_request.change_request_status = Booking.CHANGE_CONFIRMED
@@ -918,8 +932,12 @@ class OperationViewSet(PermissionClassByActionMixin,
     @action(methods=['post'], detail=True, url_path='review')
     def leave_review(self, request, *args, **kwargs):
         operation = self.get_object()
+        request.data['operation'] = operation
+        request.data['reviewer'] = request.user
+        Review.objects.create(**request.data)
         request.data['operation'] = operation.id
-        return self.create(request, *args, **kwargs)
+        request.data['reviewer'] = request.user.id
+        return Response(request.data, status=status.HTTP_201_CREATED)
 
 
 class OperationBillingViewSet(mixins.ListModelMixin,

@@ -136,6 +136,7 @@ class OperationFilterSet(django_filters.FilterSet):
     aceid = django_filters.CharFilter(field_name='aceid', lookup_expr='icontains')
     carrier = django_filters.CharFilter(field_name='freight_rate__carrier__title', lookup_expr='icontains')
     status = django_filters.CharFilter(method='status_filter', label='Operation statuses')
+    route = django_filters.CharFilter(method='route_filter', label='Route filter')
 
     class Meta:
         model = Booking
@@ -144,7 +145,13 @@ class OperationFilterSet(django_filters.FilterSet):
             'my_operations',
             'aceid',
             'carrier',
+            'route',
         )
+
+    def route_filter(self, queryset, _, value):
+        return queryset.filter(
+            Q(freight_rate__origin__code__icontains=value) | Q(freight_rate__destination__code__icontains=value)
+        ).distinct()
 
     def my_operations_filter(self, queryset, _, value):
         if value:

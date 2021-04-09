@@ -182,22 +182,25 @@ def calculate_freight_rate(totals,
     freight = dict()
     code = rate.currency.code
     freight['currency'] = code
-    freight['cost'] = float(total_weight_per_pack * rate.rate)
+    cost_pure = float(total_weight_per_pack * rate.rate)
+    freight['cost_pure'] = cost_pure
+    freight['cost'] = cost_pure
     subtotal = volume * total_weight * rate.rate
+    freight['subtotal_pure'] = float(subtotal)
+    freight['subtotal'] = subtotal
     if booking_fee and calculate_fees:
         booking_fee_value_in_foreign_curr, booking_fee_value_in_local_curr = calculate_fee(booking_fee,
                                                                                            rate,
                                                                                            main_currency_code,
                                                                                            exchange_rate,
                                                                                            subtotal)
-        freight['booking_fee'] = booking_fee_value_in_foreign_curr
-        freight['subtotal_pure'] = float(subtotal)
-        subtotal = float(subtotal) + booking_fee_value_in_foreign_curr
+        freight['booking_fee'] = round((booking_fee_value_in_foreign_curr * volume), 2)
+        cost = float(cost_pure + booking_fee_value_in_foreign_curr)
+        subtotal = round(float(volume * cost), 2)
         add_currency_value(totals['booking_fee'], code, booking_fee_value_in_foreign_curr)
-        add_currency_value(totals, code, booking_fee_value_in_foreign_curr)
         add_currency_value(totals, 'booking_fee_in_local_currency', booking_fee_value_in_local_curr)
-    subtotal = float(subtotal)
-    freight['subtotal'] = subtotal
+        freight['cost'] = cost
+        freight['subtotal'] = subtotal
     add_currency_value(totals, code, subtotal)
     add_currency_value(totals['total_freight_rate'], code, subtotal)
     return freight
@@ -367,6 +370,10 @@ def calculate_freight_rate_charges(freight_rate,
             'pay_to_book': pay_to_book,
             'currency': main_currency_code,
         }
+        result['totals_pure'] = {
+            main_currency_code: (totals[main_currency_code] - result['pay_to_book']['pay_to_book'])}
+    else:
+        result['totals_pure'] = totals
 
     result['totals'] = totals
 

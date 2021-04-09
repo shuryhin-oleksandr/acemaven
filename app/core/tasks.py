@@ -6,6 +6,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 
 from app.handling.models import LocalFee, ShippingMode
+from config.settings import DOMAIN_ADDRESS
 
 logger = logging.getLogger("acemaven.task.logging")
 
@@ -14,7 +15,7 @@ logger = logging.getLogger("acemaven.task.logging")
 def send_registration_email(token, recipient_email):
     subject = 'Acemaven. Registration process.'
     logger.info(f'New registration email is going to be send to {recipient_email}')
-    message_body = f'{settings.DOMAIN_ADDRESS}signup?token={token}'
+    message_body = f'{DOMAIN_ADDRESS}additional/user?token={token}'
     template_html = get_template(f"core/emails_templates/index.html")
     text = "To complete your sign-up, please press the button:"
     context = {

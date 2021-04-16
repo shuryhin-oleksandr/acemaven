@@ -100,7 +100,7 @@ def wm_calculate(data, shipping_type=None):
 
 
 def add_currency_value(totals, code, subtotal):
-    totals[code] = round((totals[code] + subtotal), 1) if code in totals else round(subtotal, 1)
+    totals[code] = round((totals[code] + subtotal), 2) if code in totals else round(subtotal, 2)
 
 
 def calculate_additional_surcharges(totals,
@@ -127,7 +127,7 @@ def calculate_additional_surcharges(totals,
                         cost_per_pack = Decimal(cargo_group.get('weight')) * charge.charge
                     elif condition == Charge.FIXED:
                         fixed_cost = True
-                subtotal = cost_per_pack * Decimal(cargo_group.get('volume')) if not fixed_cost else cost_per_pack
+                subtotal = cost_per_pack * Decimal(cargo_group.get('volume')) if not fixed_cost else cost_per_pack * Decimal(cargo_group.get('volume'))
                 subtotal = float(subtotal)
                 cost_per_pack = float(cost_per_pack)
                 code = charge.currency.code
@@ -154,11 +154,7 @@ def calculate_additional_surcharges(totals,
 
 def calculate_fee(booking_fee, rate, main_currency_code, exchange_rate, subtotal):
     if booking_fee.value_type == GlobalFee.FIXED:
-        if rate.currency.code != main_currency_code:
-            booking_fee_value_in_foreign_curr = booking_fee.value / (exchange_rate.rate * (
-                    1 + exchange_rate.spread / 100))
-        else:
-            booking_fee_value_in_foreign_curr = booking_fee.value
+        booking_fee_value_in_foreign_curr = booking_fee.value
         booking_fee_value_in_local_curr = booking_fee.value
     else:
         booking_fee_value_in_foreign_curr = subtotal * booking_fee.value / 100
@@ -185,7 +181,7 @@ def calculate_freight_rate(totals,
     cost_pure = float(total_weight_per_pack * rate.rate)
     freight['cost_pure'] = cost_pure
     freight['cost'] = cost_pure
-    subtotal = volume * total_weight * rate.rate
+    subtotal = float(volume) * float(total_weight_per_pack) * float(rate.rate)
     freight['subtotal_pure'] = float(subtotal)
     freight['subtotal'] = subtotal
     if booking_fee and calculate_fees:
@@ -194,15 +190,16 @@ def calculate_freight_rate(totals,
                                                                                            main_currency_code,
                                                                                            exchange_rate,
                                                                                            subtotal)
-        freight['booking_fee'] = round((booking_fee_value_in_foreign_curr * volume), 2)
+        booking_fee_for_volumes = float(booking_fee_value_in_foreign_curr * volume)
+        freight['booking_fee'] = booking_fee_for_volumes
         cost = float(cost_pure + booking_fee_value_in_foreign_curr)
-        subtotal = round(float(volume * cost), 2)
-        add_currency_value(totals['booking_fee'], code, booking_fee_value_in_foreign_curr)
-        add_currency_value(totals, 'booking_fee_in_local_currency', booking_fee_value_in_local_curr)
-        freight['cost'] = cost
-        freight['subtotal'] = subtotal
-    add_currency_value(totals, code, subtotal)
-    add_currency_value(totals['total_freight_rate'], code, subtotal)
+        subtotal = subtotal + booking_fee_for_volumes
+        add_currency_value(totals['booking_fee'], code, booking_fee_for_volumes)
+        add_currency_value(totals, 'booking_fee_in_local_currency', booking_fee_for_volumes)
+        freight['cost'] = round(cost, 2)
+        freight['subtotal'] = round(float(subtotal), 2)
+    add_currency_value(totals, code, float(subtotal))
+    add_currency_value(totals['total_freight_rate'], code, float(subtotal))
     return freight
 
 
@@ -242,6 +239,7 @@ def calculate_freight_rate_charges(freight_rate,
                                                                 exchange_rate,
                                                                 booking_fee=booking_fee,
                                                                 total_weight_per_pack=total_weight_per_pack,
+                                                                volume=cargo_group.get('volume'),
                                                                 total_weight=total_weight,
                                                                 calculate_fees=calculate_fees, )
 
@@ -317,24 +315,33 @@ def calculate_freight_rate_charges(freight_rate,
     doc_fee['subtotal'] = subtotal_doc_fee_charge
     result['doc_fee'] = doc_fee
     add_currency_value(totals, charge.currency.code, subtotal_doc_fee_charge)
+    add_currency_value(totals['total_surcharge'], doc_fee['currency'], subtotal_doc_fee_charge)
 
     total_freight_rate = totals.pop('total_freight_rate')
     total_surcharge = totals.pop('total_surcharge')
     result['total_freight_rate'] = total_freight_rate
     result['total_surcharge'] = total_surcharge
+    result['totals_pure'] = totals
 
     if calculate_fees:
         result['booking_fee'] = totals.pop('booking_fee', {})
         exchange_rates = dict()
-        for key, _ in result['booking_fee'].items():
+        total_booking_fee = 0
+        for key, value in result['booking_fee'].items():
             if key != main_currency_code:
                 exchange_rate = ExchangeRate.objects.filter(
                     currency__code=key,
                     is_platforms=True,
                 ).first()
-                exchange_rates[key] = float(exchange_rate.rate) * (1 + float(exchange_rate.spread) / 100)
+                a = round((float(exchange_rate.rate) * (1 + float(exchange_rate.spread) / 100)), 2)
+                exchange_rates[key] = a
+                total_booking_fee += a * value
+            else:
+                total_booking_fee += value
+
         result['exchange_rates'] = exchange_rates
-        booking_fee_in_local_currency = totals.pop('booking_fee_in_local_currency', 0)
+        booking_fee_in_local_currency = total_booking_fee
+        totals.pop('booking_fee_in_local_currency', 0)
 
         if service_fee:
             float_service_fee_value = float(service_fee.value)
@@ -366,14 +373,17 @@ def calculate_freight_rate_charges(freight_rate,
         pay_to_book = service_fee_value + booking_fee_in_local_currency
         result['pay_to_book'] = {
             'service_fee': service_fee_value,
-            'booking_fee': booking_fee_in_local_currency,
-            'pay_to_book': pay_to_book,
+            'booking_fee': round(booking_fee_in_local_currency, 2),
+            'pay_to_book': round(pay_to_book, 2),
             'currency': main_currency_code,
         }
-        result['totals_pure'] = {
-            main_currency_code: (totals[main_currency_code] - result['pay_to_book']['pay_to_book'])}
-    else:
-        result['totals_pure'] = totals
+        result['totals'] = totals
+        totals_pure = totals.copy()
+        totals_pure[main_currency_code] = round((totals_pure[main_currency_code] - service_fee_value), 2)
+
+        for currency, value in totals_pure.items():
+            totals_pure[currency] = value - result['booking_fee'].get(currency, 0)
+        result['totals_pure'] = totals_pure
 
     result['totals'] = totals
 

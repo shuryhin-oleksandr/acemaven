@@ -1279,14 +1279,17 @@ class OperationRetrieveSerializer(OperationListBaseSerializer):
             if billing_exchange_rate:
                 main_currency_code = Currency.objects.filter(is_main=True).first().code
                 total_today = 0
+                result['today_exchange_rate'] = {}
                 for key, value in totals.items():
                     rate_today = 1
                     if key != main_currency_code:
                         rate = billing_exchange_rate.rates.filter(currency__code=key).first()
                         rate_today = round(float(rate.rate) * (1 + float(rate.spread) / 100), 2)
                         result[f'{key} exchange rate'] = rate_today
+                        today_exchange_rate = {key: rate_today}
+                        result['today_exchange_rate'].update(today_exchange_rate)
                     total_today += value * rate_today
-                    result['today_exchange_rate'] = {'currency': main_currency_code, 'exchange_rate': rate_today}
+
                 result['total_today'] = total_today
         return result
 

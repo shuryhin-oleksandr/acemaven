@@ -523,6 +523,8 @@ class QuoteViesSet(PermissionClassByActionMixin,
 
                     freight_rate = FreightRate.objects.filter(id=data.get('freight_rate')).first()
                     freight_rate_dict = FreightRateSearchListSerializer(freight_rate).data
+                    booking_fee, service_fee = get_fees(freight_rate.company, freight_rate.shipping_mode)
+                    calculate_fees = ClientPlatformSetting.load().enable_booking_fee_payment
                     cargo_groups = CargoGroupSerializer(quote.quote_cargo_groups, many=True).data
                     container_type_ids_list = [
                         group.get('container_type') for group in cargo_groups if group.get('container_type')
@@ -543,7 +545,10 @@ class QuoteViesSet(PermissionClassByActionMixin,
                                                             main_currency_code,
                                                             quote.date_from,
                                                             quote.date_to,
-                                                            container_type_ids_list, )
+                                                            container_type_ids_list,
+                                                            booking_fee=booking_fee,
+                                                            service_fee=service_fee,
+                                                            calculate_fees=calculate_fees)
                     data['charges'] = result
 
                     serializer = QuoteStatusBaseSerializer(data=data)

@@ -140,16 +140,17 @@ def calculate_additional_surcharges(totals,
 
     if shipping_mode.has_surcharge_containers:
         usage_fee_data = dict()
-        code = usage_fee.currency.code
-        usage_fee_data['currency'] = code
-        usage_fee_data['cost'] = float(usage_fee.charge)
-        subtotal = usage_fee.charge * Decimal(cargo_group.get('volume'))
-        subtotal = float(subtotal)
-        usage_fee_data['subtotal'] = subtotal
-        data_key = 'usage_fee' if shipping_mode.is_need_volume else 'handling'
-        new_cargo_group[data_key] = usage_fee_data
-        add_currency_value(totals, code, subtotal)
-        add_currency_value(totals['total_surcharge'], code, subtotal)
+        if usage_fee:
+            code = usage_fee.currency.code
+            usage_fee_data['currency'] = code
+            usage_fee_data['cost'] = float(usage_fee.charge)
+            subtotal = usage_fee.charge * Decimal(cargo_group.get('volume'))
+            subtotal = float(subtotal)
+            usage_fee_data['subtotal'] = subtotal
+            data_key = 'usage_fee' if shipping_mode.is_need_volume else 'handling'
+            new_cargo_group[data_key] = usage_fee_data
+            add_currency_value(totals, code, subtotal)
+            add_currency_value(totals['total_surcharge'], code, subtotal)
 
 
 def calculate_fee(booking_fee, rate, main_currency_code, exchange_rate, subtotal):

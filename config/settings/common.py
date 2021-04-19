@@ -24,7 +24,7 @@ REPO_DIR = BASE_DIR.parent.resolve()
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '%2!lic16312n0yqo8ul)&-o8u-fpf1t^*7d+w%(h!!pvqurtvd'
+SECRET_KEY = '%2!lic16312n0yqo8ul)&-o8u-fpf1t^*7d+w%(h!!pvqurtv'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True

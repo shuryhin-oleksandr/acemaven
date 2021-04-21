@@ -6,7 +6,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 
 from app.handling.models import LocalFee, ShippingMode
-from config.settings import DOMAIN_ADDRESS
+from config.settings.local import DOMAIN_ADDRESS
 
 logger = logging.getLogger("acemaven.task.logging")
 

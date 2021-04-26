@@ -3,6 +3,7 @@ from django.contrib import admin
 from app.handling.models import ShippingType, ShippingMode, PackagingType, ContainerType, \
     IMOClass, ReleaseType, Carrier, Airline, Currency, Port, ExchangeRate, ClientPlatformSetting, GeneralSetting, \
     AirTrackingSetting, SeaTrackingSetting, LocalFee
+from django.utils.translation import ugettext_lazy as _
 
 
 @admin.register(ClientPlatformSetting)
@@ -18,7 +19,12 @@ class ClientPlatformSettingAdmin(admin.ModelAdmin):
 
 @admin.register(GeneralSetting)
 class GeneralSettingAdmin(admin.ModelAdmin):
-    pass
+    def formfield_for_choice_field(self, db_field, request, **kwargs):
+        if db_field.name == "show_freight_forwarder_name":
+            kwargs['choices'] = [(choice[0], _(choice[1])) for choice in
+                                 GeneralSetting.SHOW_FREIGHT_FORWARDER_NAME_CHOICES]
+
+        return super(GeneralSettingAdmin, self).formfield_for_choice_field(db_field, request, **kwargs)
 
 
 @admin.register(AirTrackingSetting)
@@ -38,7 +44,7 @@ class PortAdmin(admin.ModelAdmin):
 
 @admin.register(Currency)
 class CurrencyAdmin(admin.ModelAdmin):
-    search_fields = ('code', )
+    search_fields = ('code',)
     list_display = ('code', 'is_active', 'is_main',)
 
 
@@ -49,8 +55,8 @@ class AirlineAdmin(admin.ModelAdmin):
 
 @admin.register(Carrier)
 class CarrierAdmin(admin.ModelAdmin):
-    list_display = ('title', 'shipping_type', 'scac', 'code', 'prefix', )
-    list_filter = ('shipping_type', )
+    list_display = ('title', 'shipping_type', 'scac', 'code', 'prefix',)
+    list_filter = ('shipping_type',)
 
 
 @admin.register(ReleaseType)
@@ -111,4 +117,3 @@ class ListTopFilter(admin.filters.ChoicesFieldListFilter):
 
 class RelatedListTopFilter(admin.filters.RelatedFieldListFilter):
     template = 'handling/global_fee_change_list_filter.html'
-

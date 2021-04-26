@@ -5,9 +5,11 @@ from django_with_extra_context_admin.admin import DjangoWithExtraContextAdmin
 from app.booking.models import Surcharge, AdditionalSurcharge, FreightRate, TrackStatus, Direction, Booking, \
     CargoGroup, ShipmentDetails, Transaction
 
+from django.utils.translation import ugettext_lazy as _
+
 import logging
 
-from django.contrib import admin, messages
+from django.contrib import admin
 
 from app.websockets.models import Chat
 
@@ -53,7 +55,7 @@ class TransactionAdmin(admin.ModelAdmin):
     list_display = (
         'transaction',
         'booking_number',
-        'status',
+        'status_choices',
     )
     readonly_fields = ('response', 'booking', 'charge', 'txid', 'qr_code')
 
@@ -61,7 +63,11 @@ class TransactionAdmin(admin.ModelAdmin):
         return obj.booking.aceid
 
     def transaction(self, obj):
-        return f'Transaction number: {obj.id} {f"with txid {obj.txid}" if obj.txid else ""}'
+        if obj.txid:
+            number = obj.txid
+        else:
+            number = obj.id
+        return _('Transaction number: {number}').format(number=number)
 
     def get_readonly_fields(self, request, obj=None):
         if 'add' in request.META['PATH_INFO']:
@@ -69,11 +75,33 @@ class TransactionAdmin(admin.ModelAdmin):
         else:
             return self.readonly_fields
 
+    def status_choices(self, obj):
+        choice = \
+            next(filter(lambda x: x[0] == obj.status, Transaction.STATUS_CHOICES),
+                 Transaction.STATUS_CHOICES[0])[1]
+        return _(choice)
+
+    def formfield_for_choice_field(self, db_field, request, **kwargs):
+        if db_field.name == "status":
+            kwargs['choices'] = [(choice[0], _(choice[1])) for choice in Transaction.STATUS_CHOICES]
+
+        return super(TransactionAdmin, self).formfield_for_choice_field(db_field, request, **kwargs)
+
+    status_choices.short_description = _("Status")
+    transaction.short_description = _("Transaction")
+    booking_number.short_description = _("Booking number")
+
 
 class TransactionInline(admin.StackedInline):
     model = Transaction
     extra = 0
     readonly_fields = ['txid', 'charge', 'booking', 'qr_code', 'response']
+
+    def formfield_for_choice_field(self, db_field, request, **kwargs):
+        if db_field.name == "status":
+            kwargs['choices'] = [(choice[0], _(choice[1])) for choice in Transaction.STATUS_CHOICES]
+
+        return super(TransactionInline, self).formfield_for_choice_field(db_field, request, **kwargs)
 
 
 @admin.register(Booking)
@@ -92,12 +120,12 @@ class BookingAdmin(DjangoWithExtraContextAdmin, admin.ModelAdmin):
         'volume',
         'dates',
         'carrier',
-        'status',
+        'status_choice',
         'agent_contact_person'
     )
 
     fieldsets = (
-        ('Operation info', {
+        (_('Operation info'), {
             'fields': (
                 'aceid',
                 'status',
@@ -108,7 +136,7 @@ class BookingAdmin(DjangoWithExtraContextAdmin, admin.ModelAdmin):
             ),
         }
          ),
-        ('Dates info', {
+        (_('Dates info'), {
             'fields': (
                 'date_from',
                 'date_to',
@@ -116,7 +144,7 @@ class BookingAdmin(DjangoWithExtraContextAdmin, admin.ModelAdmin):
             )
         }),
         (
-            'General information', {
+            _('General information'), {
                 'fields':
                     (
                         'client_contact_person',
@@ -186,6 +214,29 @@ class BookingAdmin(DjangoWithExtraContextAdmin, admin.ModelAdmin):
             url = reverse_lazy("booking:operation-chat", kwargs=dict(booking=obj.id, chat_id=chat.id))
             return redirect(url)
         return super().response_change(request, obj)
+
+    def formfield_for_choice_field(self, db_field, request, **kwargs):
+
+        if db_field.name == "status":
+            kwargs['choices'] = [(choice[0], _(choice[1])) for choice in Booking.STATUS_CHOICES]
+
+        if db_field.name == "change_request_status":
+            kwargs['choices'] = [(choice[0], _(choice[1])) for choice in Booking.CHANGE_REQUESTED_CHOICES]
+
+        return super(BookingAdmin, self).formfield_for_choice_field(db_field, request, **kwargs)
+
+    def status_choice(self, obj):
+        choice = \
+            next(filter(lambda x: x[0] == obj.status, Booking.CHANGE_REQUESTED_CHOICES), Booking.CHANGE_REQUESTED_CHOICES[0])[1]
+        return _(choice)
+
+    status_choice.short_description = _("Status")
+    route.short_description = _("Route")
+    volume.short_description = _("Volume")
+    dates.short_description = _("Dates")
+    carrier.short_description = _("Carrier")
+    chat.short_description = _("Chat")
+    messages.short_description = _("Messages")
 
 
 @admin.register(TrackStatus)

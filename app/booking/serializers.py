@@ -25,6 +25,7 @@ from app.websockets.tasks import create_chat_for_operation, send_email
 from app.websockets.tasks import create_and_assign_notification
 from config import settings
 from app.core.util.payment import get_qr_code
+from django.utils.translation import ugettext as _
 
 try:
     MAIN_COUNTRY_CODE = Country.objects.filter(is_main=True).first().code
@@ -86,6 +87,7 @@ class UsageFeeSerializer(UserUpdateMixin, serializers.ModelSerializer):
             'charge',
         )
 
+
 class TransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transaction
@@ -96,6 +98,7 @@ class TransactionSerializer(serializers.ModelSerializer):
             'booking',
             'qr_code',
         )
+
 
 class UsageFeeEditSerializer(UserFullNameGetMixin, UsageFeeSerializer):
     container_type = ContainerTypesSerializer()
@@ -668,7 +671,6 @@ class BookingSerializer(serializers.ModelSerializer):
                 if pay_to_book == 0:
                     validated_data['is_paid'] = True
                     validated_data['status'] = Booking.REQUEST_RECEIVED
-                    # result.pop('pay_to_book', None)
 
                 validated_data['charges'] = result
                 validated_data['aceid'] = generate_aceid(freight_rate, company)
@@ -680,14 +682,18 @@ class BookingSerializer(serializers.ModelSerializer):
         except Exception as error:
             raise serializers.ValidationError({'error': error})
         if booking.is_paid:
-            agent_text = f'A new booking request on number {booking.aceid} has been received.'
+            agent_text = _('A new booking request on number {aceid} has been received.') \
+                .format(aceid=booking.aceid)
             ff_company = booking.freight_rate.company
             users_ids = list(
                 ff_company.users.filter(role__groups__name__in=('master', 'agent')).values_list('id', flat=True)
             )
+            message_body = 'A new booking request on number {aceid} has been received.'
+            message_params = {'aceid': booking.aceid}
             create_and_assign_notification.delay(
                 Notification.REQUESTS,
-                agent_text,
+                message_body,
+                message_params,
                 users_ids,
                 Notification.BOOKING,
                 object_id=booking.id,
@@ -697,10 +703,12 @@ class BookingSerializer(serializers.ModelSerializer):
             )
             send_email.delay(agent_text, agent_emails, object_id=f'{settings.DOMAIN_ADDRESS}new_booking/{booking.id}')
 
-            client_text = f'The booking request on number {booking.aceid} has been sent to "{ff_company.name}".'
+            client_text = _('The booking request on number {aceid} has been sent to "{name}".') \
+                .format(aceid=booking.aceid, name=ff_company.name)
             create_and_assign_notification.delay(
                 Notification.REQUESTS,
-                client_text,
+                'The booking request on number {aceid} has been sent to "{name}".',
+                {'aceid': booking.aceid, 'name': ff_company.name},
                 [user.id, ],
                 Notification.OPERATION,
                 object_id=booking.id,
@@ -720,17 +728,19 @@ class BookingSerializer(serializers.ModelSerializer):
             check_payment.delay(txid=txid, booking_id=booking.id, token_uri=pix_settings.token_uri,
                                 client_id=pix_settings.client_id, client_secret=pix_settings.client_secret,
                                 basic_token=pix_settings.basic_token, base_url=pix_settings.base_url,
-                                developer_key=pix_settings.developer_key,)
+                                developer_key=pix_settings.developer_key, )
 
             users_ids = list(
                 company.users.filter(role__groups__name__in=('master', 'billing')).values_list('id', flat=True)
             )
 
-            message_body = f'A new Booking Request on number {booking.aceid} ' \
-                           f'is pending of Booking Fee payment to be sent.'
+            message_body = _(
+                'A new Booking Request on number {aceid} is pending of Booking Fee payment to be sent.') \
+                .format(aceid=booking.aceid)
             create_and_assign_notification.delay(
                 Notification.REQUESTS,
-                message_body,
+                'A new Booking Request on number {aceid} is pending of Booking Fee payment to be sent.',
+                {'aceid': booking.aceid},
                 users_ids,
                 Notification.BILLING,
                 object_id=booking.id,
@@ -873,10 +883,12 @@ class ShipmentDetailsBaseSerializer(serializers.ModelSerializer):
             create_track = True
 
             if direction == 'import':
-                message_body = f'The shipment {booking.aceid} has departed from {booking.freight_rate.origin}.'
+                message_body = _('The shipment {aceid} has departed from {origin}.') \
+                    .format(aceid=booking.aceid, origin=booking.freight_rate.origin)
                 create_and_assign_notification.delay(
                     Notification.OPERATIONS_IMPORT,
-                    message_body,
+                    'The shipment {aceid} has departed from {origin}.',
+                    {'aceid':booking.aceid, 'origin':booking.freight_rate.origin},
                     [booking.agent_contact_person_id, booking.client_contact_person_id, ],
                     Notification.OPERATION,
                     object_id=booking.id,
@@ -896,10 +908,12 @@ class ShipmentDetailsBaseSerializer(serializers.ModelSerializer):
             create_track = True
 
             if direction == 'export':
-                message_body = f'The shipment {booking.aceid} has arrived at {booking.freight_rate.destination}.',
+                message_body = _('The shipment {aceid} has arrived at {destination}.') \
+                    .format(aceid=booking.aceid, destination=booking.freight_rate.destination)
                 create_and_assign_notification.delay(
                     Notification.OPERATIONS_EXPORT,
-                    message_body,
+                    'The shipment {aceid} has arrived at {destination}.',
+                    {'aceid':booking.aceid, 'destination':booking.freight_rate.destination},
                     [booking.agent_contact_person_id, booking.client_contact_person_id, ],
                     Notification.OPERATION,
                     object_id=booking.id,
@@ -938,10 +952,12 @@ class ShipmentDetailsBaseSerializer(serializers.ModelSerializer):
                 status=track_status,
                 booking=booking,
             )
-            message_body = f'Shipment details in {booking.aceid} have changed. {track_message}'
+            message_body = _('Shipment details in {aceid} have changed. {track_message}') \
+                .format(aceid=booking.aceid, track_message=track_message)
             create_and_assign_notification.delay(
                 Notification.OPERATIONS,
-                message_body,
+                'Shipment details in {aceid} have changed. {track_message}',
+                {'aceid':booking.aceid, 'track_message':track_message},
                 [booking.agent_contact_person_id, booking.client_contact_person_id, ],
                 Notification.OPERATION,
                 object_id=booking.id,
@@ -994,10 +1010,12 @@ class TrackSerializer(serializers.ModelSerializer):
             shipment_details.actual_date_of_departure = actual_date_of_departure
 
             if direction == 'import':
-                message_body = f'The shipment {booking.aceid} has departed from {booking.freight_rate.origin}.'
+                message_body = _('The shipment {aceid} has departed from {origin}.') \
+                    .format(aceid=booking.aceid, origin=booking.freight_rate.origin)
                 create_and_assign_notification.delay(
                     Notification.OPERATIONS_IMPORT,
-                    message_body,
+                    'The shipment {aceid} has departed from {origin}.',
+                    {'aceid':booking.aceid, 'origin':booking.freight_rate.origin},
                     [booking.agent_contact_person_id, booking.client_contact_person_id, ],
                     Notification.OPERATION,
                     object_id=booking.id,
@@ -1010,10 +1028,12 @@ class TrackSerializer(serializers.ModelSerializer):
             shipment_details.actual_date_of_arrival = actual_date_of_arrival
 
             if direction == 'export':
-                message_body = f'The shipment {booking.aceid} has arrived at {booking.freight_rate.destination}.'
+                message_body = _('The shipment {aceid} has arrived at {destination}.') \
+                    .format(aceid=booking.aceid, destination=booking.freight_rate.destination)
                 create_and_assign_notification.delay(
                     Notification.OPERATIONS_EXPORT,
-                    message_body,
+                    'The shipment {aceid} has arrived at {destination}.',
+                    {'aceid':booking.aceid, 'destination':booking.freight_rate.destination},
                     [booking.agent_contact_person_id, booking.client_contact_person_id, ],
                     Notification.OPERATION,
                     object_id=booking.id,
@@ -1142,10 +1162,15 @@ class OperationSerializer(serializers.ModelSerializer):
         original_booking.change_request_status = Booking.CHANGE_REQUESTED
         original_booking.save()
 
-        message_body = f'The Client has requested a change in the shipment {original_booking.aceid}, from {original_booking.freight_rate.origin} to {original_booking.freight_rate.destination}'
+        message_body = _(
+            'The Client has requested a change in the shipment {aceid}, from {origin} to {destination}') \
+            .format(aceid=original_booking.aceid, origin=original_booking.freight_rate.origin,
+                    destination=original_booking.freight_rate.destination)
         create_and_assign_notification.delay(
             Notification.OPERATIONS,
-            message_body,
+            'The Client has requested a change in the shipment {aceid}, from {origin} to {destination}',
+            {'aceid':original_booking.aceid, 'origin':original_booking.freight_rate.origin,
+                    'destination':original_booking.freight_rate.destination},
             [original_booking.agent_contact_person.id, ],
             Notification.OPERATION,
             object_id=original_booking.id,
@@ -1157,10 +1182,15 @@ class OperationSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         super().update(instance, validated_data)
         if 'payment_due_by' in validated_data:
-            message_body = f'Payment due date for the operation {instance.aceid} has been updated to {datetime.datetime.strftime(validated_data["payment_due_by"], "%d %B %Y")}.'
+            message_body = _(
+                'Payment due date for the operation {aceid} has been updated to {datetime}.') \
+                .format(aceid=instance.aceid,
+                        datetime=datetime.datetime.strftime(validated_data["payment_due_by"], "%d %B %Y"))
             create_and_assign_notification.delay(
                 Notification.OPERATIONS,
-                message_body,
+                'Payment due date for the operation {aceid} has been updated to {datetime}.',
+                {'aceid':instance.aceid,
+                        'datetime':datetime.datetime.strftime(validated_data["payment_due_by"], "%d %B %Y")},
                 [instance.client_contact_person.id, ],
                 Notification.OPERATION,
                 object_id=instance.id,
@@ -1365,10 +1395,7 @@ class OperationBillingBaseSerializer(serializers.ModelSerializer):
         )
 
     def get_status(self, obj):
-        # if change_request_status := obj.change_request_status:
-        #     return list(filter(lambda x: x[0] == change_request_status, Booking.CHANGE_REQUESTED_CHOICES))[0][1]
         return list(filter(lambda x: x[0] == obj.status, Booking.STATUS_CHOICES))[0][1]
-
 
 
 class OperationBillingAgentListSerializer(OperationBillingBaseSerializer):

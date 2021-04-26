@@ -3,6 +3,12 @@
     input:hover {
         color:black;
     }
+    input[value=Todos] {
+        display: none;
+    }
+    input[value=Todo] {
+        display: none;
+    }
 </style>
 <div class="js-inline-admin-formset inline-group" id="{{ inline_admin_formset.formset.prefix }}-group"
      data-inline-type="tabular"
@@ -11,10 +17,10 @@
 {{ inline_admin_formset.formset.management_form }}
 <fieldset class="module {{ inline_admin_formset.classes }}">
    <h2>{{ inline_admin_formset.opts.verbose_name_plural|capfirst }}</h2>
-    <input type="button" id='1' onclick="location.href='./?fee_type=booking#tabs-2'" value="Booking Fee" {% if request.GET.fee_type == 'booking' %}style="color: black"{% endif %}>
-    <input type="button" id='2' onclick="location.href='./?fee_type=penalty#tabs-2'" value="Cancellation Fee" {% if request.GET.fee_type == 'penalty' %}style="color: black"{% endif %}>
-    <input type="button" id='3' onclick="location.href='./?fee_type=agent_booking#tabs-2'" value="Agent Booking Fee" {% if request.GET.fee_type == 'agent_booking' %}style="color: black"{% endif %}>
-    <input type="button" id='4' onclick="location.href='./?fee_type=service#tabs-2'" value="Service Fee" {% if request.GET.fee_type == 'service' %}style="color: black"{% endif %}>
+    <input type="button" id='1' onclick="location.href='./?fee_type=booking#tabs-2'" value="{% translate 'Booking Fee' %}" {% if request.GET.fee_type == 'booking' %}style="color: black"{% endif %}>
+    <input type="button" id='2' onclick="location.href='./?fee_type=penalty#tabs-2'" value="{% translate 'Cancellation Fee' %}" {% if request.GET.fee_type == 'penalty' %}style="color: black"{% endif %}>
+    <input type="button" id='3' onclick="location.href='./?fee_type=agent_booking#tabs-2'" value="{% translate 'Agent Booking Fee' %}" {% if request.GET.fee_type == 'agent_booking' %}style="color: black"{% endif %}>
+    <input type="button" id='4' onclick="location.href='./?fee_type=service#tabs-2'" value="{% translate 'Service Fee' %}" {% if request.GET.fee_type == 'service' %}style="color: black"{% endif %}>
    {{ inline_admin_formset.formset.non_form_errors }}
    <table>
      <thead><tr>

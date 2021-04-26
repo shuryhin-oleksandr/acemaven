@@ -5,7 +5,10 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser, Group
 from django.core.validators import RegexValidator, MinValueValidator, MaxValueValidator
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext as __
+
+from config.settings import LANGUAGES, LANGUAGE_CODE
 
 tax_id_validator = RegexValidator(
     regex=r'^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$',
@@ -107,6 +110,14 @@ class CustomUser(AbstractUser):
         'Company',
         related_name='users',
         through='Role',
+        verbose_name=_('Company'),
+    )
+
+    language = models.CharField(
+        _('Language'),
+        max_length=6,
+        choices=LANGUAGES,
+        default=LANGUAGE_CODE,
     )
 
     objects = CustomUserManager()
@@ -221,7 +232,8 @@ class Company(models.Model):
         )
 
     class Meta:
-        verbose_name_plural = 'Companies'
+        verbose_name = _("Company")
+        verbose_name_plural = _("Companies")
 
 
 class EmailNotificationSetting(models.Model):
@@ -271,7 +283,11 @@ class EmailNotificationSetting(models.Model):
     )
 
     def __str__(self):
-        return f'Email notification settings for user [{self.user.id}]'
+        return __(f'Email notification settings for user [{self.user.id}]')
+
+    class Meta:
+        verbose_name = _("Email notification")
+        verbose_name_plural = _("Email notifications")
 
 
 class SignUpRequest(models.Model):
@@ -362,7 +378,11 @@ class SignUpRequest(models.Model):
     )
 
     def __str__(self):
-        return f'Sign up request of company "{self.name}"'
+        return __('Sign up request of company "{name}"').format(name=self.name)
+
+    class Meta:
+        verbose_name = _("Sign up request")
+        verbose_name_plural = _("Sign up requests")
 
 
 class SignUpToken(models.Model):
@@ -377,7 +397,12 @@ class SignUpToken(models.Model):
     user = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
+        verbose_name=_("User")
     )
+
+    class Meta:
+        verbose_name = _("Sign up token")
+        verbose_name_plural = _("Sign up tokens")
 
 
 class Role(models.Model):
@@ -388,10 +413,12 @@ class Role(models.Model):
     company = models.ForeignKey(
         'Company',
         on_delete=models.CASCADE,
+        verbose_name=_("Company")
     )
     user = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
+        verbose_name=_('User')
     )
     groups = models.ManyToManyField(
         Group,
@@ -405,6 +432,10 @@ class Role(models.Model):
 
     def __str__(self):
         return f'{self.user}, "{self.company}", {list(self.groups.all().values_list("name", flat=True))}'
+
+    class Meta:
+        verbose_name = _("Role")
+        verbose_name_plural = _("Roles")
 
 
 class BankAccount(models.Model):
@@ -467,11 +498,11 @@ class BankAccount(models.Model):
     )
 
     class Meta:
-        verbose_name = _('Bank Account')
-        verbose_name_plural = _('Bank Accounts')
+        verbose_name = _("Bank account")
+        verbose_name_plural = _("Bank accounts")
 
     def __str__(self):
-        return f'{self.__class__.__name__} of company {self.company}'
+        return __('Bank Account of company {company}').format(company=self.company)
 
     def save(self, *args, **kwargs):
         if self.is_default:
@@ -540,7 +571,11 @@ class Shipper(models.Model):
     )
 
     def __str__(self):
-        return f'Shipper {self.name}, {self.phone}'
+        return __(f'Shipper {self.name}, {self.phone}')
+
+    class Meta:
+        verbose_name = _("Shipper")
+        verbose_name_plural = _("Shippers")
 
 
 class Review(models.Model):
@@ -568,6 +603,7 @@ class Review(models.Model):
         get_user_model(),
         on_delete=models.SET_NULL,
         null=True,
+        verbose_name=_('Reviewer'),
     )
     operation = models.OneToOneField(
         'booking.Booking',
@@ -578,6 +614,7 @@ class Review(models.Model):
             Booking.CANCELED_BY_AGENT,
             Booking.CANCELED_BY_SYSTEM,
         )),
+        verbose_name=_('Operation'),
     )
 
     class Meta:
@@ -585,6 +622,9 @@ class Review(models.Model):
             'reviewer__companies__name',
             '-date_created',
         ]
+        verbose_name = _("Review")
+        verbose_name_plural = _("Reviews")
 
     def __str__(self):
-        return f'Client review for company [{self.operation.agent_contact_person.get_company()}]'
+        return __('Client review for company [{company}]') \
+            .format(company=self.operation.agent_contact_person.get_company())

@@ -8,16 +8,18 @@ from django.conf import settings
 from app.handling.models import LocalFee, ShippingMode
 from config.settings.local import DOMAIN_ADDRESS
 
+from django.utils.translation import ugettext as _
+
 logger = logging.getLogger("acemaven.task.logging")
 
 
 @celery_app.task
 def send_registration_email(token, recipient_email):
-    subject = 'Acemaven. Registration process.'
+    subject = _('Acemaven. Registration process.')
     logger.info(f'New registration email is going to be send to {recipient_email}')
     message_body = f'{DOMAIN_ADDRESS}additional/user?token={token}'
     template_html = get_template(f"core/emails_templates/index.html")
-    text = "To complete your sign-up, please press the button:"
+    text = _("To complete your sign-up, please press the button:")
     context = {
         "email": recipient_email,
         "text": text,

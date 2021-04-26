@@ -1,5 +1,5 @@
 from django.db import models
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ugettext_lazy as _
 
 
 class Country(models.Model):
@@ -19,6 +19,7 @@ class Country(models.Model):
         'handling.Currency',
         null=True,
         on_delete=models.SET_NULL,
+        verbose_name=_('Currency'),
     )
     is_active = models.BooleanField(
         _('Country is active'),
@@ -38,4 +39,5 @@ class Country(models.Model):
         super(Country, self).save(*args, **kwargs)
 
     class Meta:
-        verbose_name_plural = 'Countries'
+        verbose_name = _("Country")
+        verbose_name_plural = _("Countries")

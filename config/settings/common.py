@@ -14,6 +14,8 @@ import datetime
 from pathlib import Path
 from celery.schedules import crontab
 
+from django.utils.translation import ugettext_lazy as _
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 
 PROJECT_DIR = Path(__file__).parent.resolve()
@@ -62,6 +64,7 @@ INSTALLED_APPS = [
     'app.location',
     'app.websockets',
     'app.management',
+    'app.language_switcher',
 ]
 
 REST_FRAMEWORK = {
@@ -95,6 +98,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'admin_reorder.middleware.ModelAdminReorder',
+    'django.middleware.locale.LocaleMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -107,7 +111,7 @@ TEMPLATES = [
     {
         "BACKEND": "django.template.backends.jinja2.Jinja2",
         "DIRS": [
-            os.path.join(BASE_DIR, "jinja2",)
+            os.path.join(BASE_DIR, "jinja2", )
         ],
         "APP_DIRS": True,
         "OPTIONS": {
@@ -172,13 +176,20 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+# Django translations
+LANGUAGE_CODE = 'en'
+LANGUAGES = (
+    ("en", _("English")),
+    ("es", _("Spanish")),
+    ("pt", _("Portuguese"))
+)
+DIR_LOCALE = (REPO_DIR / 'locale').resolve()
+DIR_LOCALE.mkdir(exist_ok=True)
+LOCALE_PATHS = [DIR_LOCALE]
+USE_I18N = True
+USE_L10N = True
 
 TIME_ZONE = 'UTC'
-
-USE_I18N = True
-
-USE_L10N = True
 
 USE_TZ = True
 
@@ -260,33 +271,33 @@ CHANNEL_LAYERS = {
 ADMIN_REORDER = (
 
     {'app': 'handling',
-     'label': 'AceMaven Service Revenue Settings',
+     'label': _('AceMaven Service Revenue Settings'),
      'models': ('handling.LocalFee', 'handling.GlobalFee')
      },
 
     {'app': 'core',
-     'label': 'Accounts and Billing',
+     'label': _('Accounts and Billing'),
      'models': ('core.CustomUser', 'core.BankAccount', 'handling.ExchangeRate', 'booking.Transaction')
      },
 
     {'app': 'booking',
-     'label': 'Sections',
+     'label': _('Sections'),
      'models': ('booking.Booking', 'core.Company')
      },
 
     {'app': 'handling',
-     'label': 'Platform setting',
+     'label': _('Platform setting'),
      'models': ('handling.GeneralSetting', 'handling.ClientPlatformSetting',
                 'location.Country', 'handling.Currency')
      },
 
     {'app': 'websockets',
-     'label': 'Ticket section',
+     'label': _('Ticket section'),
      'models': ('websockets.Ticket', 'core.SignUpRequest', 'core.Review')
      },
 
     {'app': 'websockets',
-     'label': 'Special settings on platform (for superuser)',
+     'label': _('Special settings on platform (for superuser)'),
      'models': ('core.Role', 'core.SignUpToken', 'auth.Group',
                 'handling.AirTrackingSetting', 'handling.Airline',
                 'handling.Carrier', 'handling.ContainerType',
@@ -297,6 +308,5 @@ ADMIN_REORDER = (
                 'booking.Direction', 'booking.FreightRate',
                 'booking.Surcharge', 'booking.TrackStatus',)
      },
-
 
 )

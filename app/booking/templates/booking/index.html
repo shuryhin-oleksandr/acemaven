@@ -1,4 +1,5 @@
 {% load static %}
+{% load i18n %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -33,7 +34,7 @@
                         </label>
                         <input type="file" id="upload" class="uploadInput">
                     </div>
-                    <input type="text" class="messageInput" placeholder="Message...">
+                    <input type="text" class="messageInput" placeholder="{% trans 'Message...' %}">
                     <div class="sendIconWrapper">
                         <img src="{% static "icons/send_mesage.svg" %}" alt="">
                     </div>

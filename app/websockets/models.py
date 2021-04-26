@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as __
 
 User = get_user_model()
 
@@ -27,6 +28,8 @@ class Chat(models.Model):
 
     class Meta:
         ordering = ['-id', ]
+        verbose_name = _("Chat")
+        verbose_name_plural = _("Chats")
 
     def __str__(self):
         return f'Chat [{self.id}]'
@@ -64,9 +67,12 @@ class ChatPermission(models.Model):
         default=0,
     )
 
+    def __str__(self):
+        return f'{self.user.get_full_name()} permission for chat {self.chat_id}'
 
-def __str__(self):
-    return f'{self.user.get_full_name()} permission for chat {self.chat_id}'
+    class Meta:
+        verbose_name = _("Chat permission")
+        verbose_name_plural = _("Chat permissions")
 
 
 class Message(models.Model):
@@ -95,6 +101,8 @@ class Message(models.Model):
 
     class Meta:
         ordering = ['date_created', ]
+        verbose_name = _("Message")
+        verbose_name_plural = _("Messages")
 
     def __str__(self):
         return f'Message [{self.id}] of chat [{self.chat_id}]'
@@ -118,6 +126,10 @@ class MessageFile(models.Model):
 
     def __str__(self):
         return f'File of message [{self.message}]'
+
+    class Meta:
+        verbose_name = _("Message file")
+        verbose_name_plural = _("Message files")
 
 
 class Notification(models.Model):
@@ -186,6 +198,8 @@ class Notification(models.Model):
 
     class Meta:
         ordering = ['-date_created', ]
+        verbose_name = _("Notification")
+        verbose_name_plural = _("Notifications")
 
     def __str__(self):
         return f'Notification [{self.id}] to users {list(self.users.values_list("id", flat=True))}'
@@ -240,18 +254,24 @@ class Ticket(models.Model):
         (BILLING, 'Billing'),
         (RATES_AND_SERVICES, 'Rates and services'),
 
-
     )
 
     category = models.CharField(_('Categories'),
                                 max_length=20,
                                 choices=CATEGORIES_CHOICES,
                                 default=REQUESTS, )
-    topic = models.TextField('Topic', blank=True, )
-    description = models.TextField('Description', blank=True, )
+    topic = models.TextField(_('Topic'), blank=True, )
+    description = models.TextField(_('Description'), blank=True, )
     status = models.CharField(_('Status'),
                               max_length=20,
                               choices=STATUS_CHOICES,
                               default=IN_PROGRESS, )
-    chat = models.OneToOneField(Chat, on_delete=models.CASCADE)
+    chat = models.OneToOneField(Chat, on_delete=models.CASCADE, verbose_name=_('Chat'))
     aceid = models.CharField(_('Operation number'), max_length=20, null=True)
+
+    class Meta:
+        verbose_name = _("Ticket")
+        verbose_name_plural = _("Tickets")
+
+    def __str__(self):
+        return self.topic

@@ -13,6 +13,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf.urls.i18n import i18n_patterns
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from rest_framework import permissions
@@ -23,14 +24,21 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 
-admin.autodiscover()
-admin.site.enable_nav_sidebar = False
-admin.site.site_header = 'Acemaven admin'
-admin.site.site_title = 'System Management'
-admin.site.index_title = 'Acemaven system management'
+from django.utils.translation import gettext_lazy as _
 
-urlpatterns = [
+admin.autodiscover()
+admin.site.index_template = 'language_switcher/base_site.html'
+admin.site.enable_nav_sidebar = False
+admin.site.site_header = _('Acemaven admin')
+admin.site.site_title = _('System Management')
+admin.site.index_title = _('Acemaven system management')
+
+
+urlpatterns = i18n_patterns(
     path('admin/', admin.site.urls),
+)
+
+urlpatterns += [
     path('api/v1/websockets/', include('app.websockets.urls', namespace='websockets')),
     path('api/v1/core/', include('app.core.urls', namespace='core')),
     path('api/v1/handling/', include('app.handling.urls', namespace='handling')),

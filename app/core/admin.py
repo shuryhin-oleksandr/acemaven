@@ -14,6 +14,8 @@ from app.handling.models import LocalFee, PixApiSetting
 from app.core.tasks import create_company_empty_fees
 from app.core.utils import master_account_processing
 
+from django.utils.translation import ugettext_lazy as _
+
 MASTER_ACCOUNT_FIELDS = ['email', 'first_name', 'last_name', 'master_phone', 'position', ]
 EXCLUDE_FIELDS = ['id', 'approved', *MASTER_ACCOUNT_FIELDS]
 
@@ -25,6 +27,13 @@ class LocalFeeInline(admin.TabularInline):
     radio_fields = {'value_type': admin.VERTICAL}
     model = LocalFee
     extra = 0
+
+    def formfield_for_choice_field(self, db_field, request, **kwargs):
+
+        if db_field.name == "value_type":
+            kwargs['choices'] = [(choice[0], _(choice[1])) for choice in LocalFee.VALUE_TYPE_CHOICES]
+
+        return super(LocalFeeInline, self).formfield_for_choice_field(db_field, request, **kwargs)
 
     def has_delete_permission(self, request, obj=None):
         return False
@@ -43,6 +52,11 @@ class LocalFeeInline(admin.TabularInline):
 class RoleInline(admin.TabularInline):
     model = Role
     extra = 0
+
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
+        if db_field.name == "groups":
+            kwargs["queryset"] = Group.objects.filter(name__in=['master', 'billing', 'support', ])
+        return super(RoleInline, self).formfield_for_manytomany(db_field, request, **kwargs)
 
 
 class BankAccountInline(admin.TabularInline):
@@ -144,12 +158,13 @@ class CustomUserAdmin(UserAdmin):
     )
 
     fieldsets = (
-        ('User info', {
+        (_('User info'), {
             'fields': (
                 'email',
                 'password',
                 'first_name',
                 'last_name',
+                'language',
                 'groups',
             ),
         }),
@@ -160,10 +175,10 @@ class CustomUserAdmin(UserAdmin):
 
     def formfield_for_manytomany(self, db_field, request, **kwargs):
         if db_field.name == "groups":
-            kwargs["queryset"] = Group.objects.filter(name__in=['master', 'billing', 'support',])
+            kwargs["queryset"] = Group.objects.filter(name__in=['master', 'billing', 'support', ])
         return super(CustomUserAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
 
-
+    company.short_description = _("Company")
 
 
 @admin.register(Company)
@@ -172,7 +187,7 @@ class CompanyAdmin(TabbedModelAdmin):
     list_display = (
         'id',
         'name',
-        'type',
+        'type_choice',
         'date_created',
     )
     list_display_links = (
@@ -209,9 +224,22 @@ class CompanyAdmin(TabbedModelAdmin):
     def get_queryset(self, request):
         return super().get_queryset(request)
 
+    def type_choice(self, obj):
+        choice = \
+            next(filter(lambda x: x[0] == obj.type, Company.COMPANY_TYPE_CHOICES), Company.COMPANY_TYPE_CHOICES[0])[1]
+        return _(choice)
+
+    def formfield_for_choice_field(self, db_field, request, **kwargs):
+        if db_field.name == "type":
+            kwargs['choices'] = [(choice[0], _(choice[1])) for choice in Company.COMPANY_TYPE_CHOICES]
+
+        return super(CompanyAdmin, self).formfield_for_choice_field(db_field, request, **kwargs)
+
+    type_choice.short_description = _('Company Type')
+
     tabs = (
-        ('Company', tab_company),
-        ('Fees', tab_fee),
+        (_('Company'), tab_company),
+        (_('Fees'), tab_fee),
     )
 
     search_fields = ('id', 'name',)
@@ -221,16 +249,16 @@ class CompanyAdmin(TabbedModelAdmin):
 class SignUpRequestAdmin(admin.ModelAdmin):
     readonly_fields = ['type', 'name', 'address_line_first', 'address_line_second', 'state', 'city', 'zip_code',
                        'phone', 'tax_id', 'employees_number', 'website', 'email', 'first_name', 'last_name',
-                       'master_phone', 'position']
+                       'master_phone', 'position', 'approved']
     change_form_template = 'core/sign_up_request_changeform.html'
     list_display = (
         'name',
-        'type',
+        'type_choice',
         'phone',
         'approved',
     )
     fieldsets = (
-        ('Company info', {
+        (_('Company info'), {
             'fields': (
                 'type',
                 'name',
@@ -248,7 +276,7 @@ class SignUpRequestAdmin(admin.ModelAdmin):
                 'approved',
             ),
         }),
-        ('Contact person info', {
+        (_('Contact person info'), {
             'fields': (
                 'email',
                 'first_name',
@@ -262,7 +290,7 @@ class SignUpRequestAdmin(admin.ModelAdmin):
     def response_change(self, request, obj):
         if "_company_sign_up" in request.POST:
             if obj.approved:
-                self.message_user(request, "Sign up request was already approved.")
+                self.message_user(request, _("Sign up request was already approved."))
             else:
                 try:
                     with transaction.atomic():
@@ -275,12 +303,12 @@ class SignUpRequestAdmin(admin.ModelAdmin):
                         transaction.on_commit(lambda: create_company_empty_fees.delay(company.id))
                     token = SignUpToken.objects.filter(
                         user=get_user_model().objects.filter(email=obj.email).first()).first().token
-                    self.message_user(request, "Company saved. Link to register master account was sent.")
-                    self.message_user(request, f"Registration link - 192.168.1.33:8000/create-account?token={token}")
+                    self.message_user(request, _("Company saved. Link to register master account was sent."))
+                    self.message_user(request, _(f"Registration link - 192.168.1.33:8000/create-account?token={token}"))
                     # TODO: Do not push test user message and token.
                 except Exception as error:
-                    self.message_user(request, f"Company with provided phone number or tax id already exists. "
-                                               f"Additional info [{error}]")
+                    self.message_user(request, _(
+                        f"Company with provided phone number or tax id already exists. Additional info [{error}]"))
             return HttpResponseRedirect(".")
         return super().response_change(request, obj)
 
@@ -289,6 +317,19 @@ class SignUpRequestAdmin(admin.ModelAdmin):
             return ()
         else:
             return self.readonly_fields
+
+    def type_choice(self, obj):
+        choice = \
+            next(filter(lambda x: x[0] == obj.type, Company.COMPANY_TYPE_CHOICES), Company.COMPANY_TYPE_CHOICES[0])[1]
+        return _(choice)
+
+    def formfield_for_choice_field(self, db_field, request, **kwargs):
+        if db_field.name == "type":
+            kwargs['choices'] = [(choice[0], _(choice[1])) for choice in Company.COMPANY_TYPE_CHOICES]
+
+        return super(SignUpRequestAdmin, self).formfield_for_choice_field(db_field, request, **kwargs)
+
+    type_choice.short_description = _('Company Type')
 
 
 @admin.register(Review)
@@ -311,7 +352,7 @@ class ReviewAdmin(admin.ModelAdmin):
         'date_created',
     )
     fieldsets = (
-        ('Review info', {
+        (_('Review info'), {
             'fields': (
                 'rating',
                 'comment',
@@ -319,7 +360,7 @@ class ReviewAdmin(admin.ModelAdmin):
                 'operation',
             ),
         }),
-        ('Approved', {
+        (_('Approved'), {
             'fields': (
                 'approved',
             ),
@@ -329,11 +370,11 @@ class ReviewAdmin(admin.ModelAdmin):
     def response_change(self, request, obj):
         if "_approve_review" in request.POST:
             if obj.approved:
-                self.message_user(request, "Review was already approved.")
+                self.message_user(request, _("Review was already approved."))
             else:
                 obj.approved = True
                 obj.save()
-                self.message_user(request, "Review successfully approved.")
+                self.message_user(request, _("Review successfully approved."))
             return HttpResponseRedirect(".")
         return super().response_change(request, obj)
 

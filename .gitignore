@@ -1,7 +1,8 @@
-__pycache__/
-.idea/
 .DS_Store
+.idea/
+.static/
+__pycache__/
+config/media
 config/settings/local.py
 config/staticfiles
-config/media
-.static/
+venv/

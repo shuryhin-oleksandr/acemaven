@@ -93,6 +93,7 @@ DATE_INPUT_FORMATS = ['%d/%m/%Y']
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -310,3 +311,7 @@ ADMIN_REORDER = (
      },
 
 )
+
+STATICFILES_STORAGE = (
+        "whitenoise.storage.CompressedManifestStaticFilesStorage"
+    )

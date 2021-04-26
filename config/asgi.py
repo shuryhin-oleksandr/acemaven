@@ -15,11 +15,14 @@ from django.core.asgi import get_asgi_application
 from app.websockets.routing import websocket_urlpatterns
 from app.websockets.middleware import TokenAuthMiddlewareStack
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mysite.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
+
+import django
+django.setup()
 
 application = ProtocolTypeRouter({
-  "http": get_asgi_application(),
-  "websocket": TokenAuthMiddlewareStack(
+    "http": get_asgi_application(),
+    "websocket": TokenAuthMiddlewareStack(
         URLRouter(
             websocket_urlpatterns,
         )

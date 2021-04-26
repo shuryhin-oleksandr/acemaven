@@ -1,3 +1,4 @@
+import os
 from urllib import parse
 
 from channels.auth import AuthMiddlewareStack
@@ -8,6 +9,8 @@ from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
+
+os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 
 
 @database_sync_to_async

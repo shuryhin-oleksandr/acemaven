@@ -11,7 +11,6 @@ from django.http import HttpResponseRedirect
 from app.core.models import CustomUser, Company, BankAccount, Role, SignUpRequest, SignUpToken, Review
 
 from app.handling.models import LocalFee, PixApiSetting
-from app.core.tasks import create_company_empty_fees
 from app.core.utils import master_account_processing
 
 from django.utils.translation import ugettext_lazy as _
@@ -288,6 +287,7 @@ class SignUpRequestAdmin(admin.ModelAdmin):
     )
 
     def response_change(self, request, obj):
+        from app.core.tasks import create_company_empty_fees
         if "_company_sign_up" in request.POST:
             if obj.approved:
                 self.message_user(request, _("Sign up request was already approved."))

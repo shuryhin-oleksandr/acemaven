@@ -12,6 +12,8 @@ from app.booking.models import Booking
 from app.websockets.models import Message, Chat, Notification, MessageFile, ChatPermission, Ticket
 from app.websockets.tasks import create_and_assign_notification
 
+from django.utils.translation import ugettext as _
+
 User = get_user_model()
 
 
@@ -69,19 +71,24 @@ class ChatConsumer(WebsocketConsumer):
                 if unread_messages == 0:
                     operation_id = user.chat.operation_id
                     if operation_id:
-                        aceid = Booking.objects.filter(id=user.chat.operation_id).values_list('aceid', flat=True).first()
-                        message_body = f'You have a new message in chat on operation number {aceid}'
+                        aceid = Booking.objects.filter(id=user.chat.operation_id) \
+                            .values_list('aceid', flat=True).first()
+                        message_body = _('You have a new message in chat on operation number {aceid}') \
+                            .format(aceid=aceid)
                     else:
-                        topic = Ticket.objects.filter(chat_id=self.chat_id).values_list('topic', flat=True).first()
-                        message_body = f'You have a new message in support chat on topic "{topic}"'
+                        topic = Ticket.objects.filter(chat_id=self.chat_id) \
+                            .values_list('topic', flat=True).first()
+                        message_body = _('You have a new message in support chat on topic "{topic}"') \
+                            .format(topic=topic)
 
-                    create_and_assign_notification.delay(
-                        Notification.CHATS,
-                        message_body,
-                        [user.user_id, ],
-                        Notification.OPERATION if operation_id else Notification.SUPPORT,
-                        object_id=operation_id if operation_id else ticket,
-                    )
+                        create_and_assign_notification.delay(
+                            Notification.CHATS,
+                            'You have a new message in support chat on topic "{topic}"',
+                            {'topic':topic},
+                            [user.user_id, ],
+                            Notification.OPERATION if operation_id else Notification.SUPPORT,
+                            object_id=operation_id if operation_id else ticket,
+                        )
                 unread_messages += 1
                 user.unread_messages = unread_messages
                 user.save()

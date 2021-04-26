@@ -1,0 +1,3364 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-04-15 08:53+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: acemaven/lib/python3.9/site-packages/django/contrib/messages/apps.py:7
+#: app/booking/admin.py:239 app/websockets/models.py:105
+msgid "Messages"
+msgstr "Mensajes"
+
+#: acemaven/lib/python3.9/site-packages/django/contrib/sitemaps/apps.py:7
+msgid "Site Maps"
+msgstr "Mapas del sitio"
+
+#: acemaven/lib/python3.9/site-packages/django/contrib/staticfiles/apps.py:9
+msgid "Static Files"
+msgstr "Archivos estáticos"
+
+#: acemaven/lib/python3.9/site-packages/django/contrib/syndication/apps.py:7
+msgid "Syndication"
+msgstr "Sindicación"
+
+#: acemaven/lib/python3.9/site-packages/django/core/paginator.py:48
+msgid "That page number is not an integer"
+msgstr "Ese número de página no es un número entero"
+
+#: acemaven/lib/python3.9/site-packages/django/core/paginator.py:50
+msgid "That page number is less than 1"
+msgstr "Ese número de página es menor que 1"
+
+#: acemaven/lib/python3.9/site-packages/django/core/paginator.py:55
+msgid "That page contains no results"
+msgstr "Esa página no contiene resultados"
+
+#: acemaven/lib/python3.9/site-packages/django/core/validators.py:20
+msgid "Enter a valid value."
+msgstr "Introduce un valor valido."
+
+#: acemaven/lib/python3.9/site-packages/django/core/validators.py:91
+#: acemaven/lib/python3.9/site-packages/django/forms/fields.py:671
+msgid "Enter a valid URL."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/core/validators.py:145
+msgid "Enter a valid integer."
+msgstr "Ingrese una URL válida."
+
+#: acemaven/lib/python3.9/site-packages/django/core/validators.py:156
+msgid "Enter a valid email address."
+msgstr "Introduzca una dirección de correo electrónico válida."
+
+#. Translators: "letters" means latin letters: a-z and A-Z.
+#: acemaven/lib/python3.9/site-packages/django/core/validators.py:230
+msgid ""
+"Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
+msgstr ""
+"Introduzca un 'slug' válido que consta de letras, números, guiones bajos o "
+"guiones."
+
+#: acemaven/lib/python3.9/site-packages/django/core/validators.py:237
+msgid ""
+"Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
+msgstr ""
+"Ingrese un 'slug' válido que conste de letras Unicode, números, guiones "
+"bajos o guiones."
+
+#: acemaven/lib/python3.9/site-packages/django/core/validators.py:246
+#: acemaven/lib/python3.9/site-packages/django/core/validators.py:266
+msgid "Enter a valid IPv4 address."
+msgstr "Ingrese una dirección IPv4 válida."
+
+#: acemaven/lib/python3.9/site-packages/django/core/validators.py:251
+#: acemaven/lib/python3.9/site-packages/django/core/validators.py:267
+msgid "Enter a valid IPv6 address."
+msgstr "Ingrese una dirección IPv6 válida."
+
+#: acemaven/lib/python3.9/site-packages/django/core/validators.py:261
+#: acemaven/lib/python3.9/site-packages/django/core/validators.py:265
+msgid "Enter a valid IPv4 or IPv6 address."
+msgstr "Ingrese una dirección IPv4 o IPv6 válida."
+
+#: acemaven/lib/python3.9/site-packages/django/core/validators.py:295
+msgid "Enter only digits separated by commas."
+msgstr "Ingrese solo dígitos separados por comas."
+
+#: acemaven/lib/python3.9/site-packages/django/core/validators.py:301
+#, python-format
+msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/core/validators.py:334
+#, python-format
+msgid "Ensure this value is less than or equal to %(limit_value)s."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/core/validators.py:343
+#, python-format
+msgid "Ensure this value is greater than or equal to %(limit_value)s."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/core/validators.py:353
+#, python-format
+msgid ""
+"Ensure this value has at least %(limit_value)d character (it has "
+"%(show_value)d)."
+msgid_plural ""
+"Ensure this value has at least %(limit_value)d characters (it has "
+"%(show_value)d)."
+msgstr[0] ""
+msgstr[1] ""
+
+#: acemaven/lib/python3.9/site-packages/django/core/validators.py:368
+#, python-format
+msgid ""
+"Ensure this value has at most %(limit_value)d character (it has "
+"%(show_value)d)."
+msgid_plural ""
+"Ensure this value has at most %(limit_value)d characters (it has "
+"%(show_value)d)."
+msgstr[0] ""
+msgstr[1] ""
+
+#: acemaven/lib/python3.9/site-packages/django/core/validators.py:387
+#: acemaven/lib/python3.9/site-packages/django/forms/fields.py:292
+#: acemaven/lib/python3.9/site-packages/django/forms/fields.py:327
+msgid "Enter a number."
+msgstr "Ingrese un numero."
+
+#: acemaven/lib/python3.9/site-packages/django/core/validators.py:389
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] ""
+msgstr[1] ""
+
+#: acemaven/lib/python3.9/site-packages/django/core/validators.py:394
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] ""
+msgstr[1] ""
+
+#: acemaven/lib/python3.9/site-packages/django/core/validators.py:399
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] ""
+msgstr[1] ""
+
+#: acemaven/lib/python3.9/site-packages/django/core/validators.py:461
+#, python-format
+msgid ""
+"File extension “%(extension)s” is not allowed. Allowed extensions are: "
+"%(allowed_extensions)s."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/core/validators.py:513
+msgid "Null characters are not allowed."
+msgstr "No se permiten caracteres nulos."
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/base.py:1187
+#: acemaven/lib/python3.9/site-packages/django/forms/models.py:760
+msgid "and"
+msgstr "y"
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/base.py:1189
+#, python-format
+msgid "%(model_name)s with this %(field_labels)s already exists."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:100
+#, python-format
+msgid "Value %(value)r is not a valid choice."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:101
+msgid "This field cannot be null."
+msgstr "Este campo no puede ser nulo."
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:102
+msgid "This field cannot be blank."
+msgstr "Este campo no puede estar vacío."
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:103
+#, python-format
+msgid "%(model_name)s with this %(field_label)s already exists."
+msgstr ""
+
+#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
+#. Eg: "Title must be unique for pub_date year"
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:107
+#, python-format
+msgid ""
+"%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:126
+#, python-format
+msgid "Field of type: %(field_type)s"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:939
+#, python-format
+msgid "“%(value)s” value must be either True or False."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:940
+#, python-format
+msgid "“%(value)s” value must be either True, False, or None."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:942
+msgid "Boolean (Either True or False)"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:983
+#, python-format
+msgid "String (up to %(max_length)s)"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1047
+msgid "Comma-separated integers"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1096
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid date format. It must be in YYYY-MM-DD "
+"format."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1098
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1241
+#, python-format
+msgid ""
+"“%(value)s” value has the correct format (YYYY-MM-DD) but it is an invalid "
+"date."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1101
+msgid "Date (without time)"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1239
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
+"uuuuuu]][TZ] format."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1243
+#, python-format
+msgid ""
+"“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
+"[TZ]) but it is an invalid date/time."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1247
+msgid "Date (with time)"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1395
+#, python-format
+msgid "“%(value)s” value must be a decimal number."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1397
+msgid "Decimal number"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1536
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
+"uuuuuu] format."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1539
+msgid "Duration"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1589
+#: app/core/models.py:356 app/core/models.py:562
+msgid "Email address"
+msgstr "Correo electronico"
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1612
+msgid "File path"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1678
+#, python-format
+msgid "“%(value)s” value must be a float."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1680
+msgid "Floating point number"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1718
+#, python-format
+msgid "“%(value)s” value must be an integer."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1720
+msgid "Integer"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1803
+msgid "Big (8 byte) integer"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1819
+msgid "IPv4 address"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1850
+msgid "IP address"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1930
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1931
+#, python-format
+msgid "“%(value)s” value must be either None, True or False."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1933
+msgid "Boolean (Either True, False or None)"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1976
+msgid "Positive big integer"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1989
+msgid "Positive integer"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2002
+msgid "Positive small integer"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2016
+#, python-format
+msgid "Slug (up to %(max_length)s)"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2048
+msgid "Small integer"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2055
+msgid "Text"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2083
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
+"format."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2085
+#, python-format
+msgid ""
+"“%(value)s” value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
+"invalid time."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2088
+msgid "Time"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2214
+msgid "URL"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2236
+msgid "Raw binary data"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2301
+#, python-format
+msgid "“%(value)s” is not a valid UUID."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2303
+msgid "Universally unique identifier"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/files.py:231
+msgid "File"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/files.py:377
+msgid "Image"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/json.py:18
+msgid "A JSON object"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/json.py:20
+msgid "Value must be valid JSON."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/related.py:790
+#, python-format
+msgid "%(model)s instance with %(field)s %(value)r does not exist."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/related.py:792
+msgid "Foreign Key (type determined by related field)"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/related.py:1045
+msgid "One-to-one relationship"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/related.py:1099
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/related.py:1100
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/db/models/fields/related.py:1142
+msgid "Many-to-many relationship"
+msgstr ""
+
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the label
+#: acemaven/lib/python3.9/site-packages/django/forms/boundfield.py:150
+msgid ":?.!"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/forms/fields.py:54
+msgid "This field is required."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/forms/fields.py:247
+msgid "Enter a whole number."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/forms/fields.py:398
+#: acemaven/lib/python3.9/site-packages/django/forms/fields.py:1139
+msgid "Enter a valid date."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/forms/fields.py:422
+#: acemaven/lib/python3.9/site-packages/django/forms/fields.py:1140
+msgid "Enter a valid time."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/forms/fields.py:450
+msgid "Enter a valid date/time."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/forms/fields.py:484
+msgid "Enter a valid duration."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/forms/fields.py:485
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/forms/fields.py:545
+msgid "No file was submitted. Check the encoding type on the form."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/forms/fields.py:546
+msgid "No file was submitted."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/forms/fields.py:547
+msgid "The submitted file is empty."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/forms/fields.py:549
+#, python-format
+msgid "Ensure this filename has at most %(max)d character (it has %(length)d)."
+msgid_plural ""
+"Ensure this filename has at most %(max)d characters (it has %(length)d)."
+msgstr[0] ""
+msgstr[1] ""
+
+#: acemaven/lib/python3.9/site-packages/django/forms/fields.py:552
+msgid "Please either submit a file or check the clear checkbox, not both."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/forms/fields.py:613
+msgid ""
+"Upload a valid image. The file you uploaded was either not an image or a "
+"corrupted image."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/forms/fields.py:775
+#: acemaven/lib/python3.9/site-packages/django/forms/fields.py:865
+#: acemaven/lib/python3.9/site-packages/django/forms/models.py:1296
+#, python-format
+msgid "Select a valid choice. %(value)s is not one of the available choices."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/forms/fields.py:866
+#: acemaven/lib/python3.9/site-packages/django/forms/fields.py:981
+#: acemaven/lib/python3.9/site-packages/django/forms/models.py:1295
+msgid "Enter a list of values."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/forms/fields.py:982
+msgid "Enter a complete value."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/forms/fields.py:1198
+msgid "Enter a valid UUID."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/forms/fields.py:1228
+msgid "Enter a valid JSON."
+msgstr ""
+
+#. Translators: This is the default suffix added to form field labels
+#: acemaven/lib/python3.9/site-packages/django/forms/forms.py:78
+msgid ":"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/forms/forms.py:205
+#, python-format
+msgid "(Hidden field %(name)s) %(error)s"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/forms/formsets.py:93
+msgid "ManagementForm data is missing or has been tampered with"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/forms/formsets.py:345
+#, python-format
+msgid "Please submit %d or fewer forms."
+msgid_plural "Please submit %d or fewer forms."
+msgstr[0] ""
+msgstr[1] ""
+
+#: acemaven/lib/python3.9/site-packages/django/forms/formsets.py:352
+#, python-format
+msgid "Please submit %d or more forms."
+msgid_plural "Please submit %d or more forms."
+msgstr[0] ""
+msgstr[1] ""
+
+#: acemaven/lib/python3.9/site-packages/django/forms/formsets.py:379
+#: acemaven/lib/python3.9/site-packages/django/forms/formsets.py:386
+msgid "Order"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/forms/formsets.py:391
+msgid "Delete"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/forms/models.py:755
+#, python-format
+msgid "Please correct the duplicate data for %(field)s."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/forms/models.py:759
+#, python-format
+msgid "Please correct the duplicate data for %(field)s, which must be unique."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/forms/models.py:765
+#, python-format
+msgid ""
+"Please correct the duplicate data for %(field_name)s which must be unique "
+"for the %(lookup)s in %(date_field)s."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/forms/models.py:774
+msgid "Please correct the duplicate values below."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/forms/models.py:1096
+msgid "The inline value did not match the parent instance."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/forms/models.py:1180
+msgid "Select a valid choice. That choice is not one of the available choices."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/forms/models.py:1298
+#, python-format
+msgid "“%(pk)s” is not a valid value."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/forms/utils.py:167
+#, python-format
+msgid ""
+"%(datetime)s couldn’t be interpreted in time zone %(current_timezone)s; it "
+"may be ambiguous or it may not exist."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/forms/widgets.py:398
+msgid "Clear"
+msgstr "Claro"
+
+#: acemaven/lib/python3.9/site-packages/django/forms/widgets.py:399
+msgid "Currently"
+msgstr "Actualmente"
+
+#: acemaven/lib/python3.9/site-packages/django/forms/widgets.py:400
+#: app/core/templates/core/local_fee_inline_tabular.html:49
+#: app/language_switcher/templates/language_switcher/base_site.html:74
+msgid "Change"
+msgstr "Cambio"
+
+#: acemaven/lib/python3.9/site-packages/django/forms/widgets.py:709
+#: app/booking/utils.py:556
+msgid "Unknown"
+msgstr "Desconocido"
+
+#: acemaven/lib/python3.9/site-packages/django/forms/widgets.py:710
+msgid "Yes"
+msgstr "Sí"
+
+#: acemaven/lib/python3.9/site-packages/django/forms/widgets.py:711
+msgid "No"
+msgstr "No"
+
+#. Translators: Please do not add spaces around commas.
+#: acemaven/lib/python3.9/site-packages/django/template/defaultfilters.py:790
+msgid "yes,no,maybe"
+msgstr "Sí,No,Quizás"
+
+#: acemaven/lib/python3.9/site-packages/django/template/defaultfilters.py:819
+#: acemaven/lib/python3.9/site-packages/django/template/defaultfilters.py:836
+#, python-format
+msgid "%(size)d byte"
+msgid_plural "%(size)d bytes"
+msgstr[0] ""
+msgstr[1] ""
+
+#: acemaven/lib/python3.9/site-packages/django/template/defaultfilters.py:838
+#, python-format
+msgid "%s KB"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/template/defaultfilters.py:840
+#, python-format
+msgid "%s MB"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/template/defaultfilters.py:842
+#, python-format
+msgid "%s GB"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/template/defaultfilters.py:844
+#, python-format
+msgid "%s TB"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/template/defaultfilters.py:846
+#, python-format
+msgid "%s PB"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dateformat.py:65
+msgid "p.m."
+msgstr "p.m."
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dateformat.py:66
+msgid "a.m."
+msgstr "a.m."
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dateformat.py:71
+msgid "PM"
+msgstr "PM"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dateformat.py:72
+msgid "AM"
+msgstr "AM"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dateformat.py:149
+msgid "midnight"
+msgstr "medianoche"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dateformat.py:151
+msgid "noon"
+msgstr "mediodía"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:6
+msgid "Monday"
+msgstr "Lunes"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:6
+msgid "Tuesday"
+msgstr "Martes"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:6
+msgid "Wednesday"
+msgstr "Miercoles"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:6
+msgid "Thursday"
+msgstr "Jueves"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:6
+msgid "Friday"
+msgstr "Viernes"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:7
+msgid "Saturday"
+msgstr "Sabado"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:7
+msgid "Sunday"
+msgstr "Domingo"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:10
+msgid "Mon"
+msgstr "Lun"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:10
+msgid "Tue"
+msgstr "Mar"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:10
+msgid "Wed"
+msgstr "Mie"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:10
+msgid "Thu"
+msgstr "Jue"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:10
+msgid "Fri"
+msgstr "Vie"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:11
+msgid "Sat"
+msgstr "Sab"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:11
+msgid "Sun"
+msgstr "Dom"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:14
+msgid "January"
+msgstr "Enero"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:14
+msgid "February"
+msgstr "Febrero"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:14
+msgid "March"
+msgstr "Marzo"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:14
+msgid "April"
+msgstr "Abril"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:14
+msgid "May"
+msgstr "Mayo"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:14
+msgid "June"
+msgstr "Junio"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:15
+msgid "July"
+msgstr "Julio"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:15
+msgid "August"
+msgstr "Agosto"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:15
+msgid "September"
+msgstr "Septiembre"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:15
+msgid "October"
+msgstr "Octubre"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:15
+msgid "November"
+msgstr "Noviembro"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:16
+msgid "December"
+msgstr "Diciembro"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:19
+msgid "jan"
+msgstr "enero"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:19
+msgid "feb"
+msgstr "feb"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:19
+msgid "mar"
+msgstr "marzo"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:19
+msgid "apr"
+msgstr "abr"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:19
+msgid "may"
+msgstr "mayo"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:19
+msgid "jun"
+msgstr "jun"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:20
+msgid "jul"
+msgstr "jul"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:20
+msgid "aug"
+msgstr "agosto"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:20
+msgid "sep"
+msgstr "sept"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:20
+msgid "oct"
+msgstr "oct"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:20
+msgid "nov"
+msgstr "nov"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:20
+msgid "dec"
+msgstr "dic"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:23
+msgctxt "abbrev. month"
+msgid "Jan."
+msgstr "enero"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:24
+msgctxt "abbrev. month"
+msgid "Feb."
+msgstr "feb."
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:25
+msgctxt "abbrev. month"
+msgid "March"
+msgstr "marzo"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:26
+msgctxt "abbrev. month"
+msgid "April"
+msgstr "abr."
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:27
+msgctxt "abbrev. month"
+msgid "May"
+msgstr "mayo"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:28
+msgctxt "abbrev. month"
+msgid "June"
+msgstr "jun."
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:29
+msgctxt "abbrev. month"
+msgid "July"
+msgstr "jul."
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:30
+msgctxt "abbrev. month"
+msgid "Aug."
+msgstr "agosto"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:31
+msgctxt "abbrev. month"
+msgid "Sept."
+msgstr "sept."
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:32
+msgctxt "abbrev. month"
+msgid "Oct."
+msgstr "oct."
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:33
+msgctxt "abbrev. month"
+msgid "Nov."
+msgstr "nov."
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:34
+msgctxt "abbrev. month"
+msgid "Dec."
+msgstr "dic."
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:37
+msgctxt "alt. month"
+msgid "January"
+msgstr "Enero"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:38
+msgctxt "alt. month"
+msgid "February"
+msgstr "Febrero"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:39
+msgctxt "alt. month"
+msgid "March"
+msgstr "Marcha"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:40
+msgctxt "alt. month"
+msgid "April"
+msgstr "Abril"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:41
+msgctxt "alt. month"
+msgid "May"
+msgstr "Mayo"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:42
+msgctxt "alt. month"
+msgid "June"
+msgstr "Junio"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:43
+msgctxt "alt. month"
+msgid "July"
+msgstr "Julio"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:44
+msgctxt "alt. month"
+msgid "August"
+msgstr "Agosto"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:45
+msgctxt "alt. month"
+msgid "September"
+msgstr "Septiembre"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:46
+msgctxt "alt. month"
+msgid "October"
+msgstr "Octubre"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:47
+msgctxt "alt. month"
+msgid "November"
+msgstr "Noviembre"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/dates.py:48
+msgctxt "alt. month"
+msgid "December"
+msgstr "Diciembre"
+
+#: acemaven/lib/python3.9/site-packages/django/utils/ipv6.py:8
+msgid "This is not a valid IPv6 address."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/utils/text.py:70
+#, python-format
+msgctxt "String to return when truncating text"
+msgid "%(truncated_text)s…"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/utils/text.py:236
+msgid "or"
+msgstr ""
+
+#. Translators: This string is used as a separator between list elements
+#: acemaven/lib/python3.9/site-packages/django/utils/text.py:255
+#: acemaven/lib/python3.9/site-packages/django/utils/timesince.py:83
+msgid ", "
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/utils/timesince.py:9
+#, python-format
+msgid "%d year"
+msgid_plural "%d years"
+msgstr[0] ""
+msgstr[1] ""
+
+#: acemaven/lib/python3.9/site-packages/django/utils/timesince.py:10
+#, python-format
+msgid "%d month"
+msgid_plural "%d months"
+msgstr[0] ""
+msgstr[1] ""
+
+#: acemaven/lib/python3.9/site-packages/django/utils/timesince.py:11
+#, python-format
+msgid "%d week"
+msgid_plural "%d weeks"
+msgstr[0] ""
+msgstr[1] ""
+
+#: acemaven/lib/python3.9/site-packages/django/utils/timesince.py:12
+#, python-format
+msgid "%d day"
+msgid_plural "%d days"
+msgstr[0] ""
+msgstr[1] ""
+
+#: acemaven/lib/python3.9/site-packages/django/utils/timesince.py:13
+#, python-format
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] ""
+msgstr[1] ""
+
+#: acemaven/lib/python3.9/site-packages/django/utils/timesince.py:14
+#, python-format
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] ""
+msgstr[1] ""
+
+#: acemaven/lib/python3.9/site-packages/django/views/csrf.py:110
+msgid "Forbidden"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/views/csrf.py:111
+msgid "CSRF verification failed. Request aborted."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/views/csrf.py:115
+msgid ""
+"You are seeing this message because this HTTPS site requires a “Referer "
+"header” to be sent by your Web browser, but none was sent. This header is "
+"required for security reasons, to ensure that your browser is not being "
+"hijacked by third parties."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/views/csrf.py:120
+msgid ""
+"If you have configured your browser to disable “Referer” headers, please re-"
+"enable them, at least for this site, or for HTTPS connections, or for “same-"
+"origin” requests."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/views/csrf.py:124
+msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the “Referrer-Policy: no-referrer” header, please remove them. The "
+"CSRF protection requires the “Referer” header to do strict referer checking. "
+"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" …> for links to third-party sites."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/views/csrf.py:132
+msgid ""
+"You are seeing this message because this site requires a CSRF cookie when "
+"submitting forms. This cookie is required for security reasons, to ensure "
+"that your browser is not being hijacked by third parties."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/views/csrf.py:137
+msgid ""
+"If you have configured your browser to disable cookies, please re-enable "
+"them, at least for this site, or for “same-origin” requests."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/views/csrf.py:142
+msgid "More information is available with DEBUG=True."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/views/generic/dates.py:41
+msgid "No year specified"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/views/generic/dates.py:61
+#: acemaven/lib/python3.9/site-packages/django/views/generic/dates.py:111
+#: acemaven/lib/python3.9/site-packages/django/views/generic/dates.py:208
+msgid "Date out of range"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/views/generic/dates.py:90
+msgid "No month specified"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/views/generic/dates.py:142
+msgid "No day specified"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/views/generic/dates.py:188
+msgid "No week specified"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/views/generic/dates.py:338
+#: acemaven/lib/python3.9/site-packages/django/views/generic/dates.py:367
+#, python-format
+msgid "No %(verbose_name_plural)s available"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/views/generic/dates.py:589
+#, python-format
+msgid ""
+"Future %(verbose_name_plural)s not available because %(class_name)s."
+"allow_future is False."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/views/generic/dates.py:623
+#, python-format
+msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/views/generic/detail.py:54
+#, python-format
+msgid "No %(verbose_name)s found matching the query"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/views/generic/list.py:67
+msgid "Page is not “last”, nor can it be converted to an int."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/views/generic/list.py:72
+#, python-format
+msgid "Invalid page (%(page_number)s): %(message)s"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/views/generic/list.py:154
+#, python-format
+msgid "Empty list and “%(class_name)s.allow_empty” is False."
+msgstr "Lista vacía y “%(class_name)s.allow_empty” es falso"
+
+#: acemaven/lib/python3.9/site-packages/django/views/static.py:40
+msgid "Directory indexes are not allowed here."
+msgstr "Los índices de directorio no están permitidos aquí."
+
+#: acemaven/lib/python3.9/site-packages/django/views/static.py:42
+#, python-format
+msgid "“%(path)s” does not exist"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/views/static.py:80
+#, python-format
+msgid "Index of %(directory)s"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/views/templates/default_urlconf.html:7
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr "Django: el marco web para perfeccionistas con plazos."
+
+#: acemaven/lib/python3.9/site-packages/django/views/templates/default_urlconf.html:346
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/views/templates/default_urlconf.html:368
+msgid "The install worked successfully! Congratulations!"
+msgstr "¡La instalación funcionó correctamente! ¡Felicidades!"
+
+#: acemaven/lib/python3.9/site-packages/django/views/templates/default_urlconf.html:369
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+
+#: acemaven/lib/python3.9/site-packages/django/views/templates/default_urlconf.html:384
+msgid "Django Documentation"
+msgstr "Documentación de Django"
+
+#: acemaven/lib/python3.9/site-packages/django/views/templates/default_urlconf.html:385
+msgid "Topics, references, &amp; how-to’s"
+msgstr "Temas, referencias y amp; cómo hacer"
+
+#: acemaven/lib/python3.9/site-packages/django/views/templates/default_urlconf.html:396
+msgid "Tutorial: A Polling App"
+msgstr "Tutorial: una aplicación de encuesta"
+
+#: acemaven/lib/python3.9/site-packages/django/views/templates/default_urlconf.html:397
+msgid "Get started with Django"
+msgstr "Empiece con Django"
+
+#: acemaven/lib/python3.9/site-packages/django/views/templates/default_urlconf.html:408
+msgid "Django Community"
+msgstr "Comunidad Django"
+
+#: acemaven/lib/python3.9/site-packages/django/views/templates/default_urlconf.html:409
+msgid "Connect, get help, or contribute"
+msgstr "Conéctese, obtenga ayuda o contribuya"
+
+#: acemaven/lib/python3.9/site-packages/kombu/transport/qpid.py:1301
+#, python-format
+msgid "Attempting to connect to qpid with SASL mechanism %s"
+msgstr "Intentando conectarse a qpid con el mecanismo SASL %s"
+
+#: acemaven/lib/python3.9/site-packages/kombu/transport/qpid.py:1306
+#, python-format
+msgid "Connected to qpid with SASL mechanism %s"
+msgstr "Conectado a qpid con mecanismo SASL %s"
+
+#: acemaven/lib/python3.9/site-packages/kombu/transport/qpid.py:1324
+#, python-format
+msgid "Unable to connect to qpid with SASL mechanism %s"
+msgstr "No se puede conectar a qpid con el mecanismo SASL %s"
+
+#: acemaven/lib/python3.9/site-packages/tabbed_admin/admin.py:85
+msgid "Each tab entry must be either a list or a tuple"
+msgstr "Cada entrada de pestaña debe ser una lista o una tupla"
+
+#: acemaven/lib/python3.9/site-packages/tabbed_admin/admin.py:87
+msgid ""
+"Each tabs entry must contain 2 arguments: a verbose name and the tab setup."
+msgstr ""
+"Cada entrada de pestañas debe contener 2 argumentos: un nombre detallado y "
+"la configuración de la pestaña."
+
+#: acemaven/lib/python3.9/site-packages/tabbed_admin/admin.py:89
+msgid "A tab definition must be either a list or a tuple"
+msgstr "Una definición de pestaña debe ser una lista o una tupla"
+
+#: acemaven/lib/python3.9/site-packages/tabbed_admin/templates/tabbed_admin/change_form.html:15
+#: app/handling/templates/handling/global_fee_change_list.html:54
+msgid "Please correct the error below."
+msgstr "Corrija el error a continuación."
+
+#: acemaven/lib/python3.9/site-packages/tabbed_admin/templates/tabbed_admin/change_form.html:15
+#: app/handling/templates/handling/global_fee_change_list.html:54
+msgid "Please correct the errors below."
+msgstr "Por favor corrija los siguientes errores."
+
+#: app/booking/admin.py:70
+#, python-brace-format
+msgid "Transaction number: {number}"
+msgstr "VAT: {number}"
+
+#: app/booking/admin.py:90 app/booking/admin.py:233 app/booking/models.py:775
+#: app/websockets/admin.py:84 app/websockets/models.py:265
+msgid "Status"
+msgstr "Estado"
+
+#: app/booking/admin.py:91 app/booking/models.py:945
+msgid "Transaction"
+msgstr "Transacción"
+
+#: app/booking/admin.py:92 app/booking/models.py:785
+msgid "Booking number"
+msgstr "No. De Reserva"
+
+#: app/booking/admin.py:128
+msgid "Operation info"
+msgstr "Información de operación"
+
+#: app/booking/admin.py:139
+msgid "Dates info"
+msgstr "Información de fechas"
+
+#: app/booking/admin.py:147
+msgid "General information"
+msgstr "Información general"
+
+#: app/booking/admin.py:234
+msgid "Route"
+msgstr "Ruta"
+
+#: app/booking/admin.py:235
+msgid "Volume"
+msgstr "Volumen"
+
+#: app/booking/admin.py:236
+msgid "Dates"
+msgstr "Fechas"
+
+#: app/booking/admin.py:237 app/booking/models.py:26 app/booking/models.py:243
+#: app/handling/models.py:349
+msgid "Carrier"
+msgstr "Transportador"
+
+#: app/booking/admin.py:238 app/websockets/models.py:31
+#: app/websockets/models.py:269
+msgid "Chat"
+msgstr "Chat"
+
+#: app/booking/apps.py:7 app/booking/models.py:495 app/booking/models.py:656
+#: app/booking/models.py:929
+msgid "Booking"
+msgstr "Reserva"
+
+#: app/booking/models.py:29
+msgid "Surcharge direction, whether import or export"
+msgstr "Dirección de recargo, ya sea de importación o exportación"
+
+#: app/booking/models.py:36 app/location/apps.py:7
+msgid "Location"
+msgstr "Ubicación"
+
+#: app/booking/models.py:39
+msgid "Surcharge start date"
+msgstr "Fecha de inicio de la tasa"
+
+#: app/booking/models.py:42
+msgid "Surcharge expiration date"
+msgstr "Fecha de vencimiento de la tasa"
+
+#: app/booking/models.py:45
+msgid "Temporary surcharge or not"
+msgstr "Recargo temporal o no"
+
+#: app/booking/models.py:49
+msgid "Surcharge is archived"
+msgstr "El recargo está archivado"
+
+#: app/booking/models.py:56 app/booking/models.py:203 app/booking/models.py:281
+#: app/booking/models.py:1019 app/handling/models.py:96
+#: app/handling/models.py:188 app/handling/models.py:496
+msgid "Shipping mode"
+msgstr "Tipo de embarque"
+
+#: app/booking/models.py:62 app/booking/models.py:287 app/core/admin.py:181
+#: app/core/admin.py:241 app/core/models.py:113 app/core/models.py:235
+#: app/core/models.py:416 app/handling/models.py:502
+msgid "Company"
+msgstr "Compañía"
+
+#: app/booking/models.py:68 app/handling/models.py:270
+msgid "Container types"
+msgstr "Tipos de contenedores"
+
+#: app/booking/models.py:83
+msgid "Surcharge"
+msgstr "Tasa"
+
+#: app/booking/models.py:84
+msgid "Surcharges"
+msgstr "Tasas"
+
+#: app/booking/models.py:107 app/booking/models.py:161
+msgid "Charge amount"
+msgstr "Costo"
+
+#: app/booking/models.py:119 app/booking/models.py:179
+msgid "Date and time usage fee was updated"
+msgstr "Se actualizó la tarifa de uso de fecha y hora"
+
+#: app/booking/models.py:127
+msgid "Usage fee"
+msgstr "Tarifa de uso"
+
+#: app/booking/models.py:128
+msgid "Usage fees"
+msgstr "Tarifas de uso"
+
+#: app/booking/models.py:168
+msgid "Conditions"
+msgstr "Condiciones"
+
+#: app/booking/models.py:187
+msgid "Charge"
+msgstr "Costo"
+
+#: app/booking/models.py:188
+msgid "Charges"
+msgstr "Costos"
+
+#: app/booking/models.py:197
+msgid "Additional surcharge title"
+msgstr "Título de recargo adicional"
+
+#: app/booking/models.py:206
+msgid "Is dangerous"
+msgstr "Es peligroso"
+
+#: app/booking/models.py:210
+msgid "Is cold"
+msgstr "Esta frio"
+
+#: app/booking/models.py:214
+msgid "Is handling"
+msgstr "Está manejando"
+
+#: app/booking/models.py:218
+msgid "Is document"
+msgstr "Es documento"
+
+#: app/booking/models.py:222
+msgid "Is other"
+msgstr "Es otro"
+
+#: app/booking/models.py:230
+msgid "Additional surcharge"
+msgstr "Tasa adicional"
+
+#: app/booking/models.py:231
+msgid "Additional surcharges"
+msgstr "Tasas adicionales"
+
+#: app/booking/models.py:246
+msgid "Whether carrier name disclosed or not"
+msgstr "Si el nombre del transportador fue divulgado o no"
+
+#: app/booking/models.py:253
+msgid "Origin"
+msgstr "Origen"
+
+#: app/booking/models.py:259
+msgid "Destination"
+msgstr "Destino"
+
+#: app/booking/models.py:262
+msgid "Transit time in days"
+msgstr "Tiempo de tránsito en días"
+
+#: app/booking/models.py:266
+msgid "Freight rate is active or paused"
+msgstr "La tarifa de flete está activa o en pausa"
+
+#: app/booking/models.py:270
+msgid "Temporary freight rate or not"
+msgstr "Tarifa de flete temporal o no"
+
+#: app/booking/models.py:274
+msgid "Freight rate is archived"
+msgstr "La tarifa de flete está archivada"
+
+#: app/booking/models.py:294 app/booking/models.py:470
+msgid "Freight rate"
+msgstr "Tarifa de flete"
+
+#: app/booking/models.py:295
+msgid "Freight rates"
+msgstr "Tarifas de flete"
+
+#: app/booking/models.py:308
+msgid "Rate amount"
+msgstr "Importe de la tarifa"
+
+#: app/booking/models.py:315
+msgid "Rate start date"
+msgstr "Fecha de inicio de la tarifa"
+
+#: app/booking/models.py:319
+msgid "Rate expiration date"
+msgstr "Fecha de vencimiento del fleta"
+
+#: app/booking/models.py:328
+msgid "Date and time rate was updated"
+msgstr "Se actualizó la tasa de fecha y hora"
+
+#: app/booking/models.py:347
+msgid "Rate"
+msgstr "Tarifa"
+
+#: app/booking/models.py:348
+msgid "Rates"
+msgstr "Tarifas"
+
+#: app/booking/models.py:387
+msgid "Booking ACEID number"
+msgstr "Número ACEID de reserva"
+
+#: app/booking/models.py:392
+msgid "Booking date from"
+msgstr "Fecha de reserva desde"
+
+#: app/booking/models.py:395
+msgid "Booking date to"
+msgstr "Fecha de reserva hasta"
+
+#: app/booking/models.py:398
+msgid "Payment due by date"
+msgstr "Fecha limite para el pago"
+
+#: app/booking/models.py:402
+msgid "Whether booking paid or not"
+msgstr "Ya sea reserva pagada o no"
+
+#: app/booking/models.py:406
+msgid "Is assigned to user"
+msgstr "Fue asignado al usuario"
+
+#: app/booking/models.py:410
+msgid "Booking change request status"
+msgstr "Estado de la solicitud de cambio de reserva"
+
+#: app/booking/models.py:416
+msgid "Booking confirmed or not"
+msgstr "Reserva confirmada o no"
+
+#: app/booking/models.py:426
+msgid "Client contact person"
+msgstr "Persona de contacto del cliente"
+
+#: app/booking/models.py:433
+msgid "Agent contact person"
+msgstr "Persona de contacto del agente"
+
+#: app/booking/models.py:439 app/handling/models.py:310
+msgid "Release type"
+msgstr "Tipo de lanzamiento"
+
+#: app/booking/models.py:442
+msgid "Number of documents for chosen release type"
+msgstr "Número de documentos para el tipo de publicación elegido"
+
+#: app/booking/models.py:447 app/booking/models.py:770
+msgid "Charges calculations"
+msgstr "Cálculos de costos"
+
+#: app/booking/models.py:451
+msgid "Automatic status tracking"
+msgstr "Seguimiento de estado automático"
+
+#: app/booking/models.py:455
+msgid "Vessel arrived status"
+msgstr "Estado de llegada del buque"
+
+#: app/booking/models.py:459
+msgid "Date booking created"
+msgstr "Fecha de creación de la reserva"
+
+#: app/booking/models.py:463
+msgid "Date booking accepted by an agent"
+msgstr "Fecha de reserva aceptada por un agente"
+
+#: app/booking/models.py:477 app/core/models.py:577
+msgid "Shipper"
+msgstr "Embarcador"
+
+#: app/booking/models.py:496
+msgid "Bookings"
+msgstr "Reservas"
+
+#: app/booking/models.py:518 app/booking/models.py:543
+msgid "Cancellation reason"
+msgstr "Razon de cancelacion"
+
+#: app/booking/models.py:524
+msgid "Comment to cancellation reason"
+msgstr "Comentario al motivo de la cancelación"
+
+#: app/booking/models.py:528
+msgid "Date reason created"
+msgstr "Fecha de creación del motivo"
+
+#: app/booking/models.py:544
+msgid "Cancellation reasons"
+msgstr "Motivos de cancelación"
+
+#: app/booking/models.py:577 app/handling/models.py:269
+msgid "Container type"
+msgstr "Tipo de contenedor"
+
+#: app/booking/models.py:583 app/handling/models.py:158
+msgid "Packaging type"
+msgstr "Tipo de embalaje"
+
+#: app/booking/models.py:586
+msgid "Weight Measurement"
+msgstr "Medida de peso"
+
+#: app/booking/models.py:592
+msgid "Length Measurement"
+msgstr "Medida de largo"
+
+#: app/booking/models.py:598
+msgid "Number of items"
+msgstr "Número de items"
+
+#: app/booking/models.py:602 app/handling/models.py:119
+#: app/handling/models.py:206
+msgid "Height"
+msgstr "Altura"
+
+#: app/booking/models.py:609 app/handling/models.py:124
+#: app/handling/models.py:211
+msgid "Length"
+msgstr "Largo"
+
+#: app/booking/models.py:616 app/handling/models.py:129
+#: app/handling/models.py:216
+msgid "Width"
+msgstr "Ancho"
+
+#: app/booking/models.py:623 app/handling/models.py:139
+msgid "Weight"
+msgstr "Peso"
+
+#: app/booking/models.py:630
+msgid "Total w/m"
+msgstr "Total w/m"
+
+#: app/booking/models.py:637
+msgid "Dangerous freight"
+msgstr "Carga peligrosa"
+
+#: app/booking/models.py:641
+msgid "Frozen or chilled cargo"
+msgstr "Carga congelada o refrigerada"
+
+#: app/booking/models.py:647
+msgid "Cargo description"
+msgstr "Descripción del la carga"
+
+#: app/booking/models.py:663 app/booking/models.py:727
+msgid "Quote"
+msgstr "Cotizacione"
+
+#: app/booking/models.py:670
+msgid "Cargo group"
+msgstr "Grupo de carga"
+
+#: app/booking/models.py:671
+msgid "Cargo groups"
+msgstr "Grupos de carga"
+
+#: app/booking/models.py:695
+msgid "Quote start date"
+msgstr "Fecha de inicio de cotización"
+
+#: app/booking/models.py:698
+msgid "Quote expiration date"
+msgstr "Fecha de vencimiento de la cotización"
+
+#: app/booking/models.py:701
+msgid "Quote creation date"
+msgstr "Fecha de creación de la cotización"
+
+#: app/booking/models.py:705
+msgid "Quote is active or paused"
+msgstr "La cotización está activa o en pausa"
+
+#: app/booking/models.py:709
+msgid "Quote is archived"
+msgstr "La cotización fue archivada"
+
+#: app/booking/models.py:728
+msgid "Quotes"
+msgstr "Cotizaciones"
+
+#: app/booking/models.py:761
+msgid "Quote - freight rate status"
+msgstr "Cotización - estado de la tarifa de flete"
+
+#: app/booking/models.py:766
+msgid "Offer is viewed"
+msgstr "La oferta fue visualizada"
+
+#: app/booking/models.py:776
+msgid "Statuses"
+msgstr "Estados"
+
+#: app/booking/models.py:789
+msgid "Booking number with carrier"
+msgstr "Número de reserva con transportista"
+
+#: app/booking/models.py:794
+msgid "Flight number"
+msgstr "Número de vuelo"
+
+#: app/booking/models.py:799
+msgid "Vessel number"
+msgstr "Número de buque"
+
+#: app/booking/models.py:804
+msgid "Voyage number"
+msgstr "Número de viaje"
+
+#: app/booking/models.py:809
+msgid "Container number"
+msgstr "Número de contenedor"
+
+#: app/booking/models.py:814
+msgid "MAWB"
+msgstr "MAWB"
+
+#: app/booking/models.py:819
+msgid "Estimated time of departure"
+msgstr "Fecha Estimada de Embarque"
+
+#: app/booking/models.py:822
+msgid "Estimated time of arrival"
+msgstr "Fecha Estimada de Arribo"
+
+#: app/booking/models.py:825
+msgid "Actual time of departure"
+msgstr "Hora real de salida"
+
+#: app/booking/models.py:829
+msgid "Actual time of arrival"
+msgstr "Hora real de llegada"
+
+#: app/booking/models.py:833
+msgid "Document cut off date"
+msgstr "Fecha limite para envío de documentación"
+
+#: app/booking/models.py:837
+msgid "Cargo cut off date"
+msgstr "Fecha límite para recibo de la carga"
+
+#: app/booking/models.py:841
+msgid "Cargo pick up location"
+msgstr "Lugar de recogida de carga"
+
+#: app/booking/models.py:846
+msgid "Cargo pick up location address"
+msgstr "Dirección del lugar de recogida de carga"
+
+#: app/booking/models.py:851
+msgid "Cargo drop off location"
+msgstr "Terminal para Entrega de Carga"
+
+#: app/booking/models.py:856
+msgid "Cargo drop off location address"
+msgstr "Dirección de ubicación de entrega de carga"
+
+#: app/booking/models.py:861
+msgid "Empty pick up location"
+msgstr "Local de Retirada de Vacios"
+
+#: app/booking/models.py:866
+msgid "Empty pick up location address"
+msgstr "Dirección de ubicación de recogida vacía"
+
+#: app/booking/models.py:871
+msgid "Container free time"
+msgstr "Tiempo Libre de los Contenedores"
+
+#: app/booking/models.py:875
+msgid "Booking notes"
+msgstr "Comentarios sobre la reserva"
+
+#: app/booking/models.py:889
+msgid "Shipment detail"
+msgstr "Detalle de envio"
+
+#: app/booking/models.py:890
+msgid "Shipment details"
+msgstr "Detalles del envío"
+
+#: app/booking/models.py:910
+msgid "Transaction identifier"
+msgstr "Identificador de transacción"
+
+#: app/booking/models.py:914
+msgid "Transaction status"
+msgstr "Estado de la transacción"
+
+#: app/booking/models.py:920
+msgid "Transaction charge amount"
+msgstr "Importe del cargo por transacción"
+
+#: app/booking/models.py:932
+msgid "QR code "
+msgstr "Código QR"
+
+#: app/booking/models.py:937
+msgid "Response from getting payment"
+msgstr "Respuesta al recibir el pago"
+
+#: app/booking/models.py:946
+msgid "Transactions"
+msgstr "Actas"
+
+#: app/booking/models.py:955
+msgid "Json data"
+msgstr "Datos json"
+
+#: app/booking/models.py:965
+msgid "Date the track object created"
+msgstr "Fecha en que se creó el objeto de seguimiento"
+
+#: app/booking/models.py:969
+msgid "Json data from tracking api"
+msgstr "Datos json de la API de seguimiento"
+
+#: app/booking/models.py:973
+msgid "Json route data from tracking api"
+msgstr "Datos de ruta json de la API de seguimiento"
+
+#: app/booking/models.py:977
+msgid "Comment text"
+msgstr "Texto de comentario"
+
+#: app/booking/models.py:981
+msgid "Manually created tracking event"
+msgstr "Evento de seguimiento creado manualmente"
+
+#: app/booking/models.py:1003
+msgid "Track"
+msgstr "Pista"
+
+#: app/booking/models.py:1004
+msgid "Tracks"
+msgstr "Pistas"
+
+#: app/booking/models.py:1013
+msgid "Status title"
+msgstr "Título de estado"
+
+#: app/booking/models.py:1023 app/booking/models.py:1065
+msgid "Direction"
+msgstr "Dirección"
+
+#: app/booking/models.py:1026
+msgid "Must update actual date of departure"
+msgstr "Debe actualizar la fecha real de salida"
+
+#: app/booking/models.py:1030
+msgid "Show status after actual date of departure set"
+msgstr "Mostrar estado después de la fecha real de salida establecida"
+
+#: app/booking/models.py:1034
+msgid "Add the status after adding actual date of departure"
+msgstr "Agregue el estado después de agregar la fecha real de salida"
+
+#: app/booking/models.py:1038
+msgid "Add the status after adding actual date of arrival"
+msgstr "Agregue el estado después de agregar la fecha real de llegada"
+
+#: app/booking/models.py:1042
+msgid "Add the status after changing shipment details"
+msgstr "Agregue el estado después de cambiar los detalles del envío"
+
+#: app/booking/models.py:1047
+msgid "Track status"
+msgstr "Estado de seguimiento"
+
+#: app/booking/models.py:1048
+msgid "Track statuses"
+msgstr "Seguimiento de estados"
+
+#: app/booking/models.py:1057
+msgid "Direction title"
+msgstr "Título de la dirección"
+
+#: app/booking/models.py:1066
+msgid "Directions"
+msgstr "Direcciones"
+
+#: app/booking/serializers.py:686
+#, python-brace-format
+msgid "A new booking request on number {aceid} has been received."
+msgstr "Una nueva solicitud de reserva fue recibida ID {aceid}"
+
+#: app/booking/serializers.py:704
+#, python-brace-format
+msgid "The booking request on number {aceid} has been sent to \"{name}\"."
+msgstr ""
+"La solicitud de reserva {aceid} ha sido procesada e enviada para \"{name}\"."
+
+#: app/booking/serializers.py:735
+msgid ""
+"A new Booking Request on number {aceid} is pending of Booking Fee payment to "
+"be sent."
+msgstr "Una nueva solicitud de reserva fue recibida ID {aceid}"
+
+#: app/booking/serializers.py:882 app/booking/serializers.py:1006
+#: app/booking/tasks.py:331 app/booking/views.py:1001
+#, python-brace-format
+msgid "The shipment {aceid} has departed from {origin}."
+msgstr "El embarque {aceid} salió del local de origen {origin}."
+
+#: app/booking/serializers.py:906 app/booking/serializers.py:1023
+#: app/booking/tasks.py:358 app/booking/views.py:1019
+#, python-brace-format
+msgid "The shipment {aceid} has arrived at {destination}."
+msgstr "El embarque {aceid} arribó a su destino {destination}."
+
+#: app/booking/serializers.py:949
+#, python-brace-format
+msgid "Shipment details in {aceid} have changed. {track_message}"
+msgstr "Hubieron cambios en los detalles del embarque {aceid}. {track_message}"
+
+#: app/booking/serializers.py:1156
+#, python-brace-format
+msgid ""
+"The Client has requested a change in the shipment {aceid}, from {origin} to "
+"{destination}"
+msgstr ""
+"El cliente solicitó una alteración en la reserva {aceid} de {origin} para "
+"{destination}"
+
+#: app/booking/serializers.py:1174
+#, python-brace-format
+msgid ""
+"Payment due date for the operation {aceid} has been updated to {datetime}."
+msgstr ""
+"La fecha límite para el pago del embarque {aceid} fue actualizada para "
+"{datetime}."
+
+#: app/booking/tasks.py:55
+#, python-brace-format
+msgid "Payment on booking number {aceid} is success"
+msgstr "El pago de la reserva con el número {aceid} se realizó correctamente"
+
+#: app/booking/tasks.py:66
+#, python-brace-format
+msgid "A new booking request {aceid} has been received."
+msgstr "Una nueva solicitud de reserva ID {aceid} fue recibida."
+
+#: app/booking/tasks.py:85
+#, python-brace-format
+msgid "The booking request {aceid} has been sent to \"{name}\"."
+msgstr "La solicitud de reserva {aceid} se ha enviado a \"{name}\"."
+
+#: app/booking/tasks.py:115
+#, python-brace-format
+msgid ""
+"Have some problems with payment on booking number {aceid}, please, contact "
+"support team."
+msgstr ""
+"Hubieron algunos problemas con el pago de la reserva número {aceid}, "
+"comuníquese con el equipo de soporte."
+
+#: app/booking/tasks.py:147
+#, python-brace-format
+msgid "Update charge on booking number {aceid} is success"
+msgstr "La actualización del encargo en la reserva número {aceid} fue un éxito"
+
+#: app/booking/tasks.py:159
+#, python-brace-format
+msgid ""
+"Have some problems with updating charge on booking number {aceid}, please, "
+"contact support team."
+msgstr ""
+"Hubieron algunos problemas con el pago de la reserva número {aceid}, "
+"comuníquese con el equipo de soporte."
+
+#: app/booking/tasks.py:223
+msgid ""
+"Operation cancelled according to expired time for confirming booking by an "
+"agent"
+msgstr ""
+"Operación cancelada según el plazo de vencimiento para confirmar la reserva "
+"por parte de un agente"
+
+#: app/booking/tasks.py:230
+#, python-brace-format
+msgid "Sending new airway bill number to track [{booking_number}]"
+msgstr "Envío de un nuevo número de AWB aérea para rastrear {booking_number}"
+
+#: app/booking/tasks.py:247
+#, python-brace-format
+msgid ""
+"The shipment {booking_number} cannot be tracked because of wrong booking "
+"number."
+msgstr ""
+"El embarque {booking_number} ser rastreado debido a un número de reserva "
+"incorrecto."
+
+#: app/booking/tasks.py:264
+#, python-brace-format
+msgid ""
+"Response text for airway bill number [{booking_number}] - {response.text}"
+msgstr ""
+"Texto de respuesta para el número de factura de la vía aérea "
+"{booking_number} - {response.text}"
+
+#: app/booking/tasks.py:269
+msgid "Starting to get track statuses for confirmed operations"
+msgstr ""
+"Comenzando a obtener estados de seguimiento para operaciones confirmadas"
+
+#: app/booking/tasks.py:297
+#, python-brace-format
+msgid "The shipment {aceid} cannot be tracked because of wrong booking number."
+msgstr ""
+"El embarque {aceid} ser rastreado debido a un número de reserva incorrecto."
+
+#: app/booking/tasks.py:401 app/booking/tasks.py:426
+msgid ""
+"Surcharges are about to expire. Please, extend its expiration rate or create "
+"a new one with the updated costs."
+msgstr ""
+"Algunas tasas irán a vencer pronto. Por favor, extienda su plazo de validad "
+"o cree un nuevo registro con valores actualizados."
+
+#: app/booking/tasks.py:448 app/booking/tasks.py:473
+msgid ""
+"Rates are about to expire.Please, extend its expiration rate or create a new "
+"one with the updated costs."
+msgstr ""
+"Algunas tarifas irán a vencer pronto. Por favor, extienda su plazo de "
+"validad o cree un nuevo registro con valores actualizados."
+
+#: app/booking/tasks.py:498
+msgid "The shipment {aceid} is set to arrive in 3 days at {destination}."
+msgstr ""
+"El embarque {aceid} está programado para arribar a su destino {destination} en 3 dias"
+
+#: app/booking/tasks.py:524
+#, python-brace-format
+msgid ""
+"The shipment {booking.aceid} is set to arrive in 3 days at {booking."
+"freight_rate.destination}."
+msgstr ""
+"El embarque {booking.aceid} está programado para arribar a su destino "
+"{booking.freight_rate.destination} en 3 dias"
+
+#: app/booking/templates/booking/booking_changeform.html:12
+msgid "Charge calculation"
+msgstr "Cálculos de cargos"
+
+#: app/booking/templates/booking/booking_changeform.html:15
+msgid "Doc fee"
+msgstr "Documentacion"
+
+#: app/booking/templates/booking/booking_changeform.html:31
+msgid "Total surcharge"
+msgstr "Tasa total"
+
+#: app/booking/templates/booking/booking_changeform.html:46
+msgid "Total freight rate"
+msgstr "Total tarifa de flete"
+
+#: app/booking/templates/booking/booking_changeform.html:60
+msgid "Totals"
+msgstr "Totales"
+
+#: app/booking/templates/booking/booking_changeform.html:79
+msgid "Open chat"
+msgstr "Conversación abierta"
+
+#: app/booking/templates/booking/index.html:37
+#: app/websockets/templates/websockets/index.html:29
+msgid "Message..."
+msgstr "Mensaje..."
+
+#: app/booking/utils.py:557
+msgid "Land Transshipment"
+msgstr "Transbordo terrestre"
+
+#: app/booking/utils.py:558
+msgid "Barge Transshipment"
+msgstr "Transbordo de barcazas"
+
+#: app/booking/utils.py:559
+msgid "Container empty to shipper"
+msgstr "Contenedor vacío para expedidor"
+
+#: app/booking/utils.py:560
+msgid "Container pickup at shipper"
+msgstr "Recogida de contenedores en el expedidor"
+
+#: app/booking/utils.py:561
+msgid "Container arrival at first POL (Gate in)"
+msgstr "Llegada del contenedor al primer POL (puerta de entrada)"
+
+#: app/booking/utils.py:562
+msgid "Container loaded at first POL"
+msgstr "Contenedor cargado en el primer POL"
+
+#: app/booking/utils.py:563
+msgid "Vessel departure from first POL"
+msgstr "Salida del buque desde el primer POL"
+
+#: app/booking/utils.py:564
+msgid "Vessel arrival at T/S port"
+msgstr "Llegada del buque al puerto T/S"
+
+#: app/booking/utils.py:565
+msgid "Container discharge at T/S port"
+msgstr "Descarga de contenedores en el puerto T/S"
+
+#: app/booking/utils.py:566
+msgid "Transshipment delay"
+msgstr "Retraso de transbordo"
+
+#: app/booking/utils.py:567
+msgid "Container loaded at T/S port"
+msgstr "Contenedor cargado en puerto T/S"
+
+#: app/booking/utils.py:568
+msgid "Vessel departure from T/S"
+msgstr "Salida del barco desde T/S"
+
+#: app/booking/utils.py:569
+msgid "Vessel arrival at final POD"
+msgstr "Llegada del barco al POD final"
+
+#: app/booking/utils.py:570
+msgid "Container discharge at final POD"
+msgstr "Descarga del contenedor en el POD final"
+
+#: app/booking/utils.py:571
+msgid "Container departure from final POD (Gate out)"
+msgstr "Salida del contenedor desde el POD final (puerta de salida)"
+
+#: app/booking/utils.py:572
+msgid "Container delivery to consignee"
+msgstr "Entrega de contenedores al destinatario"
+
+#: app/booking/utils.py:573
+msgid "Container empty return to depot"
+msgstr "Contenedor vacío retorno a depósito"
+
+#: app/booking/views.py:715
+msgid "date_from or date_to mismatch with surcharges or freight rate dates."
+msgstr ""
+"date_from o date_to desajuste con recargos o fechas de tarifas de flete."
+
+#: app/booking/views.py:752
+#, python-brace-format
+msgid "{user} has assigned an operation to you. Operation [{aceid}]."
+msgstr "{user} te ha asignado una operación. Operación [{aceid}]."
+
+#: app/booking/views.py:853
+#, python-brace-format
+msgid ""
+"The Agent has confirmed your changes in the shipment {aceid} from {origin} "
+"to {destination}."
+msgstr ""
+"El agente confirmo sus alteraciones para el embarque {aceid} de {origin} "
+"para {destination}."
+
+#: app/core/admin.py:161
+msgid "User info"
+msgstr "Información de usuario"
+
+#: app/core/admin.py:238 app/core/admin.py:332 app/core/models.py:167
+#: app/core/models.py:299
+msgid "Company Type"
+msgstr "Tipo de compañía"
+
+#: app/core/admin.py:242
+msgid "Fees"
+msgstr "Tarifa"
+
+#: app/core/admin.py:261
+msgid "Company info"
+msgstr "Información de la compañía"
+
+#: app/core/admin.py:279
+msgid "Contact person info"
+msgstr "Información de la persona de contacto"
+
+#: app/core/admin.py:293
+msgid "Sign up request was already approved."
+msgstr "La solicitud de registro ya fue aprobada."
+
+#: app/core/admin.py:306
+msgid "Company saved. Link to register master account was sent."
+msgstr "Empresa aprobada. Se envió el enlace para registrar la cuenta maestra."
+
+#: app/core/admin.py:307
+#, python-brace-format
+msgid "Registration link - 192.168.1.33:8000/create-account?token={token}"
+msgstr "Enlace de registro - 192.168.1.33:8000/create-account?token={token}"
+
+#: app/core/admin.py:311
+#, python-brace-format
+msgid ""
+"Company with provided phone number or tax id already exists. Additional info "
+"[{error}]"
+msgstr ""
+"La empresa con el número de teléfono o el número de identificación fiscal "
+"proporcionados ya existe. información adicional {error}"
+
+#: app/core/admin.py:355
+msgid "Review info"
+msgstr "Revisar información"
+
+#: app/core/admin.py:363 app/core/models.py:352
+msgid "Approved"
+msgstr "Aprobado"
+
+#: app/core/admin.py:373
+msgid "Review was already approved."
+msgstr "La revisión ya fue aprobada."
+
+#: app/core/admin.py:377
+msgid "Review successfully approved."
+msgstr "Revisión aprobada con éxito."
+
+#: app/core/apps.py:7
+msgid "Core"
+msgstr "Centro"
+
+#: app/core/models.py:89
+msgid "email address"
+msgstr "dirección de correo electrónico"
+
+#: app/core/models.py:93 app/core/models.py:200 app/core/models.py:332
+#: app/core/models.py:370 app/core/models.py:553
+msgid "Phone number"
+msgstr "Teléfono"
+
+#: app/core/models.py:98
+msgid "Position In Company"
+msgstr "Posición em la compañia"
+
+#: app/core/models.py:102
+msgid "Profile Photo"
+msgstr "Foto de perfil"
+
+#: app/core/models.py:117
+msgid "Language"
+msgstr "Idioma"
+
+#: app/core/models.py:129 app/core/models.py:400 app/core/models.py:421
+msgid "User"
+msgstr "Usuario"
+
+#: app/core/models.py:130
+msgid "Users"
+msgstr "Usuarios"
+
+#: app/core/models.py:162
+msgid "Disable functionality"
+msgstr "Deshabilitar la funcionalidad"
+
+#: app/core/models.py:172 app/core/models.py:304 app/core/models.py:519
+msgid "Company Name"
+msgstr "Nombre de empresa"
+
+#: app/core/models.py:176 app/core/models.py:308 app/core/models.py:523
+#: app/handling/models.py:383
+msgid "First address line"
+msgstr "Primera línea de dirección"
+
+#: app/core/models.py:181 app/core/models.py:313 app/core/models.py:528
+msgid "Second address line"
+msgstr "Segunda línea de dirección"
+
+#: app/core/models.py:187 app/core/models.py:319 app/core/models.py:534
+msgid "State"
+msgstr "Provincia"
+
+#: app/core/models.py:191 app/core/models.py:323 app/core/models.py:539
+msgid "City"
+msgstr "Ciudad"
+
+#: app/core/models.py:195 app/core/models.py:327 app/core/models.py:543
+msgid "Zip Code"
+msgstr "Código postal"
+
+#: app/core/models.py:205
+msgid "Tax id Number"
+msgstr "VAT"
+
+#: app/core/models.py:211 app/core/models.py:342
+msgid "Number of employees in company"
+msgstr "No. De Funcionarios"
+
+#: app/core/models.py:215 app/core/models.py:346
+msgid "Company website"
+msgstr "Sitio Web la compañía"
+
+#: app/core/models.py:221
+msgid "Date company created"
+msgstr "Fecha de creación de la empresa"
+
+#: app/core/models.py:236
+msgid "Companies"
+msgstr "Empresas"
+
+#: app/core/models.py:245
+msgid "Sea import shipment alerts"
+msgstr "Alerta de llegada de embarques de importación marítima"
+
+#: app/core/models.py:249
+msgid "Sea import shipment alerts in days"
+msgstr "Alerta de llegada de embarques de importación marítima en días"
+
+#: app/core/models.py:253
+msgid "Import shipment departure alerts"
+msgstr "Importar alertas de salida de envío"
+
+#: app/core/models.py:257
+msgid "Export shipment arrival alerts"
+msgstr "Alerta de llegada de embarque de exportación"
+
+#: app/core/models.py:261
+msgid "Operation details change"
+msgstr "Cambio de detalles de los embarque"
+
+#: app/core/models.py:265
+msgid "Surcharge expiration"
+msgstr "Vencimiento del recargo"
+
+#: app/core/models.py:269
+msgid "Surcharge expiration in days"
+msgstr "Vencimiento del recargo en días"
+
+#: app/core/models.py:273
+msgid "Freight rate expiration"
+msgstr "Vencimiento de la tarifa de flete"
+
+#: app/core/models.py:277
+msgid "Freight rate expiration in days"
+msgstr "Vencimiento de la tarifa de flete en días"
+
+#: app/core/models.py:289
+msgid "Email notification"
+msgstr "Notificación de correo electrónico"
+
+#: app/core/models.py:290
+msgid "Email notifications"
+msgstr "Notificaciónes de Correo Electrónico"
+
+#: app/core/models.py:337
+msgid "Tax id Number (00.000.000/0000-00)"
+msgstr "VAT (00.000.000 / 0000-00)"
+
+#: app/core/models.py:360
+msgid "First name"
+msgstr "Nombre"
+
+#: app/core/models.py:365
+msgid "Last name"
+msgstr "Apellido"
+
+#: app/core/models.py:375
+msgid "Position in company"
+msgstr "Cargo en la Empresa"
+
+#: app/core/models.py:384
+msgid "Sign up request"
+msgstr "Solicitud de registro"
+
+#: app/core/models.py:385
+msgid "Sign up requests"
+msgstr "Solicitudes de registro"
+
+#: app/core/models.py:394
+msgid "Sign Up Token"
+msgstr "Token de registro"
+
+#: app/core/models.py:404
+msgid "Sign up token"
+msgstr "Token de registro"
+
+#: app/core/models.py:405
+msgid "Sign up tokens"
+msgstr "Registrarse tokens"
+
+#: app/core/models.py:425
+msgid "groups"
+msgstr "grupos"
+
+#: app/core/models.py:427
+msgid ""
+"The groups this user belongs to. A user will get all permissions granted to "
+"each of their groups."
+msgstr ""
+"Los grupos a los que pertenece este usuario. Un usuario obtendrá todos los "
+"permisos concedidos a cada uno de sus grupos."
+
+#: app/core/models.py:437
+msgid "Role"
+msgstr "Rol"
+
+#: app/core/models.py:438
+msgid "Roles"
+msgstr "Roles"
+
+#: app/core/models.py:455
+msgid "Bank Name"
+msgstr "Nombre del banco"
+
+#: app/core/models.py:459
+msgid "Bank Number"
+msgstr "Número de banco"
+
+#: app/core/models.py:464
+msgid "Branch Number (0000-0)"
+msgstr "Número de sucursal (0000-0)"
+
+#: app/core/models.py:469
+msgid "Account Number"
+msgstr "Número de cuenta"
+
+#: app/core/models.py:475
+msgid "Account Type"
+msgstr "Tipo de cuenta"
+
+#: app/core/models.py:487
+msgid "Is bank account of the platform"
+msgstr "Es cuenta bancaria de la plataforma"
+
+#: app/core/models.py:491
+msgid "Is default bank account or not"
+msgstr "Seleccionar como principal"
+
+#: app/core/models.py:495
+msgid "Pix payment key"
+msgstr "Pix clave de pago"
+
+#: app/core/models.py:501
+msgid "Bank account"
+msgstr "Datos bancarios"
+
+#: app/core/models.py:502
+msgid "Bank accounts"
+msgstr "Datos bancarios"
+
+#: app/core/models.py:549
+msgid "Shippers contact name"
+msgstr "Nombre de contacto del remitente"
+
+#: app/core/models.py:557
+msgid "Additional phone number"
+msgstr "Teléfono adicional"
+
+#: app/core/models.py:565
+msgid "Is company partner"
+msgstr "Es socio de la empresa"
+
+#: app/core/models.py:578
+msgid "Shippers"
+msgstr "Embarcadores"
+
+#: app/core/models.py:588
+msgid "Company rating from 1 to 10"
+msgstr "Calificación de la empresa de 1 a 10"
+
+#: app/core/models.py:592
+msgid "Review text"
+msgstr "Revisar texto"
+
+#: app/core/models.py:595
+msgid "Approved by platform"
+msgstr "Aprobado por plataforma"
+
+#: app/core/models.py:599
+msgid "Date review created"
+msgstr "Fecha de la reseña"
+
+#: app/core/models.py:606
+msgid "Reviewer"
+msgstr "Crítico"
+
+#: app/core/models.py:617
+msgid "Operation"
+msgstr "Operación"
+
+#: app/core/models.py:625
+msgid "Review"
+msgstr "Revisar"
+
+#: app/core/models.py:626
+msgid "Reviews"
+msgstr "Reseñas"
+
+#: app/core/tasks.py:17
+msgid "Acemaven. Registration process."
+msgstr "Acemaven. Proceso de registro."
+
+#: app/core/tasks.py:19
+#, python-brace-format
+msgid "{settings.DOMAIN_ADDRESS}signup?token={token}"
+msgstr "{settings.DOMAIN_ADDRESS}signup?token={token}"
+
+#: app/core/tasks.py:21
+msgid "To complete your sign-up, please press the button:"
+msgstr "Presione el botón para completar su registro:"
+
+#: app/core/templates/core/local_fee_inline_tabular.html:20
+#: app/handling/models.py:426
+msgid "Booking Fee"
+msgstr "Tasa de reserva"
+
+#: app/core/templates/core/local_fee_inline_tabular.html:21
+msgid "Cancellation Fee"
+msgstr "Tasa de cancelación"
+
+#: app/core/templates/core/local_fee_inline_tabular.html:22
+#: app/handling/models.py:428
+msgid "Agent Booking Fee"
+msgstr "Tasa de reserva del agente"
+
+#: app/core/templates/core/local_fee_inline_tabular.html:23
+#: app/handling/models.py:429
+msgid "Service Fee"
+msgstr "Tasa de servicio"
+
+#: app/core/templates/core/local_fee_inline_tabular.html:35
+msgid "Delete?"
+msgstr "¿Borrar?"
+
+#: app/core/templates/core/local_fee_inline_tabular.html:49
+msgid "View"
+msgstr "Visualizar"
+
+#: app/core/templates/core/local_fee_inline_tabular.html:51
+msgid "View on site"
+msgstr "Ver en el sitio"
+
+#: app/core/templates/core/review_changeform.html:6
+msgid "Approve client review"
+msgstr "Aprobar la reseña del cliente"
+
+#: app/core/templates/core/sign_up_request_changeform.html:6
+msgid "Approve company sign up"
+msgstr "Aprobar el registro de la empresa"
+
+#: app/handling/apps.py:7
+msgid "Handling"
+msgstr "Manejando"
+
+#: app/handling/models.py:52
+msgid "Shipping Type Title"
+msgstr "Título del tipo de envío"
+
+#: app/handling/models.py:60 app/handling/models.py:89
+#: app/handling/models.py:342
+msgid "Shipping type"
+msgstr "Tipo de envío"
+
+#: app/handling/models.py:61
+msgid "Shipping types"
+msgstr "Tipos de envío"
+
+#: app/handling/models.py:70
+msgid "Shipping Mode Title"
+msgstr "Título del modo de envío"
+
+#: app/handling/models.py:74
+msgid "Is need volume"
+msgstr "Es volumen de necesidad"
+
+#: app/handling/models.py:78
+msgid "Has container types in freight rate"
+msgstr "Tiene tipos de contenedores en la tarifa de flete"
+
+#: app/handling/models.py:82
+msgid "Has container types in surcharge"
+msgstr "Tiene tipos de contenedores en recargo"
+
+#: app/handling/models.py:97 app/handling/models.py:151
+msgid "Shipping modes"
+msgstr "Tipo de embarques"
+
+#: app/handling/models.py:106
+msgid "Packaging code"
+msgstr "Código de empaque"
+
+#: app/handling/models.py:110 app/handling/models.py:180
+#: app/websockets/models.py:264
+msgid "Description"
+msgstr "Descripción"
+
+#: app/handling/models.py:114 app/handling/models.py:176
+msgid "Description PT"
+msgstr "Descripción PT"
+
+#: app/handling/models.py:134
+msgid "Dimension unit"
+msgstr "Unidad de dimensión"
+
+#: app/handling/models.py:144
+msgid "Weight unit"
+msgstr "Unidad de peso"
+
+#: app/handling/models.py:159
+msgid "Packaging types"
+msgstr "Tipos de empaque"
+
+#: app/handling/models.py:168
+msgid "Active"
+msgstr "EM MARCHA"
+
+#: app/handling/models.py:172
+msgid "Container code"
+msgstr "Código de contenedor"
+
+#: app/handling/models.py:191
+msgid "FCL type"
+msgstr "Contenedor FCL"
+
+#: app/handling/models.py:195
+msgid "IATA class"
+msgstr "IATA clasa"
+
+#: app/handling/models.py:201
+msgid "TEU"
+msgstr "TEU"
+
+#: app/handling/models.py:221
+msgid "Gross weight"
+msgstr "Peso bruto"
+
+#: app/handling/models.py:226
+msgid "Tare weight"
+msgstr "Peso de tara"
+
+#: app/handling/models.py:231
+msgid "Capacity (M3)"
+msgstr "Capacidad (M3)"
+
+#: app/handling/models.py:237
+msgid "ISO"
+msgstr "ISO"
+
+#: app/handling/models.py:242
+msgid "ISO type"
+msgstr "ISO tipo"
+
+#: app/handling/models.py:247
+msgid "ISO size"
+msgstr "ISO talla"
+
+#: app/handling/models.py:252
+msgid "ISO description"
+msgstr "ISO descripción"
+
+#: app/handling/models.py:257
+msgid "Is frozen"
+msgstr "Congelado"
+
+#: app/handling/models.py:261
+msgid "Can be dangerous"
+msgstr "Carga peligrosa"
+
+#: app/handling/models.py:279
+msgid "IMO class title"
+msgstr "IMO título de la clase"
+
+#: app/handling/models.py:283
+msgid "IMO class"
+msgstr "IMO clase"
+
+#: app/handling/models.py:288
+msgid "Imo class"
+msgstr "Imo clase"
+
+#: app/handling/models.py:289
+msgid "Imo classes"
+msgstr "Imo clases"
+
+#: app/handling/models.py:298
+msgid "Release type title"
+msgstr "Título del tipo de publicación"
+
+#: app/handling/models.py:302
+msgid "Release code"
+msgstr "Código de liberación"
+
+#: app/handling/models.py:311
+msgid "Release types"
+msgstr "Tipos de lanzamiento"
+
+#: app/handling/models.py:320
+msgid "Carrier title"
+msgstr "Título del transportista"
+
+#: app/handling/models.py:324
+msgid "SCAC code"
+msgstr "SCAC código"
+
+#: app/handling/models.py:329
+msgid "2 letter air code"
+msgstr "Código aéreo de 2 letras"
+
+#: app/handling/models.py:334
+msgid "Airline prefix"
+msgstr "Prefijo de aerolínea"
+
+#: app/handling/models.py:350
+msgid "Carriers"
+msgstr "Transportistas"
+
+#: app/handling/models.py:359
+msgid "Two char airline code"
+msgstr "Código de aerolínea de dos caracteres"
+
+#: app/handling/models.py:364
+msgid "Three char airline code"
+msgstr "Código de aerolínea de tres caracteres"
+
+#: app/handling/models.py:369
+msgid "Numeric airline code"
+msgstr "Código de aerolínea numérico"
+
+#: app/handling/models.py:374
+msgid "Airline title"
+msgstr "Título de la aerolínea"
+
+#: app/handling/models.py:378
+msgid "Airline additional title"
+msgstr "Título adicional de la aerolínea"
+
+#: app/handling/models.py:388
+msgid "Additional address line"
+msgstr "Línea de dirección adicional"
+
+#: app/handling/models.py:393
+msgid "Airline city"
+msgstr "Ciudad de la aerolínea"
+
+#: app/handling/models.py:398
+msgid "Airline postcode"
+msgstr "Código postal de la aerolínea"
+
+#: app/handling/models.py:403
+msgid "CASS controled"
+msgstr "CASS controlado"
+
+#: app/handling/models.py:411
+msgid "Airline"
+msgstr "Aerolínea"
+
+#: app/handling/models.py:412
+msgid "Airlines"
+msgstr "Aerolíneas"
+
+#: app/handling/models.py:427
+msgid "Cancellation Penalty Fee"
+msgstr "Penalización por cancelación"
+
+#: app/handling/models.py:440
+msgid "Fee type"
+msgstr "Tipo de tarifa"
+
+#: app/handling/models.py:445
+msgid "Fee enabled"
+msgstr "Tarifa habilitada"
+
+#: app/handling/models.py:449
+msgid "Fee value"
+msgstr "Valor de la tarifa"
+
+#: app/handling/models.py:455 app/location/admin.py:68
+msgid "Value type"
+msgstr "Tipo de valor"
+
+#: app/handling/models.py:463
+msgid "Common fee"
+msgstr "Tarifa común"
+
+#: app/handling/models.py:464
+msgid "Common fees"
+msgstr "Tarifas comunes"
+
+#: app/handling/models.py:476 app/handling/models.py:483
+msgid "Global fee"
+msgstr "Tarifa global"
+
+#: app/handling/models.py:484
+msgid "Global fees"
+msgstr "Tarifas globales"
+
+#: app/handling/models.py:509
+msgid "Local fee"
+msgstr "Tarifa local"
+
+#: app/handling/models.py:510
+msgid "Local fees"
+msgstr "Tarifas locales"
+
+#: app/handling/models.py:519
+msgid "Currency three char code"
+msgstr "Código de tres caracteres de moneda"
+
+#: app/handling/models.py:523
+msgid "Is active in the platform"
+msgstr "Está activa en la plataforma"
+
+#: app/handling/models.py:527
+msgid "Is main currency in the platform"
+msgstr "Es la moneda principal de la plataforma."
+
+#: app/handling/models.py:535 app/handling/models.py:633
+#: app/location/models.py:22
+msgid "Currency"
+msgstr "Moneda"
+
+#: app/handling/models.py:536
+msgid "Currencies"
+msgstr "Monedas"
+
+#: app/handling/models.py:552
+msgid "Port Code"
+msgstr "Código de puerto"
+
+#: app/handling/models.py:556
+msgid "Port Name"
+msgstr "Nombre del puerto"
+
+#: app/handling/models.py:560
+msgid "IATA"
+msgstr "IATA"
+
+#: app/handling/models.py:565
+msgid "Port coordinates"
+msgstr "Coordenadas del puerto"
+
+#: app/handling/models.py:569
+msgid "Port timezone"
+msgstr "Zona horaria del puerto"
+
+#: app/handling/models.py:574
+msgid "Port is active"
+msgstr "Puerto activo"
+
+#: app/handling/models.py:578
+msgid "Port or airport"
+msgstr "Puerto o aeropuerto"
+
+#: app/handling/models.py:587 app/location/models.py:42
+msgid "Country"
+msgstr "Países"
+
+#: app/handling/models.py:592
+msgid "Port"
+msgstr "Puerto"
+
+#: app/handling/models.py:593
+msgid "Ports"
+msgstr "Puertos"
+
+#: app/handling/models.py:618 app/handling/models.py:650
+msgid "Exchange rate"
+msgstr "Tasa de Cambio"
+
+#: app/handling/models.py:624
+msgid "Spread"
+msgstr "Untada"
+
+#: app/handling/models.py:636
+msgid "Is exchange rate of the platform"
+msgstr "Es el tipo de cambio de la plataforma."
+
+#: app/handling/models.py:651
+msgid "Exchange rates"
+msgstr "Los tipos de cambio"
+
+#: app/handling/models.py:660
+msgid "Exchange rate date"
+msgstr "Fecha de tipo de cambio"
+
+#: app/handling/models.py:671
+msgid "Billing exchange rate"
+msgstr "Tipo de cambio de facturación"
+
+#: app/handling/models.py:672
+msgid "Billing exchange rates"
+msgstr "Tasas de cambio de facturación"
+
+#: app/handling/models.py:681
+msgid "Number of rates results will return"
+msgstr "Número de resultados de búsqueda de fletes"
+
+#: app/handling/models.py:685
+msgid "Hide carrier name in search results"
+msgstr "Ocultar el nombre del operador en los resultados de búsqueda"
+
+#: app/handling/models.py:689
+msgid "Number of bids client can receive"
+msgstr "Número de cotizaciones que el cliente puede recibir"
+
+#: app/handling/models.py:693
+msgid "Number of days a quote will be shown to ff"
+msgstr "Número de días que se mostrará una cotización al agente"
+
+#: app/handling/models.py:697
+msgid "Enable booking/service fee payment to book freight rate"
+msgstr ""
+"Habilite el pago de la tarifa de reserva / servicio para reservar la tarifa "
+"de flete"
+
+#: app/handling/models.py:705
+msgid "Client platform setting"
+msgstr "Configuración de la plataforma del cliente"
+
+#: app/handling/models.py:706
+msgid "Client platform settings"
+msgstr "Configuración de la plataforma del cliente"
+
+#: app/handling/models.py:724
+msgid "Hide/show freight forwarder"
+msgstr "Ocultar / mostrar transitario"
+
+#: app/handling/models.py:730
+msgid ""
+"Number of days an unpaid booking request can stay in client list until "
+"discarded"
+msgstr ""
+"Número de días que una solicitud de reserva no pagada puede permanecer en la "
+"lista de clientes hasta descartado"
+
+#: app/handling/models.py:734
+msgid ""
+"Number of days that the agent will have to confirm a booking request(export)"
+msgstr ""
+"Número de días que el agente tendrá para confirmar una solicitud de reserva "
+"(exportación)"
+
+#: app/handling/models.py:738
+msgid ""
+"Number of days that the agent will have to confirm a booking request(import)"
+msgstr ""
+"Número de días que el agente tendrá para confirmar una solicitud de reserva "
+"(importación)"
+
+#: app/handling/models.py:746
+msgid "General setting"
+msgstr "Ajustes generales"
+
+#: app/handling/models.py:747
+msgid "General settings"
+msgstr "Configuración general"
+
+#: app/handling/models.py:756
+msgid "Api url to track delivery progress of air shipment"
+msgstr "Api url para rastrear embarques aéreos"
+
+#: app/handling/models.py:760
+msgid "Username credential"
+msgstr "Nombre de usuario"
+
+#: app/handling/models.py:764
+msgid "Password credential"
+msgstr "Contraseña"
+
+#: app/handling/models.py:768
+msgid "PIMA"
+msgstr "PIMA"
+
+#: app/handling/models.py:776
+msgid "Air tracking setting"
+msgstr "Configuración de tracking aéreo"
+
+#: app/handling/models.py:777
+msgid "Air tracking settings"
+msgstr "Configuración de tracking aéreo"
+
+#: app/handling/models.py:786
+msgid "Api url to track delivery progress of sea shipment"
+msgstr "Api url para rastrear embarques marítimos"
+
+#: app/handling/models.py:790
+msgid "Api key"
+msgstr "llave API"
+
+#: app/handling/models.py:799
+msgid "Sea tracking setting"
+msgstr "Configuración de rastreo marítimo"
+
+#: app/handling/models.py:800
+msgid "Sea tracking settings"
+msgstr "Configuraciones de rastreo marítimo"
+
+#: app/handling/models.py:809
+msgid "Pix api base url"
+msgstr "Pix api base url"
+
+#: app/handling/models.py:813
+msgid "Pix api token uri"
+msgstr "Pix api token uri"
+
+#: app/handling/models.py:817
+msgid "Pix api cob uri"
+msgstr "Pix api cob uri"
+
+#: app/handling/models.py:821
+msgid "Client id"
+msgstr "Identificación del cliente"
+
+#: app/handling/models.py:824
+msgid "Client secret"
+msgstr "Llave del cliente"
+
+#: app/handling/models.py:827
+msgid "Developer key"
+msgstr "Llave de desarrollador"
+
+#: app/handling/models.py:830
+msgid "Basic token value"
+msgstr "Valor de token básico"
+
+#: app/handling/models.py:834
+msgid "Production environment is active"
+msgstr "El entorno de producción está activo"
+
+#: app/handling/models.py:848
+msgid "Pix api setting"
+msgstr "Configuración de PIX API"
+
+#: app/handling/models.py:849
+msgid "Pix api settings"
+msgstr "Configuraciones de PIX API"
+
+#: app/handling/templates/handling/global_fee_change_list.html:34
+msgid "Home"
+msgstr "Inicio"
+
+#: app/handling/templates/handling/global_fee_change_list.html:66
+msgid "Filter By"
+msgstr "Filtrar por"
+
+#: app/handling/templates/handling/global_fee_change_list_filter.html:10
+#, fuzzy, python-format
+#| msgid " By %(filter_title)s "
+msgid " By %(filter_title)s"
+msgstr "Por %(filter_title)s "
+
+#: app/language_switcher/templates/language_switcher/base_site.html:28
+msgid "Documentation"
+msgstr "Documentación"
+
+#: app/language_switcher/templates/language_switcher/base_site.html:32
+msgid "Change password"
+msgstr "Cambiar contrasena"
+
+#: app/language_switcher/templates/language_switcher/base_site.html:34
+msgid "Log out"
+msgstr "Cerrar sesión"
+
+#: app/language_switcher/templates/language_switcher/base_site.html:57
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "Modelos en el %(name) solicitud"
+
+#: app/language_switcher/templates/language_switcher/base_site.html:68
+msgid "Add"
+msgstr "Agregar"
+
+#: app/language_switcher/templates/language_switcher/base_site.html:85
+msgid "You don't have permission to edit anything."
+msgstr "No tienes permiso para editar nada."
+
+#: app/location/models.py:11
+msgid "Country Code"
+msgstr "Código de país"
+
+#: app/location/models.py:15
+msgid "Country Name"
+msgstr "Nombre del país"
+
+#: app/location/models.py:25
+msgid "Country is active"
+msgstr "El país está activo"
+
+#: app/location/models.py:29
+msgid "Country was chosen as main for platform"
+msgstr "El país fue elegido como principal para la plataforma."
+
+#: app/location/models.py:43
+msgid "Countries"
+msgstr "Países"
+
+#: app/websockets/admin.py:26
+msgid "Ticket info"
+msgstr "Información del ticket"
+
+#: app/websockets/admin.py:51
+msgid "You are not in chat"
+msgstr "No estas en el chat"
+
+#: app/websockets/admin.py:83
+msgid "Category"
+msgstr "Categoría"
+
+#: app/websockets/admin.py:85
+msgid "Unread messages"
+msgstr "Mensajes no leídos"
+
+#: app/websockets/apps.py:7
+msgid "Websockets"
+msgstr "Al control"
+
+#: app/websockets/consumers.py:76
+#, python-brace-format
+msgid "You have a new message in chat on operation number {aceid}"
+msgstr "Tiene un nuevo mensaje en el chat sobre la operación {aceid}"
+
+#: app/websockets/consumers.py:81
+#, python-brace-format
+msgid "You have a new message in support chat on topic \"{topic}\""
+msgstr "Tiene un nuevo mensaje en el chat de soporte sobre el tema \"{topic}\""
+
+#: app/websockets/models.py:32
+msgid "Chats"
+msgstr "Chats"
+
+#: app/websockets/models.py:44
+msgid "User has permission to read messages"
+msgstr "El usuario tiene permiso para leer mensajes"
+
+#: app/websockets/models.py:48
+msgid "User has permission to write messages"
+msgstr "El usuario tiene permiso para escribir mensajes"
+
+#: app/websockets/models.py:62
+msgid "User is online"
+msgstr "El usuario está en línea"
+
+#: app/websockets/models.py:66
+msgid "Number of unread messages"
+msgstr "Número de mensajes no leídos"
+
+#: app/websockets/models.py:74
+msgid "Chat permission"
+msgstr "Permiso de chat"
+
+#: app/websockets/models.py:75
+msgid "Chat permissions"
+msgstr "Permisos de chat"
+
+#: app/websockets/models.py:104
+msgid "Message"
+msgstr "Mensaje"
+
+#: app/websockets/models.py:117
+msgid "File from chat"
+msgstr "Archivo del chat"
+
+#: app/websockets/models.py:131
+msgid "Message file"
+msgstr "Archivo de mensajes"
+
+#: app/websockets/models.py:132
+msgid "Message files"
+msgstr "Archivos de mensajes"
+
+#: app/websockets/models.py:172
+msgid "Section"
+msgstr "Sección"
+
+#: app/websockets/models.py:177
+msgid "Date the notification object created"
+msgstr "Fecha en que se creó el objeto de notificación"
+
+#: app/websockets/models.py:181
+msgid "Notification text"
+msgstr "Texto de notificación"
+
+#: app/websockets/models.py:189
+msgid "Id of described object"
+msgstr "Id del objeto descrito"
+
+#: app/websockets/models.py:193
+msgid "Action path"
+msgstr "Ruta de la acción"
+
+#: app/websockets/models.py:201
+msgid "Notification"
+msgstr "Notificación"
+
+#: app/websockets/models.py:202
+msgid "Notifications"
+msgstr "Notificaciones"
+
+#: app/websockets/models.py:232
+msgid "Is seen by user"
+msgstr "Visto por el usuario"
+
+#: app/websockets/models.py:259
+msgid "Categories"
+msgstr "Categorías"
+
+#: app/websockets/models.py:263
+msgid "Topic"
+msgstr "Tema"
+
+#: app/websockets/models.py:270
+msgid "Operation number"
+msgstr "Número de operación"
+
+#: app/websockets/models.py:273
+msgid "Ticket"
+msgstr "llamado"
+
+#: app/websockets/models.py:274
+msgid "Tickets"
+msgstr "llamados"
+
+#: app/websockets/templates/websockets/model_changeform.html:6
+msgid "Join the chat"
+msgstr "Únete al chat"
+
+#: config/settings/common.py:182
+msgid "English"
+msgstr "Ingles"
+
+#: config/settings/common.py:183
+msgid "Spanish"
+msgstr "Español"
+
+#: config/settings/common.py:184
+msgid "Portuguese"
+msgstr "Portugues"
+
+#: config/settings/common.py:274
+msgid "AceMaven Service Revenue Settings"
+msgstr "Configuración de cobros por servicios AceMaven"
+
+#: config/settings/common.py:279
+msgid "Accounts and Billing"
+msgstr "Cuentas y facturación"
+
+#: config/settings/common.py:284
+msgid "Sections"
+msgstr "Secciones"
+
+#: config/settings/common.py:289
+msgid "Platform setting"
+msgstr "Configuración de la plataforma"
+
+#: config/settings/common.py:295
+msgid "Ticket section"
+msgstr "Sección de llamados"
+
+#: config/urls.py:32
+msgid "Acemaven admin"
+msgstr "Administrador Acemaven"
+
+#: config/urls.py:33
+msgid "System Management"
+msgstr "Gestión del sistema"
+
+#: config/urls.py:34
+msgid "Acemaven system management"
+msgstr "Gestión del sistema Acemaven"
+
+msgid "Fixed value"
+msgstr "Valor fijo"
+
+msgid "Percentage"
+msgstr "Porcentaje"
+
+msgid "Booking Change Requested"
+msgstr "Cambio em la reserva pendente"
+
+msgid "Booking Change Confirmed"
+msgstr "Cambio em la reserva confirmado"
+
+msgid "Booking Fee Pending"
+msgstr "Tasa de Solicitud de Reserva Pendiente"
+
+msgid "Booking Request Received"
+msgstr "Solicitud de Reserva Recibida"
+
+msgid "Booking Request in Progress"
+msgstr "Solicitud de reserva en proceso"
+
+msgid "Booking Confirmed"
+msgstr "Reserva confirmada"
+
+msgid "Booking Request Rejected"
+msgstr "Solicitud de reserva rechazada"
+
+msgid "Operation Canceled by Agent"
+msgstr "Operación cancelada por el Agente"
+
+msgid "Operation Canceled by Client"
+msgstr "Operación cancelada por el Cliente"
+
+msgid "Operation Canceled by the System"
+msgstr "Operación cancelada por el Sistema"
+
+msgid "Operation Complete"
+msgstr "Operación Finalizada"
+
+msgid "Booking Request Unpaid and Discarded"
+msgstr "Solicitud de reserva no pagada y descartada"
+
+msgid "Freight forwarder"
+msgstr "Transitario"
+
+msgid "Client"
+msgstr "Cliente"
+
+msgid "Transaction opened"
+msgstr "Transacción abierta"
+
+msgid "Transaction finished"
+msgstr "Transacción finalizada"
+
+msgid "Transaction canceled"
+msgstr "Transacción cancelada"
+
+msgid "Transaction expired"
+msgstr "Transacción caducada"
+
+msgid "Show only on operation page"
+msgstr "Mostrar solo en la página de la operación"
+
+msgid "Show in search results and after"
+msgstr "Mostrar en los resultados de búsqueda y después"
+
+msgid "Show after booking is paid"
+msgstr "Mostrar después de pagar la reserva"
+
+msgid "Operations"
+msgstr "Operaciones"
+
+msgid "Requests"
+msgstr "Solicitudes"
+
+msgid "Billing"
+msgstr "Cuentas"
+
+msgid "Rates and services"
+msgstr "Tarifas y servicios"
+
+msgid "Completed"
+msgstr "Finalizadas"
+
+msgid "In progress"
+msgstr "Em marcha"
+
+msgid "ShippingMode"
+msgstr "Tipo de embarque"
+
+msgid "Air tracking api general settings"
+msgstr "Configuración de seguimiento de aire"
+
+msgid "Sea tracking api general settings"
+msgstr "Configuración de seguimiento del mar"
+
+msgid "By company"
+msgstr "Por empresa"
+
+msgid "Bank Account of company {company}"
+msgstr "Cuenta bancaria de la empresa {company}"
+
+msgid "Booking [{aceid}] of freight rate [{freight_rate}]."
+msgstr "Reservas [{aceid}] de tarifa de flete [{freight_rate}]."
+
+msgid "Client review for company [{company}]"
+msgstr "Revisión del cliente para la empresa [{company}]"
+
+msgid "Exchange rate from {code}"
+msgstr "Tipo de cambio de {code}"
+
+msgid "Sign up request of company \"{name}\""
+msgstr "Solicitud de registro de la empresa \"{name}\""
+
+msgid "General platform settings"
+msgstr "Configuración general de la plataforma"
+
+msgid "A new Booking Request on number {booking.aceid} "
+msgstr "Una nueva solicitud de reserva fue recibida ID {booking.aceid}"
+
+msgid "Cargo group [{id}] of booking [{booking_number}]"
+msgstr "Grupo de carga [{id}] de la reserva [{booking_number}]"
+
+msgid "Surcharge for {direction}, {location}, {expiration_date}"
+msgstr "Recargo por {direction}, {location}, {expiration_date}"

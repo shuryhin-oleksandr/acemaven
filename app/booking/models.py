@@ -3,7 +3,8 @@ from decimal import Decimal
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from django.db import models
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext as __
 
 
 class Surcharge(models.Model):
@@ -22,6 +23,7 @@ class Surcharge(models.Model):
         'handling.Carrier',
         on_delete=models.CASCADE,
         related_name='surcharges',
+        verbose_name=_("Carrier")
     )
     direction = models.CharField(
         _('Surcharge direction, whether import or export'),
@@ -31,6 +33,7 @@ class Surcharge(models.Model):
     location = models.ForeignKey(
         'handling.Port',
         on_delete=models.CASCADE,
+        verbose_name=_("Location")
     )
     start_date = models.DateField(
         _('Surcharge start date'),
@@ -50,16 +53,19 @@ class Surcharge(models.Model):
         'handling.ShippingMode',
         on_delete=models.CASCADE,
         related_name='surcharges',
+        verbose_name=_("Shipping mode")
     )
     company = models.ForeignKey(
         'core.Company',
         on_delete=models.CASCADE,
         related_name='surcharges',
+        verbose_name=_("Company")
     )
     container_types = models.ManyToManyField(
         'handling.ContainerType',
         related_name='surcharges',
         through='UsageFee',
+        verbose_name=_("Container types")
     )
     additional_surcharges = models.ManyToManyField(
         'AdditionalSurcharge',
@@ -68,7 +74,14 @@ class Surcharge(models.Model):
     )
 
     def __str__(self):
-        return f'Surcharge for {self.direction}, {self.location}, {self.expiration_date}'
+        return __('Surcharge for {direction}, {location}, {expiration_date}')\
+                .format(direction=self.direction,
+                        location=self.location,
+                        expiration_date=self.expiration_date)
+
+    class Meta:
+        verbose_name = _("Surcharge")
+        verbose_name_plural = _("Surcharges")
 
 
 class UsageFee(models.Model):
@@ -109,6 +122,10 @@ class UsageFee(models.Model):
 
     def __str__(self):
         return f'{self.container_type}, {self.currency}, {self.charge}'
+
+    class Meta:
+        verbose_name = _("Usage fee")
+        verbose_name_plural = _("Usage fees")
 
 
 class Charge(models.Model):
@@ -166,6 +183,10 @@ class Charge(models.Model):
     def __str__(self):
         return f'{self.currency}, {self.charge}, {self.conditions}'
 
+    class Meta:
+        verbose_name = _("Charge")
+        verbose_name_plural = _("Charges")
+
 
 class AdditionalSurcharge(models.Model):
     """
@@ -179,6 +200,7 @@ class AdditionalSurcharge(models.Model):
     shipping_mode = models.ManyToManyField(
         'handling.ShippingMode',
         related_name='additional_surcharges',
+        verbose_name=_("Shipping mode")
     )
     is_dangerous = models.BooleanField(
         _('Is dangerous'),
@@ -204,6 +226,10 @@ class AdditionalSurcharge(models.Model):
     def __str__(self):
         return f'{self.title}'
 
+    class Meta:
+        verbose_name = _("Additional surcharge")
+        verbose_name_plural = _("Additional surcharges")
+
 
 class FreightRate(models.Model):
     """
@@ -214,6 +240,7 @@ class FreightRate(models.Model):
         'handling.Carrier',
         on_delete=models.CASCADE,
         related_name='freight_rates',
+        verbose_name=_("Carrier")
     )
     carrier_disclosure = models.BooleanField(
         _('Whether carrier name disclosed or not'),
@@ -223,11 +250,13 @@ class FreightRate(models.Model):
         'handling.Port',
         on_delete=models.CASCADE,
         related_name='origin_freight_rates',
+        verbose_name=_("Origin")
     )
     destination = models.ForeignKey(
         'handling.Port',
         on_delete=models.CASCADE,
         related_name='destination_freight_rates',
+        verbose_name=_("Destination")
     )
     transit_time = models.PositiveIntegerField(
         _('Transit time in days'),
@@ -249,12 +278,21 @@ class FreightRate(models.Model):
         'handling.ShippingMode',
         on_delete=models.CASCADE,
         related_name='freight_rates',
+        verbose_name=_("Shipping mode")
     )
     company = models.ForeignKey(
         'core.Company',
         on_delete=models.CASCADE,
         related_name='freight_rates',
+        verbose_name=_("Company")
     )
+
+    def __str__(self):
+        return f'{self.id}'
+
+    class Meta:
+        verbose_name = _("Freight rate")
+        verbose_name_plural = _("Freight rates")
 
 
 class Rate(models.Model):
@@ -305,6 +343,10 @@ class Rate(models.Model):
         related_name='rates',
     )
 
+    class Meta:
+        verbose_name = _("Rate")
+        verbose_name_plural = _("Rates")
+
 
 class Booking(models.Model):
     """
@@ -347,7 +389,7 @@ class Booking(models.Model):
         null=True,
     )
     date_from = models.DateField(
-        _('Booing date from'),
+        _('Booking date from'),
     )
     date_to = models.DateField(
         _('Booking date to'),
@@ -381,17 +423,20 @@ class Booking(models.Model):
         on_delete=models.CASCADE,
         related_name='client_bookings',
         null=True,
+        verbose_name=_('Client contact person')
     )
     agent_contact_person = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
         related_name='agent_bookings',
         null=True,
+        verbose_name=_('Agent contact person')
     )
     release_type = models.ForeignKey(
         'handling.ReleaseType',
         on_delete=models.SET_NULL,
         null=True,
+        verbose_name=_('Release type')
     )
     number_of_documents = models.PositiveIntegerField(
         _('Number of documents for chosen release type'),
@@ -422,12 +467,14 @@ class Booking(models.Model):
         'FreightRate',
         on_delete=models.CASCADE,
         related_name='bookings',
+        verbose_name=_('Freight rate')
     )
     shipper = models.ForeignKey(
         'core.Shipper',
         on_delete=models.SET_NULL,
         related_name='bookings',
         null=True,
+        verbose_name=_('Shipper')
     )
     original_booking = models.ForeignKey(
         'self',
@@ -437,11 +484,16 @@ class Booking(models.Model):
     )
 
     def __str__(self):
-        return f'Booking [{self.id}] of rate [{self.freight_rate}]'
+        return __('Booking [{aceid}] of freight rate [{freight_rate}].')\
+                  .format(aceid=self.aceid, freight_rate=self.freight_rate.id)
 
     @property
     def shipping_type(self):
         return self.freight_rate.shipping_mode.shipping_type.title
+
+    class Meta:
+        verbose_name = _("Booking")
+        verbose_name_plural = _("Bookings")
 
 
 class CancellationReason(models.Model):
@@ -487,6 +539,10 @@ class CancellationReason(models.Model):
         on_delete=models.CASCADE,
     )
 
+    class Meta:
+        verbose_name = _("Cancellation reason")
+        verbose_name_plural = _("Cancellation reasons")
+
 
 class CargoGroup(models.Model):
     """
@@ -518,11 +574,13 @@ class CargoGroup(models.Model):
         'handling.ContainerType',
         on_delete=models.CASCADE,
         null=True,
+        verbose_name=_('Container type')
     )
     packaging_type = models.ForeignKey(
         'handling.PackagingType',
         on_delete=models.CASCADE,
         null=True,
+        verbose_name=_('Packaging type')
     )
     weight_measurement = models.CharField(
         _('Weight Measurement'),
@@ -595,16 +653,22 @@ class CargoGroup(models.Model):
         on_delete=models.CASCADE,
         related_name='cargo_groups',
         null=True,
+        verbose_name=_('Booking')
     )
     quote = models.ForeignKey(
         'Quote',
         on_delete=models.CASCADE,
         related_name='quote_cargo_groups',
         null=True,
+        verbose_name=_('Quote')
     )
 
     def __str__(self):
-        return f'Cargo group [{self.id}] of booking [{self.booking}]'
+        return __('Cargo group [{id}] of booking [{booking_number}]').format(id=self.id, booking_number=self.booking.aceid)
+
+    class Meta:
+        verbose_name = _("Cargo group")
+        verbose_name_plural = _("Cargo groups")
 
 
 class Quote(models.Model):
@@ -659,6 +723,10 @@ class Quote(models.Model):
     def __str__(self):
         return f'Quote {self.origin.code} - {self.destination.code}'
 
+    class Meta:
+        verbose_name = _("Quote")
+        verbose_name_plural = _("Quotes")
+
 
 class Status(models.Model):
     """
@@ -702,6 +770,10 @@ class Status(models.Model):
         _('Charges calculations'),
         null=True,
     )
+
+    class Meta:
+        verbose_name = _("Status")
+        verbose_name_plural = _("Statuses")
 
 
 class ShipmentDetails(models.Model):
@@ -810,8 +882,12 @@ class ShipmentDetails(models.Model):
         null=True,
     )
 
+    def __str__(self):
+        return f'{self.id}'
+
     class Meta:
-        verbose_name_plural = 'Shipment Details'
+        verbose_name = _("Shipment detail")
+        verbose_name_plural = _("Shipment details")
 
 
 class Transaction(models.Model):
@@ -850,6 +926,7 @@ class Transaction(models.Model):
         on_delete=models.CASCADE,
         related_name='transactions',
         null=True,
+        verbose_name=_('Booking'),
     )
     qr_code = models.CharField(
         _('QR code '),
@@ -860,6 +937,13 @@ class Transaction(models.Model):
         _('Response from getting payment'),
         null=True,
     )
+
+    def __str__(self):
+        return __('{id}').format(id=self.id)
+
+    class Meta:
+        verbose_name = _("Transaction")
+        verbose_name_plural = _("Transactions")
 
 
 class PaymentData(models.Model):
@@ -915,7 +999,9 @@ class Track(models.Model):
     )
 
     class Meta:
-        ordering = ('-date_created', )
+        ordering = ('-date_created',)
+        verbose_name = _("Track")
+        verbose_name_plural = _("Tracks")
 
 
 class TrackStatus(models.Model):
@@ -930,9 +1016,11 @@ class TrackStatus(models.Model):
     shipping_mode = models.ManyToManyField(
         'handling.ShippingMode',
         related_name='tracking_statuses',
+        verbose_name=_("Shipping mode")
     )
     direction = models.ManyToManyField(
         'Direction',
+        verbose_name=_("Direction"),
     )
     must_update_actual_date_of_departure = models.BooleanField(
         _('Must update actual date of departure'),
@@ -956,7 +1044,8 @@ class TrackStatus(models.Model):
     )
 
     class Meta:
-        verbose_name_plural = 'Track statuses'
+        verbose_name = _("Track status")
+        verbose_name_plural = _("Track statuses")
 
 
 class Direction(models.Model):
@@ -971,3 +1060,7 @@ class Direction(models.Model):
 
     def __str__(self):
         return f'{self.title}'
+
+    class Meta:
+        verbose_name = _("Direction")
+        verbose_name_plural = _("Directions")

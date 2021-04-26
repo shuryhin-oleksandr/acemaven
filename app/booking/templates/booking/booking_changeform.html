@@ -1,5 +1,5 @@
 {% extends 'admin/change_form.html' %}
-
+{% load i18n %}
 {% block submit_buttons_bottom %}
     <style>
         ul.messagelist {
@@ -9,10 +9,10 @@
     <fieldset class="module aligned">
         <div class="form-row field-charges">
             <div style="display: flex; align-items: flex-start;">
-                <label class="required" for="id_charges">Charge calculations:</label>
+                <label class="required" for="id_charges">{% trans 'Charge calculation' %}</label>
                 {% if doc_fee %}
                 <table border="1" style="display: inline-block;">
-                   <caption style="white-space: nowrap; text-align: center">Doc fee</caption>
+                   <caption style="white-space: nowrap; text-align: center">{% trans 'Doc fee' %}</caption>
 
                        <tr>
                            {% for key in  doc_fee.keys %}
@@ -28,7 +28,7 @@
                 {% endif %}
 
                 <table border="1" style="display: inline-block;">
-                   <caption style="white-space: nowrap; text-align: center;">Total surcharge</caption>
+                   <caption style="white-space: nowrap; text-align: center;">{% trans 'Total surcharge' %}</caption>
                        <tr>
                        {% for key in  total_surcharge.keys %}
                            <th style="text-align: center">{{ key }}</th>
@@ -43,7 +43,7 @@
                 </table>
 
                 <table border="1" style="display: inline-block;">
-                   <caption style="white-space: nowrap; text-align: center;">Total freight rate</caption>
+                   <caption style="white-space: nowrap; text-align: center;">{% trans 'Total freight rate' %}</caption>
                        <tr>
                         {% for key in total_freight_rate.keys %}
                            <th style="text-align: center">{{ key }}</th>
@@ -57,7 +57,7 @@
                 </table>
 
                 <table border="1" style="display: inline-block;">
-                   <caption style="white-space: nowrap; background-color: black; text-align: center;">Totals</caption>
+                   <caption style="white-space: nowrap; background-color: black; text-align: center;">{% trans 'Totals' %}</caption>
                     <tr>
                     {% for key in  totals.keys %}
                         <th style="text-align: center">{{ key }}</th>
@@ -76,7 +76,7 @@
                             {{ block.super }}
     {% if chat %}
         <div class="submit-row">
-            <input type="submit" value="Open chat" name="_open_chat">
+            <input type="submit" value="{% trans 'Open chat' %}" name="_open_chat">
         </div>
     {% endif %}
 {% endblock %}

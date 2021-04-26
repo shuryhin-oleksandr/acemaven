@@ -1,7 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-
+{% load i18n %}
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="{% static "styles/index.css" %}" media="screen">
@@ -16,67 +16,6 @@
     <div class="chatWrapper">
         <div class="chatInner">
             <div class="chatContent">
-                <!-- <div class="myMessageWrapper">
-                    <div class="myPhotoWrapper">
-                        <img src="./icons/defaultUserPhoto.svg" alt="" class='userPhoto'>
-                    </div>
-                    <div class="myTextContent">
-
-                    </div>
-                    <div class="localTimeWrapper" style="margin-right: 25px;">
-                        <div class="localTimeContent">
-                        </div>
-                        <div class="deleteMessageWrap">
-                            <img src="./icons/delete_gray.svg" alt="" class="deleteMessageWrapImg">
-                        </div>
-                    </div>
-                </div>
-                <div class="opponentMessageWrapper">
-                    <div class="opponentPhotoWrapper">
-                        <img src="./icons/defaultUserPhoto.svg" alt="">
-                    </div>
-                    <div class="opponentTextContent">
-                        Котики рулят!)
-                    </div>
-                    <div class="localTimeWrapper" style="margin-left: 25px;">
-                        <div class="localTimeContent">
-                        </div>
-                    </div>
-                </div>
-                <div class="opponentMessageWrapper">
-                    <div class="opponentPhotoWrapper">
-                        <img src="./icons/defaultUserPhoto.svg" alt="" class='userPhoto'>
-                    </div>
-                    <div class="typingIconWrapper">
-                        <img src="./icons/giphy.gif" alt="">
-                    </div>
-                </div>
-                <div class="myFileMessageWrapper">
-                    <div class="myFilePhotoWrapper">
-                        <img src="./icons/defaultUserPhoto.svg" alt="">
-                    </div>
-                    <div class="myFileMessageContent">
-                        <div class="iconWrapper">
-                            <img src="./icons/upload-file-svgrepo-com.svg" alt="">
-                        </div>
-                    </div>
-                    <div class="localTimeWrapper" style="margin-right: 25px;">
-                        <div class="localTimeContent">
-                        </div>
-                        <div class="deleteMessageWrap">
-                            <img src="./icons/delete_gray.svg" alt="" class="deleteMessageWrapImg">
-                        </div>
-                    </div>
-                </div>
-                <div class="opponentFileMessageWrapper">
-                    <div class="opponentFilePhotoWrapper">
-                        <img src="./icons/defaultUserPhoto.svg" alt="">
-                    </div>
-                    <div class="opponentFileMessageContent">
-                        <div class="iconWrapper">
-                            <img src="./icons/upload-file-svgrepo-com.svg" alt="">
-                        </div>
-                    </div>
                 </div> -->
             </div>
             <div style="display: flex; align-items: center">
@@ -87,7 +26,7 @@
                         </label>
                         <input type="file" id="upload" class="uploadInput">
                     </div>
-                    <input type="text" class="messageInput" placeholder="Message...">
+                    <input type="text" class="messageInput" placeholder={% trans 'Message...' %}>
                     <div class="sendIconWrapper">
                         <img src="{% static "icons/send_mesage.svg" %}" alt="">
                     </div>

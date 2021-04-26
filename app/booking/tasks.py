@@ -21,6 +21,7 @@ from app.location.models import Country
 from app.websockets.tasks import create_and_assign_notification, send_email
 from app.websockets.models import Notification
 from app.core.util.payment import review_payment, change_amount
+from django.utils.translation import ugettext as _
 
 logger = logging.getLogger("acemaven.task.logging")
 
@@ -30,110 +31,115 @@ except (ProgrammingError, AttributeError):
     MAIN_COUNTRY_CODE = 'BR'
 
 
-
 @celery_app.task(name='check_payment')
 def check_payment(txid, base_url, developer_key, booking_id, token_uri, client_id, client_secret, basic_token, ):
-    # response, status_code = review_payment(base_url, developer_key, txid, token_uri, client_id, client_secret,
-    #                                        basic_token)
-    # Transaction.objects.filter(txid=txid).update(response=response)
-    #
-    # if isinstance(response, dict):
-    #     booking = Booking.objects.filter(id=booking_id).first()
-    #     if status_code == 200:
-    #         if 'pix' in response.keys() and response['status'] == 'CONCLUIDA':
-    #             check_charge = Decimal(response['pix'][0]['valor']) == Transaction.objects.filter(
-    #                 booking=booking_id).values_list('charge', flat=True).first()
-    #             if check_charge:
-    #                 booking.is_paid = True
-    #                 booking.status = Booking.REQUEST_RECEIVED
-    #                 booking.save()
-    #                 booking.transactions.filter(status=Transaction.OPENED).update(status=Transaction.FINISHED)
-    #
-    #                 client_contact_person_id = booking.client_contact_person_id
-    #                 client_contact_person_email = booking.client_contact_person.email
-    #
-    #                 message_body = f'Payment on booking number {booking.aceid} is success'
-    #                 create_and_assign_notification.delay(
-    #                     Notification.REQUESTS,
-    #                     message_body,
-    #                     [client_contact_person_id, ],
-    #                     Notification.OPERATION,
-    #                     booking_id,
-    #                 )
-    #                 send_email.delay(message_body, [client_contact_person_email, ],
-    #                            object_id=f'{settings.DOMAIN_ADDRESS}payment_success/{booking.id}')
-    #
-    #                 agent_text = f'A new booking request {booking.aceid} has been received.'
-    #                 ff_company = booking.freight_rate.company
-    #                 users_ids = list(
-    #                     ff_company.users.filter(role__groups__name__in=('master', 'agent')).values_list('id', flat=True)
-    #                 )
-    #                 create_and_assign_notification.delay(
-    #                     Notification.REQUESTS,
-    #                     agent_text,
-    #                     users_ids,
-    #                     Notification.BOOKING,
-    #                     object_id=booking.id,
-    #                 )
-    #                 agent_emails = list(
-    #                     ff_company.users.filter(role__groups__name__in=('master', 'agent')).values_list('email',
-    #                                                                                                     flat=True)
-    #                 )
-    #                 send_email.delay(agent_text, agent_emails,
-    #                            object_id=f'{settings.DOMAIN_ADDRESS}new_booking/{booking.id}')
-    #
-    #                 client_text = f'The booking request {booking.aceid} has been sent to "{ff_company.name}".'
-    #                 create_and_assign_notification.delay(
-    #                     Notification.REQUESTS,
-    #                     client_text,
-    #                     [client_contact_person_id, ],
-    #                     Notification.OPERATION,
-    #                     object_id=booking.id,
-    #                 )
-    #                 users_emails = [client_contact_person_email, ]
-    #                 send_email.delay(client_text, users_emails,
-    #                            object_id=f'{settings.DOMAIN_ADDRESS}booking_request/{booking.id}')
-    #                 print("Payment success")
-    #
-    #             else:
-    #                 print("Charge not match")
-    #                 check_payment.apply_async((txid, base_url, developer_key, booking_id, token_uri,
-    #                                           client_id, client_secret, basic_token,),
-    #                                           eta=now() + datetime.timedelta(seconds=7200),
-    #                                           expires=259200)
-    #         else:
-    #             print("No pix/status in response")
-    #             check_payment.apply_async((txid, base_url, developer_key, booking_id, token_uri,
-    #                                       client_id, client_secret, basic_token,),
-    #                                       eta=now() + datetime.timedelta(days=1),
-    #                                       expires=259200)
-    #     else:
-    #         user_id = booking.client_contact_person_id
-    #         user_email = booking.client_contact_person.email
-    #         message_body = f'Have some problems with payment on booking number {booking.aceid}, ' \
-    #                        f'please, contact support team.'
-    #         # create_and_assign_notification.delay(
-    #         #     Notification.REQUESTS,
-    #         #     message_body,
-    #         #     [user_id, ],
-    #         #     Notification.BILLING,
-    #         #     booking_id,
-    #         # )
-    #         # send_email.delay(message_body, [user_email, ], object_id=f'{settings.DOMAIN_ADDRESS}booking/{booking.id}')
-    pass
+    response, status_code = review_payment(base_url, developer_key, txid, token_uri, client_id, client_secret,
+                                           basic_token)
+    Transaction.objects.filter(txid=txid).update(response=response)
+
+    if isinstance(response, dict):
+        booking = Booking.objects.filter(id=booking_id).first()
+        if status_code == 200:
+            if 'pix' in response.keys() and response['status'] == 'CONCLUIDA':
+                check_charge = Decimal(response['pix'][0]['valor']) == Transaction.objects.filter(
+                    booking=booking_id).values_list('charge', flat=True).first()
+                if check_charge:
+                    booking.is_paid = True
+                    booking.status = Booking.REQUEST_RECEIVED
+                    booking.save()
+                    booking.transactions.filter(status=Transaction.OPENED).update(status=Transaction.FINISHED)
+
+                    client_contact_person_id = booking.client_contact_person_id
+                    client_contact_person_email = booking.client_contact_person.email
+
+                    message_body = _('Payment on booking number {aceid} is success').format(aceid=booking.aceid)
+                    create_and_assign_notification.delay(
+                        Notification.REQUESTS,
+                        'Payment on booking number {aceid} is success',
+                        {'aceid':booking.aceid},
+                        [client_contact_person_id, ],
+                        Notification.OPERATION,
+                        booking_id,
+                    )
+                    send_email.delay(message_body, [client_contact_person_email, ],
+                                     object_id=f'{settings.DOMAIN_ADDRESS}payment_success/{booking.id}')
+
+                    agent_text = _('A new booking request {aceid} has been received.').format(aceid=booking.aceid)
+                    ff_company = booking.freight_rate.company
+                    users_ids = list(
+                        ff_company.users.filter(role__groups__name__in=('master', 'agent')).values_list('id', flat=True)
+                    )
+                    create_and_assign_notification.delay(
+                        Notification.REQUESTS,
+                        'A new booking request {aceid} has been received.',
+                        {'aceid':booking.aceid},
+                        users_ids,
+                        Notification.BOOKING,
+                        object_id=booking.id,
+                    )
+                    agent_emails = list(
+                        ff_company.users.filter(role__groups__name__in=('master', 'agent')).values_list('email',
+                                                                                                        flat=True)
+                    )
+                    send_email.delay(agent_text, agent_emails,
+                                     object_id=f'{settings.DOMAIN_ADDRESS}new_booking/{booking.id}')
+
+                    client_text = _('The booking request {aceid} has been sent to "{name}".') \
+                        .format(aceid=booking.aceid, name=ff_company.name)
+                    create_and_assign_notification.delay(
+                        Notification.REQUESTS,
+                        'The booking request {aceid} has been sent to "{name}".',
+                        {'aceid':booking.aceid, 'name':ff_company.name},
+                        [client_contact_person_id, ],
+                        Notification.OPERATION,
+                        object_id=booking.id,
+                    )
+                    users_emails = [client_contact_person_email, ]
+                    send_email.delay(client_text, users_emails,
+                                     object_id=f'{settings.DOMAIN_ADDRESS}booking_request/{booking.id}')
+                    print("Payment success")
+
+                else:
+                    print("Charge not match")
+                    check_payment.apply_async((txid, base_url, developer_key, booking_id, token_uri,
+                                               client_id, client_secret, basic_token,),
+                                              eta=now() + datetime.timedelta(seconds=7200),
+                                              expires=259200)
+            else:
+                print("No pix/status in response")
+                check_payment.apply_async((txid, base_url, developer_key, booking_id, token_uri,
+                                           client_id, client_secret, basic_token,),
+                                          eta=now() + datetime.timedelta(days=1),
+                                          expires=259200)
+        else:
+            user_id = booking.client_contact_person_id
+            user_email = booking.client_contact_person.email
+            message_body = _(
+                'Have some problems with payment on booking number {aceid}, please, contact support team.').format(
+                aceid=booking.aceid)
+            create_and_assign_notification.delay(
+                Notification.REQUESTS,
+                'Have some problems with payment on booking number {aceid}, please, contact support team.',
+                {'aceid':booking.aceid},
+                [user_id, ],
+                Notification.BILLING,
+                booking_id,
+            )
+            send_email.delay(message_body, [user_email, ], object_id=f'{settings.DOMAIN_ADDRESS}booking/{booking.id}')
 
 
 @celery_app.task(name='test')
 def test():
     print('test')
     test.apply_async(eta=now() + datetime.timedelta(days=1),
-                                          expires=259200)
-
+                     expires=259200)
 
 
 @celery_app.task(name='change_charge')
-def change_charge(base_url, new_amount, developer_key, txid, is_prod, booking_id, token_uri, client_id, client_secret, basic_token):
-    response, status_code = change_amount(base_url, new_amount, developer_key, txid, is_prod, token_uri, client_id, client_secret, basic_token)
+def change_charge(base_url, new_amount, developer_key, txid, is_prod, booking_id, token_uri, client_id, client_secret,
+                  basic_token):
+    response, status_code = change_amount(base_url, new_amount, developer_key, txid, is_prod, token_uri, client_id,
+                                          client_secret, basic_token)
     Transaction.objects.filter(txid=txid).update(response=response)
 
     booking = Booking.objects.filter(id=booking_id).first()
@@ -142,22 +148,25 @@ def change_charge(base_url, new_amount, developer_key, txid, is_prod, booking_id
 
     if isinstance(response, dict):
         if status_code == 201:
-            message_body = f'Update charge on booking number {booking.aceid} is success'
+            message_body = _('Update charge on booking number {aceid} is success').format(aceid=booking.aceid)
             create_and_assign_notification.delay(
                 Notification.OPERATIONS,
-                message_body,
+                'Update charge on booking number {aceid} is success',
+                {'aceid':booking.aceid},
                 [client_contact_person_id, ],
                 Notification.OPERATION,
                 booking_id,
             )
             send_email.delay(message_body, [client_contact_person_email, ],
-                       object_id=f'{settings.DOMAIN_ADDRESS}update_payment_success/{booking.id}')
+                             object_id=f'{settings.DOMAIN_ADDRESS}update_payment_success/{booking.id}')
         else:
-            message_body = f'Have some problems with updating charge on booking number {booking.aceid}, ' \
-                           f'please, contact support team.'
+            message_body = _(
+                'Have some problems with updating charge on booking number {aceid}, please, contact support team.') \
+                .format(aceid=booking.aceid)
             create_and_assign_notification.delay(
                 Notification.OPERATIONS,
-                message_body,
+                'Have some problems with updating charge on booking number {aceid}, please, contact support team.',
+                {'aceid':booking.aceid},
                 [client_contact_person_id, ],
                 Notification.BILLING,
                 booking_id,
@@ -218,14 +227,14 @@ def daily_cancel_unconfirmed_agent_bookings():
     for operation in queryset:
         CancellationReason.objects.create(
             reason=CancellationReason.OTHER,
-            comment='Operation cancelled according to expired time for confirming booking by an agent',
+            comment=_('Operation cancelled according to expired time for confirming booking by an agent'),
             booking=operation,
         )
 
 
 @celery_app.task(name='post_awb_number')
 def send_awb_number_to_air_tracking_api(booking_number, booking_id, agent_contact_person_id):
-    logger.info(f'Sending new airway bill number to track [{booking_number}]')
+    logger.info(_(f'Sending new airway bill number to track [{booking_number}]'))
     settings = AirTrackingSetting.load()
     url = settings.url
     headers = {
@@ -242,10 +251,12 @@ def send_awb_number_to_air_tracking_api(booking_number, booking_id, agent_contac
     if response.status_code == 200:
         confirmation = response.json().get('confirmations')[0]
         if (error := confirmation.get('error')) == 'Wrong format of waybill number':
-            message_body = f'The shipment {booking_number} cannot be tracked because of wrong booking number.'
+            message_body = _('The shipment {booking_number} cannot be tracked because of wrong booking number.') \
+                .format(booking_number=booking_number)
             create_and_assign_notification.delay(
                 Notification.OPERATIONS,
-                message_body,
+                'The shipment {booking_number} cannot be tracked because of wrong booking number.',
+                {'booking_number':booking_number},
                 [agent_contact_person_id, ],
                 Notification.OPERATION,
                 object_id=booking_id,
@@ -258,12 +269,12 @@ def send_awb_number_to_air_tracking_api(booking_number, booking_id, agent_contac
         pass
         # Add notification to acemaven platform
 
-    logger.info(f'Response text for airway bill number [{booking_number}] - {response.text}')
+    logger.info(_(f'Response text for airway bill number [{booking_number}] - {response.text}'))
 
 
 @celery_app.task(name='track_sea_operations')
 def track_confirmed_sea_operations():
-    logger.info(f'Starting to get track statuses for confirmed operations')
+    logger.info(_(f'Starting to get track statuses for confirmed operations'))
     settings = SeaTrackingSetting.load()
     url = settings.url
     api_key = settings.api_key
@@ -291,10 +302,12 @@ def track_confirmed_sea_operations():
 
         if data_json.get('status') == 'error':
             if (message := data_json.get('message')) == 'WRONG_NUMBER':
-                message_body = f'The shipment {operation.aceid} cannot be tracked because of wrong booking number.',
+                message_body = _('The shipment {aceid} cannot be tracked because of wrong booking number.') \
+                    .format(aceid=operation.aceid)
                 create_and_assign_notification.delay(
                     Notification.OPERATIONS,
-                    message_body,
+                    'The shipment {aceid} cannot be tracked because of wrong booking number.',
+                    {'aceid':operation.aceid},
                     [operation.agent_contact_person_id, ],
                     Notification.OPERATION,
                     object_id=operation.id,
@@ -323,10 +336,13 @@ def track_confirmed_sea_operations():
                         shipment_details.actual_date_of_departure = timezone.localtime()
                         shipment_details.save()
                         if direction == 'import':
-                            message_body = f'The shipment {operation.aceid} has departed from {operation.freight_rate.origin}.'
+                            message_body = _(
+                                'The shipment {aceid} has departed from {origin}.') \
+                                .format(aceid=operation.aceid, origin=operation.freight_rate.origin)
                             create_and_assign_notification.delay(
                                 Notification.OPERATIONS_IMPORT,
-                                message_body,
+                                'The shipment {aceid} has departed from {origin}.',
+                                {'aceid':operation.aceid, 'origin':operation.freight_rate.origin},
                                 [operation.agent_contact_person_id, operation.client_contact_person_id, ],
                                 Notification.OPERATION,
                                 object_id=operation.id,
@@ -348,10 +364,13 @@ def track_confirmed_sea_operations():
                 shipment_details.actual_date_of_arrival = datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S')
                 shipment_details.save()
                 if direction == 'export':
-                    message_body = f'The shipment {operation.aceid} has arrived at {operation.freight_rate.destination}.'
+                    message_body = _(
+                        'The shipment {aceid} has arrived at {destination}.') \
+                        .format(aceid=operation.aceid, destination=operation.freight_rate.destination)
                     create_and_assign_notification.delay(
                         Notification.OPERATIONS_EXPORT,
-                        message_body,
+                        'The shipment {aceid} has arrived at {destination}.',
+                        {'aceid':operation.aceid, 'destination':operation.freight_rate.destination},
                         [operation.agent_contact_person_id, operation.client_contact_person_id, ],
                         Notification.OPERATION,
                         object_id=operation.id,
@@ -389,11 +408,12 @@ def daily_notify_users_of_expiring_surcharges():
         users_ids = list(surcharge.company.role_set.filter(
             groups__name__in=('master', 'agent')
         ).values_list('user__id', flat=True))
-        message_body = 'Surcharges are about to expire. Please, extend its expiration rate ' \
-                       'or create a new one with the updated costs.'
+        message_body = _(
+            'Surcharges are about to expire. Please, extend its expiration rate or create a new one with the updated costs.')
         create_and_assign_notification.delay(
             Notification.SURCHARGES,
             message_body,
+            {},
             users_ids,
             Notification.SURCHARGE,
             object_id=surcharge.id,
@@ -414,8 +434,8 @@ def daily_notify_users_of_expiring_surcharges():
                                                               expiration_date=now_date + datetime.timedelta(
                                                                   days=expiration_days
                                                               ), ):
-            message_body = 'Surcharges are about to expire. Please, extend its expiration rate ' \
-                           'or create a new one with the updated costs.'
+            message_body = _(
+                'Surcharges are about to expire. Please, extend its expiration rate or create a new one with the updated costs.')
             if user_email := user.email:
                 send_email(
                     message_body,
@@ -436,10 +456,12 @@ def daily_notify_users_of_expiring_freight_rates():
         users_ids = list(freight_rate.company.role_set.filter(
             groups__name__in=('master', 'agent')
         ).values_list('user__id', flat=True))
-        message_body = 'Rates are about to expire.Please, extend its expiration rate or create a new one with the updated costs.'
+        message_body = _(
+            'Rates are about to expire.Please, extend its expiration rate or create a new one with the updated costs.')
         create_and_assign_notification.delay(
             Notification.FREIGHT_RATES,
             message_body,
+            {},
             users_ids,
             Notification.FREIGHT_RATE,
             object_id=freight_rate.id,
@@ -460,8 +482,8 @@ def daily_notify_users_of_expiring_freight_rates():
                                                                     is_archived=False,
                                                                     rates__expiration_date=now_date + datetime.timedelta(
                                                                         days=expiration_days), ).distinct():
-            message_body = 'Rates are about to expire.Please, extend its expiration rate or create ' \
-                           'a new one with the updated costs.'
+            message_body = _(
+                'Rates are about to expire.Please, extend its expiration rate or create a new one with the updated costs.')
             if user_email := user.email:
                 send_email(message_body,
                            [user_email, ],
@@ -485,11 +507,13 @@ def daily_notify_users_of_import_sea_shipment_arrival():
     )
     for shipment_detail in notification_shipment_details:
         booking = shipment_detail.booking
-        message_body = f'The shipment {booking.aceid} is set to arrive in 3 days ' \
-                       f'at {booking.freight_rate.destination}.'
+        message_body = _(
+            'The shipment {aceid} is set to arrive in 3 days at {destination}.')\
+            .format(aceid=booking.aceid, destination=booking.freight_rate.destination)
         create_and_assign_notification.delay(
             Notification.OPERATIONS_IMPORT,
-            message_body,
+            'The shipment {aceid} is set to arrive in 3 days at {destination}.',
+            {'aceid':booking.aceid, 'destination':booking.freight_rate.destination},
             [booking.agent_contact_person_id, booking.client_contact_person_id, ],
             Notification.OPERATION,
             object_id=booking.id,
@@ -510,8 +534,8 @@ def daily_notify_users_of_import_sea_shipment_arrival():
 
         for shipment_detail in email_shipment_details:
             booking = shipment_detail.booking
-            message_body = f'The shipment {booking.aceid} is set to arrive in 3 days ' \
-                           f'at {booking.freight_rate.destination}.'
+            message_body = _(
+                f'The shipment {booking.aceid} is set to arrive in 3 days at {booking.freight_rate.destination}.')
             if email := user.email:
                 send_email(message_body, [email, ],
                            object_id=f'{settings.DOMAIN_ADDRESS}operation/{booking.id}')  # TODO generate a link

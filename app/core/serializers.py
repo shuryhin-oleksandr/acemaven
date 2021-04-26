@@ -212,6 +212,7 @@ class UserBaseSerializer(serializers.ModelSerializer):
             'email',
             'position',
             'companies',
+            'language',
             'roles',
         )
 

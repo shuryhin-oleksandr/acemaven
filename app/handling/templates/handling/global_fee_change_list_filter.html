@@ -1,5 +1,13 @@
 {% load i18n %}
-<h3>{% blocktranslate with filter_title=title %} By {{ filter_title }} {% endblocktranslate %}</h3>
+<style>
+    input[value=Todos] {
+        display: none;
+    }
+    input[value=Todo] {
+        display: none;
+    }
+</style>
+<h3>{% blocktranslate with filter_title=title %} By {{ filter_title }}{% endblocktranslate %}</h3>
 <p>
 {% for choice in choices %}
     {% if choice.display != 'All' %}

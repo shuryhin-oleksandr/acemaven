@@ -12,10 +12,12 @@ from config.celery import celery_app
 
 from django.contrib.auth import get_user_model
 from django.db.models import Q
-from django.utils import timezone
+from django.utils import timezone, translation
 
 from app.booking.models import Booking
 from app.websockets.models import Chat, Notification
+
+from django.utils.translation import ugettext_lazy as _
 
 logger = logging.getLogger("acemaven.task.logging")
 User = get_user_model()
@@ -37,15 +39,26 @@ def create_chat_for_operation(operation_id):
 
 
 @celery_app.task(name='create_and_assign_notification')
-def create_and_assign_notification(section, text, users_ids, action_path, object_id=None):
-    notification = Notification.objects.create(
-        section=section,
-        text=text,
-        action_path=action_path,
-        object_id=object_id,
-    )
+def create_and_assign_notification(section, text_body, text_params, users_ids, action_path, object_id=None):
     users = User.objects.filter(id__in=users_ids)
-    notification.users.set(users)
+
+    for user in users:
+        code = user.language
+        translation.activate(code)
+        text = _(text_body)
+        if text_params:
+            text = text.format(**text_params)
+        translation.deactivate()
+
+        notification = Notification.objects.create(
+            section=section,
+            text=text,
+            action_path=action_path,
+            object_id=object_id,
+        )
+
+        notification.users.add(user)
+        translation.deactivate()
 
 
 @celery_app.task(name='send_notification')

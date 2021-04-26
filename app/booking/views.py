@@ -47,6 +47,7 @@ from app.websockets.tasks import create_and_assign_notification, reassign_confir
 from app.booking.tasks import change_charge
 from config import settings
 from app.core.util.get_jwt_token import get_jwt_token
+from django.utils.translation import ugettext as _
 
 try:
     MAIN_COUNTRY_CODE = Country.objects.filter(is_main=True).first().code
@@ -718,13 +719,13 @@ class BookingViesSet(PermissionClassByActionMixin,
             except ValueError:
                 return Response(
                     data={'error': 'could not change charge because of error.'},
-                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 )
 
         except AttributeError:
             return Response(
-                data={'error': 'date_from or date_to mismatch with surcharges or freight rate dates.'},
-                status=status.HTTP_400_BAD_REQUEST
+                data={'error': _('date_from or date_to mismatch with surcharges or freight rate dates.')},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         if getattr(instance, '_prefetched_objects_cache', None):
@@ -760,10 +761,12 @@ class BookingViesSet(PermissionClassByActionMixin,
                 chat.users.add(assigned_user)
 
         if request.user != assigned_user:
-            message_body = f'{request.user.get_full_name()} has assigned an operation to you. Operation [{booking.aceid}].'
+            message_body = _('{user} has assigned an operation to you. Operation [{aceid}].') \
+                .format(user=request.user.get_full_name(), aceid=booking.aceid)
             create_and_assign_notification.delay(
                 Notification.REQUESTS,
-                f'{request.user.get_full_name()} has assigned an operation to you. Operation [{booking.aceid}].',
+                '{user} has assigned an operation to you. Operation [{aceid}].',
+                {'user':request.user.get_full_name(), 'aceid':booking.aceid},
                 [assigned_user.id, ],
                 Notification.OPERATION,
                 object_id=booking.id,
@@ -853,11 +856,6 @@ class OperationViewSet(PermissionClassByActionMixin,
             chat = operation.chat
             chat.operation = change_request
             chat.save()
-        # else:
-        #     create_chat_for_operation.delay(change_request.id)
-        #     chat = operation.chat
-        #     chat.operation = change_request
-        #     chat.save()
 
         operation.shipment_details.update(booking=change_request)
         operation.transactions.update(booking=change_request)
@@ -867,12 +865,14 @@ class OperationViewSet(PermissionClassByActionMixin,
         change_request.original_booking = None
         change_request.save()
 
-        message_body = f'The Agent has confirmed your changes in the shipment {change_request.aceid} ' \
-                       f'from {change_request.freight_rate.origin} to {change_request.freight_rate.destination}.'
+        message_body = _('The Agent has confirmed your changes in the shipment {aceid} from {origin} to {destination}.') \
+            .format(aceid=change_request.aceid, origin=change_request.freight_rate.origin,
+                    destination=change_request.freight_rate.destination)
         create_and_assign_notification.delay(
             Notification.OPERATIONS,
-            f'The Agent has confirmed your changes in the shipment {change_request.aceid} '
-            f'from {change_request.freight_rate.origin} to {change_request.freight_rate.destination}.',
+            'The Agent has confirmed your changes in the shipment {aceid} from {origin} to {destination}.',
+            {'aceid':change_request.aceid, 'origin':change_request.freight_rate.origin,
+                    'destination':change_request.freight_rate.destination},
             [change_request.client_contact_person_id, ],
             Notification.OPERATION,
             object_id=change_request.id,
@@ -1019,10 +1019,12 @@ class TrackView(views.APIView):
                 shipment_details.save()
 
                 if direction == 'import':
-                    message_body = f'The shipment {booking.aceid} has departed from {booking.freight_rate.origin}.'
+                    message_body = _('The shipment {aceid} has departed from {origin}.') \
+                        .format(aceid=booking.aceid, origin=booking.freight_rate.origin)
                     create_and_assign_notification.delay(
                         Notification.OPERATIONS_IMPORT,
-                        message_body,
+                        'The shipment {aceid} has departed from {origin}.',
+                        {'aceid':booking.aceid, 'origin':booking.freight_rate.origin},
                         [booking.agent_contact_person_id, booking.client_contact_person_id, ],
                         Notification.OPERATION,
                         object_id=booking.id,
@@ -1036,10 +1038,12 @@ class TrackView(views.APIView):
                 shipment_details.save()
 
                 if direction == 'export':
-                    message_body = f'The shipment {booking.aceid} has arrived at {booking.freight_rate.destination}.'
+                    message_body = _('The shipment {aceid} has arrived at {destination}.') \
+                        .format(aceid=booking.aceid, destination=booking.freight_rate.destination)
                     create_and_assign_notification.delay(
                         Notification.OPERATIONS_EXPORT,
-                        message_body,
+                        'The shipment {aceid} has arrived at {destination}.',
+                        {'aceid':booking.aceid, 'destination':booking.freight_rate.destination},
                         [booking.agent_contact_person_id, booking.client_contact_person_id, ],
                         Notification.OPERATION,
                         object_id=booking.id,

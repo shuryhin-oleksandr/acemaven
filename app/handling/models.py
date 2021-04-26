@@ -3,7 +3,8 @@ from decimal import Decimal
 from django.db import models
 from django.contrib.gis.db import models as gis_models
 from django.core.validators import MinValueValidator, RegexValidator
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext as __
 
 api_key_validator = RegexValidator(
     regex=r'^(\w|\d){4}-(\w|\d){4}-(\w|\d){4}-(\w|\d){4}-(\w|\d){4}$',
@@ -55,6 +56,10 @@ class ShippingType(models.Model):
     def __str__(self):
         return f'{self.title}'
 
+    class Meta:
+        verbose_name = _("Shipping type")
+        verbose_name_plural = _("Shipping types")
+
 
 class ShippingMode(models.Model):
     """
@@ -81,10 +86,15 @@ class ShippingMode(models.Model):
         'ShippingType',
         on_delete=models.CASCADE,
         related_name='shipping_modes',
+        verbose_name=_("Shipping type"),
     )
 
     def __str__(self):
         return f'{self.title} [{self.shipping_type}]'
+
+    class Meta:
+        verbose_name = _("Shipping mode")
+        verbose_name_plural = _("Shipping modes")
 
 
 class PackagingType(models.Model):
@@ -138,10 +148,15 @@ class PackagingType(models.Model):
     shipping_modes = models.ManyToManyField(
         'ShippingMode',
         related_name='packaging_types',
+        verbose_name=_("Shipping modes")
     )
 
     def __str__(self):
         return f'{self.code}, {self.description}'
+
+    class Meta:
+        verbose_name = _("Packaging type")
+        verbose_name_plural = _("Packaging types")
 
 
 class ContainerType(models.Model):
@@ -170,6 +185,7 @@ class ContainerType(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         related_name='container_types',
+        verbose_name=_("Shipping mode")
     )
     fcl_type = models.CharField(
         _('FCL type'),
@@ -249,6 +265,10 @@ class ContainerType(models.Model):
     def __str__(self):
         return f'{self.code}'
 
+    class Meta:
+        verbose_name = _("Container type")
+        verbose_name_plural = _("Container types")
+
 
 class IMOClass(models.Model):
     """
@@ -263,6 +283,10 @@ class IMOClass(models.Model):
         _('IMO class'),
         max_length=50,
     )
+
+    class Meta:
+        verbose_name = _("Imo class")
+        verbose_name_plural = _("Imo classes")
 
 
 class ReleaseType(models.Model):
@@ -281,6 +305,10 @@ class ReleaseType(models.Model):
 
     def __str__(self):
         return f'{self.title} [{self.code}]'
+
+    class Meta:
+        verbose_name = _("Release type")
+        verbose_name_plural = _("Release types")
 
 
 class Carrier(models.Model):
@@ -311,10 +339,15 @@ class Carrier(models.Model):
         'ShippingType',
         on_delete=models.CASCADE,
         related_name='carriers',
+        verbose_name=_("Shipping type")
     )
 
     def __str__(self):
         return f'{self.title}, {self.shipping_type}'
+
+    class Meta:
+        verbose_name = _("Carrier")
+        verbose_name_plural = _("Carriers")
 
 
 class Airline(models.Model):
@@ -374,6 +407,10 @@ class Airline(models.Model):
     def __str__(self):
         return f'{self.name} ({self.three_char_code})'
 
+    class Meta:
+        verbose_name = _("Airline")
+        verbose_name_plural = _("Airlines")
+
 
 class CommonFee(models.Model):
     """
@@ -386,10 +423,10 @@ class CommonFee(models.Model):
     SERVICE = 'service'
 
     FEE_TYPE_CHOICES = (
-        (BOOKING, 'Booking Fee'),
-        (CANCELLATION_PENALTY, 'Cancellation Penalty Fee'),
-        (AGENT_BOOKING, 'Agent Booking Fee'),
-        (SERVICE, 'Service Fee'),
+        (BOOKING, _('Booking Fee')),
+        (CANCELLATION_PENALTY, _('Cancellation Penalty Fee')),
+        (AGENT_BOOKING, _('Agent Booking Fee')),
+        (SERVICE, _('Service Fee')),
     )
 
     FIXED = 'fixed'
@@ -423,6 +460,8 @@ class CommonFee(models.Model):
 
     class Meta:
         abstract = True
+        verbose_name = _("Common fee")
+        verbose_name_plural = _("Common fees")
 
 
 class GlobalFee(CommonFee):
@@ -434,10 +473,15 @@ class GlobalFee(CommonFee):
         'ShippingMode',
         on_delete=models.CASCADE,
         related_name='global_fees',
+        verbose_name=_("Global fee")
     )
 
     def __str__(self):
         return f'{self.fee_type}'
+
+    class Meta:
+        verbose_name = _("Global fee")
+        verbose_name_plural = _("Global fees")
 
 
 class LocalFee(CommonFee):
@@ -449,15 +493,21 @@ class LocalFee(CommonFee):
         'ShippingMode',
         on_delete=models.CASCADE,
         related_name='local_fees',
+        verbose_name=_("Shipping mode"),
     )
     company = models.ForeignKey(
         'core.Company',
         on_delete=models.CASCADE,
         related_name='fees',
+        verbose_name=_("Company")
     )
 
     def __str__(self):
         return f'{self.fee_type}, {self.company}'
+
+    class Meta:
+        verbose_name = _("Local fee")
+        verbose_name_plural = _("Local fees")
 
 
 class Currency(models.Model):
@@ -482,7 +532,8 @@ class Currency(models.Model):
         return f'{self.code}'
 
     class Meta:
-        verbose_name_plural = 'Сurrencies'
+        verbose_name = _("Currency")
+        verbose_name_plural = _("Currencies")
 
 
 class Port(gis_models.Model):
@@ -533,10 +584,13 @@ class Port(gis_models.Model):
         'location.Country',
         null=True,
         on_delete=models.CASCADE,
+        verbose_name=_("Country")
     )
 
     class Meta:
         ordering = ('code',)
+        verbose_name = _("Port")
+        verbose_name_plural = _("Ports")
 
     def __str__(self):
         return self.display_name
@@ -576,6 +630,7 @@ class ExchangeRate(models.Model):
         'Currency',
         on_delete=models.CASCADE,
         limit_choices_to=models.Q(is_active=True, is_main=False),
+        verbose_name=_("Currency")
     )
     is_platforms = models.BooleanField(
         _('Is exchange rate of the platform'),
@@ -589,7 +644,11 @@ class ExchangeRate(models.Model):
     )
 
     def __str__(self):
-        return f'Exchange rate from {self.currency.code}'
+        return ''
+
+    class Meta:
+        verbose_name = _("Exchange rate")
+        verbose_name_plural = _("Exchange rates")
 
 
 class BillingExchangeRate(models.Model):
@@ -609,6 +668,8 @@ class BillingExchangeRate(models.Model):
 
     class Meta:
         ordering = ['date', ]
+        verbose_name = _("Billing exchange rate")
+        verbose_name_plural = _("Billing exchange rates")
 
 
 class ClientPlatformSetting(SingletonModel):
@@ -636,6 +697,13 @@ class ClientPlatformSetting(SingletonModel):
         _('Enable booking/service fee payment to book freight rate'),
         default=True,
     )
+
+    def __str__(self):
+        return f'{self.id}'
+
+    class Meta:
+        verbose_name = _("Client platform setting")
+        verbose_name_plural = _("Client platform settings")
 
 
 class GeneralSetting(SingletonModel):
@@ -672,7 +740,11 @@ class GeneralSetting(SingletonModel):
     )
 
     def __str__(self):
-        return 'General platform settings'
+        return __('General platform settings')
+
+    class Meta:
+        verbose_name = _("General setting")
+        verbose_name_plural = _("General settings")
 
 
 class AirTrackingSetting(SingletonModel):
@@ -698,7 +770,11 @@ class AirTrackingSetting(SingletonModel):
     )
 
     def __str__(self):
-        return 'Air tracking api general settings'
+        return __('Air tracking api general settings')
+
+    class Meta:
+        verbose_name = _("Air tracking setting")
+        verbose_name_plural = _("Air tracking settings")
 
 
 class SeaTrackingSetting(SingletonModel):
@@ -717,7 +793,11 @@ class SeaTrackingSetting(SingletonModel):
     )
 
     def __str__(self):
-        return 'Sea tracking api general settings'
+        return __('Sea tracking api general settings')
+
+    class Meta:
+        verbose_name = _("Sea tracking setting")
+        verbose_name_plural = _("Sea tracking settings")
 
 
 class PixApiSetting(models.Model):
@@ -760,3 +840,10 @@ class PixApiSetting(models.Model):
         on_delete=models.CASCADE,
         related_name='pix_api',
     )
+
+    def __str__(self):
+        return f'{self.id}'
+
+    class Meta:
+        verbose_name = _("Pix api setting")
+        verbose_name_plural = _("Pix api settings")

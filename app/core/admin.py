@@ -165,6 +165,7 @@ class CustomUserAdmin(UserAdmin):
                 'last_name',
                 'language',
                 'groups',
+                'photo',
             ),
         }),
     )

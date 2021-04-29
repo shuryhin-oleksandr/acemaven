@@ -772,7 +772,7 @@ class BookingViesSet(PermissionClassByActionMixin,
                 object_id=booking.id,
             )
             send_email.delay(message_body,
-                             [assigned_user.email], object_id=f'{settings.DOMAIN_ADDRESS}booking/{booking.id}')
+                             [assigned_user.email], object_id=f'{settings.DOMAIN_ADDRESS}operations/{booking.id}')
 
         delete_accepted_booking_notifications.delay(booking.id)
 
@@ -884,7 +884,7 @@ class OperationViewSet(PermissionClassByActionMixin,
         )
         client_emails = [change_request.client_contact_person.email, ]
         send_email.delay(message_body, client_emails,
-                         object_id=f'{settings.DOMAIN_ADDRESS}change_request/{change_request.id}')
+                         object_id=f'{settings.DOMAIN_ADDRESS}operations/{change_request.id}')
         return Response(data={'id': change_request.id}, status=status.HTTP_200_OK)
 
     @action(methods=['post'], detail=True, url_path='cancel_change_request')
@@ -1031,7 +1031,7 @@ class TrackView(views.APIView):
                     )
                     emails = [booking.agent_contact_person.email, booking.client_contact_person.email, ]
                     send_email.delay(message_body, emails,
-                                     object_id=f'{settings.DOMAIN_ADDRESS}shipment_departed/{booking.id}')
+                                     object_id=f'{settings.DOMAIN_ADDRESS}operations/{booking.id}')
 
             if event.get('type') == 'arrived' and destination == origin_and_destination.get('destination'):
                 shipment_details.actual_date_of_arrival = time_of_event
@@ -1050,7 +1050,7 @@ class TrackView(views.APIView):
                     )
                     emails = [booking.agent_contact_person.email, booking.client_contact_person.email, ]
                     send_email.delay(message_body, emails,
-                                     object_id=f'{settings.DOMAIN_ADDRESS}shipment_arrived/{booking.id}')
+                                     object_id=f'{settings.DOMAIN_ADDRESS}operations/{booking.id}')
 
         try:
             Track.objects.create(data=data, booking=booking)

@@ -17,7 +17,7 @@ logger = logging.getLogger("acemaven.task.logging")
 def send_registration_email(token, recipient_email):
     subject = _('Acemaven. Registration process.')
     logger.info(f'New registration email is going to be send to {recipient_email}')
-    message_body = f'{DOMAIN_ADDRESS}additional/user?token={token}'
+    message_body = f'{DOMAIN_ADDRESS}create-account?token={token}'
     template_html = get_template(f"core/emails_templates/index.html")
     text = _("To complete your sign-up, please press the button:")
     context = {

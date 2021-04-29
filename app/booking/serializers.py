@@ -701,7 +701,7 @@ class BookingSerializer(serializers.ModelSerializer):
             agent_emails = list(
                 ff_company.users.filter(role__groups__name__in=('master', 'agent')).values_list('email', flat=True)
             )
-            send_email.delay(agent_text, agent_emails, object_id=f'{settings.DOMAIN_ADDRESS}new_booking/{booking.id}')
+            send_email.delay(agent_text, agent_emails, object_id=f'{settings.DOMAIN_ADDRESS}requests/booking/{booking.id}')
 
             client_text = _('The booking request on number {aceid} has been sent to "{name}".') \
                 .format(aceid=booking.aceid, name=ff_company.name)
@@ -715,7 +715,7 @@ class BookingSerializer(serializers.ModelSerializer):
             )
             users_emails = [user.email, ]
             send_email.delay(client_text, users_emails,
-                             object_id=f'{settings.DOMAIN_ADDRESS}booking_request/{booking.id}')
+                             object_id=f'{settings.DOMAIN_ADDRESS}operations/{booking.id}')
         else:
             bank_account = BankAccount.objects.filter(is_default=True, is_platforms=True).first()
             pix_settings = bank_account.pix_api
@@ -748,7 +748,7 @@ class BookingSerializer(serializers.ModelSerializer):
             users_emails = list(
                 company.users.filter(role__groups__name__in=('master', 'billing')).values_list('email', flat=True)
             )
-            send_email.delay(message_body, users_emails, object_id=f'{settings.DOMAIN_ADDRESS}booking/{booking.id}')
+            send_email.delay(message_body, users_emails, object_id=f'{settings.DOMAIN_ADDRESS}billing_pending/')
         return booking
 
 
@@ -898,7 +898,7 @@ class ShipmentDetailsBaseSerializer(serializers.ModelSerializer):
                     emailnotificationsetting__import_shipment_departure_alert=True,
                 ).values_list('email', flat=True))
                 if emails:
-                    send_email.delay(message_body, emails, object_id=f'{settings.DOMAIN_ADDRESS}booking/{booking.id}')
+                    send_email.delay(message_body, emails, object_id=f'{settings.DOMAIN_ADDRESS}operations/{booking.id}')
 
         elif validated_data.get('actual_date_of_arrival') and not arrival_track_exists:
             track_status = TrackStatus.objects.filter(
@@ -923,7 +923,7 @@ class ShipmentDetailsBaseSerializer(serializers.ModelSerializer):
                     emailnotificationsetting__export_shipment_arrival_alert=True,
                 ).values_list('email', flat=True))
                 if emails:
-                    send_email.delay(message_body, emails, object_id=f'{settings.DOMAIN_ADDRESS}booking/{booking.id}')
+                    send_email.delay(message_body, emails, object_id=f'{settings.DOMAIN_ADDRESS}operations/{booking.id}')
 
         if create_track:
             Track.objects.create(
@@ -968,7 +968,7 @@ class ShipmentDetailsBaseSerializer(serializers.ModelSerializer):
                 emailnotificationsetting__operation_details_change=True,
             ).values_list('email', flat=True))
             if emails:
-                send_email.delay(message_body, emails, object_id=f'{settings.DOMAIN_ADDRESS}booking/{booking.id}')
+                send_email.delay(message_body, emails, object_id=f'{settings.DOMAIN_ADDRESS}operations/{booking.id}')
 
         return instance
 
@@ -1022,7 +1022,7 @@ class TrackSerializer(serializers.ModelSerializer):
                 )
                 emails = [booking.agent_contact_person.email, booking.client_contact_person.email, ]
                 send_email.delay(message_body, emails,
-                                 object_id=f'{settings.DOMAIN_ADDRESS}shipment_departed/{booking.id}')
+                                 object_id=f'{settings.DOMAIN_ADDRESS}operations/{booking.id}')
 
         elif status.auto_add_on_actual_date_of_arrival and actual_date_of_arrival:
             shipment_details.actual_date_of_arrival = actual_date_of_arrival
@@ -1040,7 +1040,7 @@ class TrackSerializer(serializers.ModelSerializer):
                 )
                 emails = [booking.agent_contact_person.email, booking.client_contact_person.email, ]
                 send_email.delay(message_body, emails,
-                                 object_id=f'{settings.DOMAIN_ADDRESS}shipment_arrived/{booking.id}')
+                                 object_id=f'{settings.DOMAIN_ADDRESS}operations/{booking.id}')
 
         shipment_details.save()
 
@@ -1176,7 +1176,7 @@ class OperationSerializer(serializers.ModelSerializer):
             object_id=original_booking.id,
         )
         send_email.delay(message_body, [original_booking.agent_contact_person.email, ],
-                         object_id=f'{settings.DOMAIN_ADDRESS}original_booking/{original_booking.id}')
+                         object_id=f'{settings.DOMAIN_ADDRESS}operations/{original_booking.id}')
         return operation
 
     def update(self, instance, validated_data):
@@ -1196,7 +1196,7 @@ class OperationSerializer(serializers.ModelSerializer):
                 object_id=instance.id,
             )
             client_email = [instance.client_contact_person.email, ]
-            send_email.delay(message_body, client_email, object_id=f'{settings.DOMAIN_ADDRESS}instance/{instance.id}')
+            send_email.delay(message_body, client_email, object_id=f'{settings.DOMAIN_ADDRESS}operations/{instance.id}')
         return instance
 
 

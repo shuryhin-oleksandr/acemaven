@@ -62,7 +62,7 @@ def check_payment(txid, base_url, developer_key, booking_id, token_uri, client_i
                         booking_id,
                     )
                     send_email.delay(message_body, [client_contact_person_email, ],
-                                     object_id=f'{settings.DOMAIN_ADDRESS}payment_success/{booking.id}')
+                                     object_id=f'{settings.DOMAIN_ADDRESS}operations/{booking.id}')
 
                     agent_text = _('A new booking request {aceid} has been received.').format(aceid=booking.aceid)
                     ff_company = booking.freight_rate.company
@@ -82,7 +82,7 @@ def check_payment(txid, base_url, developer_key, booking_id, token_uri, client_i
                                                                                                         flat=True)
                     )
                     send_email.delay(agent_text, agent_emails,
-                                     object_id=f'{settings.DOMAIN_ADDRESS}new_booking/{booking.id}')
+                                     object_id=f'{settings.DOMAIN_ADDRESS}requests/booking/{booking.id}')
 
                     client_text = _('The booking request {aceid} has been sent to "{name}".') \
                         .format(aceid=booking.aceid, name=ff_company.name)
@@ -96,7 +96,7 @@ def check_payment(txid, base_url, developer_key, booking_id, token_uri, client_i
                     )
                     users_emails = [client_contact_person_email, ]
                     send_email.delay(client_text, users_emails,
-                                     object_id=f'{settings.DOMAIN_ADDRESS}booking_request/{booking.id}')
+                                     object_id=f'{settings.DOMAIN_ADDRESS}operations/{booking.id}')
                     print("Payment success")
 
                 else:
@@ -125,7 +125,7 @@ def check_payment(txid, base_url, developer_key, booking_id, token_uri, client_i
                 Notification.BILLING,
                 booking_id,
             )
-            send_email.delay(message_body, [user_email, ], object_id=f'{settings.DOMAIN_ADDRESS}booking/{booking.id}')
+            send_email.delay(message_body, [user_email, ], object_id=f'{settings.DOMAIN_ADDRESS}billing_pending/')
 
 
 @celery_app.task(name='test')
@@ -158,7 +158,7 @@ def change_charge(base_url, new_amount, developer_key, txid, is_prod, booking_id
                 booking_id,
             )
             send_email.delay(message_body, [client_contact_person_email, ],
-                             object_id=f'{settings.DOMAIN_ADDRESS}update_payment_success/{booking.id}')
+                             object_id=f'{settings.DOMAIN_ADDRESS}operations/{booking.id}')
         else:
             message_body = _(
                 'Have some problems with updating charge on booking number {aceid}, please, contact support team.') \
@@ -172,7 +172,7 @@ def change_charge(base_url, new_amount, developer_key, txid, is_prod, booking_id
                 booking_id,
             )
             send_email.delay(message_body, [client_contact_person_email, ],
-                       object_id=f'{settings.DOMAIN_ADDRESS}update_payment_problems/{booking.id}')
+                       object_id=f'{settings.DOMAIN_ADDRESS}billing_pending/')
             raise ValueError
 
 
@@ -314,7 +314,7 @@ def track_confirmed_sea_operations():
                 )
                 client_email = [operation.agent_contact_person.email, ]
                 send_email.delay(message_body, client_email,
-                                 object_id=f'{settings.DOMAIN_ADDRESS}instance/{operation.id}')
+                                 object_id=f'{settings.DOMAIN_ADDRESS}operations/{operation.id}')
 
 
             else:
@@ -349,7 +349,7 @@ def track_confirmed_sea_operations():
                             )
                             send_email.delay(message_body, [operation.agent_contact_person.email,
                                                             operation.client_contact_person.email, ],
-                                             object_id=f'{settings.DOMAIN_ADDRESS}operation/{operation.id}')
+                                             object_id=f'{settings.DOMAIN_ADDRESS}operations/{operation.id}')
 
                     event['location'] = next(
                         filter(lambda x: x.get('id') == event['location'], data_json['data'].get('locations')), {}
@@ -377,7 +377,7 @@ def track_confirmed_sea_operations():
                     )
                     send_email.delay(message_body,
                                      [operation.agent_contact_person.email, operation.client_contact_person.email, ],
-                                     object_id=f'{settings.DOMAIN_ADDRESS}operation/{operation.id}')
+                                     object_id=f'{settings.DOMAIN_ADDRESS}operations/{operation.id}')
 
         route_response = requests.get(route_url)
         route_json = route_response.json() if (route_status_code := route_response.status_code) == 200 \
@@ -422,7 +422,7 @@ def daily_notify_users_of_expiring_surcharges():
             groups__name__in=('master', 'agent')
         ).values_list('user__emails', flat=True))
         send_email.delay(message_body, users_emails,
-                         object_id=f'{settings.DOMAIN_ADDRESS}surcharge/{surcharge.id}')
+                         object_id=f'{settings.DOMAIN_ADDRESS}services/surcharge/{surcharge.id}')
 
     for user in get_user_model().objects.filter(role__groups__name__in=('master', 'agent'),
                                                 emailnotificationsetting__surcharge_expiration=True,
@@ -440,7 +440,7 @@ def daily_notify_users_of_expiring_surcharges():
                 send_email(
                     message_body,
                     [user_email, ],
-                    object_id=f'{settings.DOMAIN_ADDRESS}surcharge/{surcharge.id}')  # TODO generate a link
+                    object_id=f'{settings.DOMAIN_ADDRESS}services/surcharge/{surcharge.id}')
 
 
 @celery_app.task(name='notify_users_of_expiring_freight_rates')
@@ -470,7 +470,7 @@ def daily_notify_users_of_expiring_freight_rates():
             groups__name__in=('master', 'agent')
         ).values_list('user__emails', flat=True))
         send_email.delay(message_body, users_emails,
-                         object_id=f'{settings.DOMAIN_ADDRESS}freight_rate/{freight_rate.id}')
+                         object_id=f'{settings.DOMAIN_ADDRESS}services/rate/{freight_rate.id}')
 
     for user in get_user_model().objects.filter(role__groups__name__in=('master', 'agent'),
                                                 emailnotificationsetting__freight_rate_expiration=True,
@@ -487,7 +487,7 @@ def daily_notify_users_of_expiring_freight_rates():
             if user_email := user.email:
                 send_email(message_body,
                            [user_email, ],
-                           object_id=f'{settings.DOMAIN_ADDRESS}freight_rate/{freight_rate.id}')  # TODO generate a link
+                           object_id=f'{settings.DOMAIN_ADDRESS}services/rate/{freight_rate.id}')
 
 
 @celery_app.task(name='notify_users_of_import_sea_shipment_arrival')
@@ -538,4 +538,4 @@ def daily_notify_users_of_import_sea_shipment_arrival():
                 f'The shipment {booking.aceid} is set to arrive in 3 days at {booking.freight_rate.destination}.')
             if email := user.email:
                 send_email(message_body, [email, ],
-                           object_id=f'{settings.DOMAIN_ADDRESS}operation/{booking.id}')  # TODO generate a link
+                           object_id=f'{settings.DOMAIN_ADDRESS}operations/{booking.id}')

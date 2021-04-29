@@ -101,7 +101,7 @@ class ChatConsumer(WebsocketConsumer):
             content = {
                 'command': 'typing_message',
                 'user_id': user_id,
-                'photo': f'{self.get_full_file_url(photo.url)}' if (photo := user.photo) else None,
+                'photo': f'{photo.url}' if (photo := user.photo) else None,
             }
             return self.send_chat_message(content)
 
@@ -151,7 +151,7 @@ class ChatConsumer(WebsocketConsumer):
             'id': message.id,
             'user': message.user.get_full_name(),
             'user_id': message.user.id,
-            'photo': f'{self.get_full_file_url(photo.url)}' if (photo := message.user.photo) else None,
+            'photo': f'{photo.url}' if (photo := message.user.photo) else None,
             'content': message.text,
             'files': list(
                 map(self.get_full_file_url,

@@ -1,6 +1,6 @@
 {% load static %}
 {% load i18n %}
-let socket = new WebSocket('ws://37.17.34.252:8443/ws/operation-chat/'+ CHAT_ID + '/?token=' + TOKEN);
+let socket = new WebSocket('ws://18.230.134.205:80/ws/operation-chat/'+ CHAT_ID + '/?token=' + TOKEN);
 socket.onerror = function(error) {
     alert(`[error] ${error.message}`);
 };
@@ -229,7 +229,7 @@ uploadInput.addEventListener('change', (e) => {
     let file = e.target.files[0];
     formData.append('file', file)
 
-    fetch('http://37.17.34.252:8443/api/v1/websockets/file/', {
+    fetch('http://18.230.134.205:80/api/v1/websockets/file/', {
             method: 'POST',
             headers: {
                 "Authorization": 'JWT ' + TOKEN

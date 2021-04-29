@@ -761,18 +761,18 @@ class BookingViesSet(PermissionClassByActionMixin,
                 chat.users.add(assigned_user)
 
         if request.user != assigned_user:
-            message_body = _('{user} has assigned an operation to you. Operation [{aceid}].') \
-                .format(user=request.user.get_full_name(), aceid=booking.aceid)
+            text_body = '{user} has assigned an operation to you. Operation [{aceid}].'
+            text_params = {'user':request.user.get_full_name(), 'aceid':booking.aceid}
             create_and_assign_notification.delay(
                 Notification.REQUESTS,
-                '{user} has assigned an operation to you. Operation [{aceid}].',
-                {'user':request.user.get_full_name(), 'aceid':booking.aceid},
+                text_body,
+                text_params,
                 [assigned_user.id, ],
                 Notification.OPERATION,
                 object_id=booking.id,
             )
-            send_email.delay(message_body,
-                             [assigned_user.email], object_id=f'{settings.DOMAIN_ADDRESS}operations/{booking.id}')
+            send_email.delay(text_body, text_params
+                             [assigned_user.id, ], object_id=f'{settings.DOMAIN_ADDRESS}operations/{booking.id}')
 
         delete_accepted_booking_notifications.delay(booking.id)
 
@@ -868,11 +868,13 @@ class OperationViewSet(PermissionClassByActionMixin,
         message_body = _('The Agent has confirmed your changes in the shipment {aceid} from {origin} to {destination}.') \
             .format(aceid=change_request.aceid, origin=change_request.freight_rate.origin,
                     destination=change_request.freight_rate.destination)
+        text_body = 'The Agent has confirmed your changes in the shipment {aceid} from {origin} to {destination}.'
+        text_params = {'aceid':change_request.aceid, 'origin':change_request.freight_rate.origin,
+                    'destination':change_request.freight_rate.destination}
         create_and_assign_notification.delay(
             Notification.OPERATIONS,
-            'The Agent has confirmed your changes in the shipment {aceid} from {origin} to {destination}.',
-            {'aceid':change_request.aceid, 'origin':change_request.freight_rate.origin,
-                    'destination':change_request.freight_rate.destination},
+            text_body,
+            text_params,
             [change_request.client_contact_person_id, ],
             Notification.OPERATION,
             object_id=change_request.id,
@@ -882,8 +884,7 @@ class OperationViewSet(PermissionClassByActionMixin,
             operation_id,
             change_request.id,
         )
-        client_emails = [change_request.client_contact_person.email, ]
-        send_email.delay(message_body, client_emails,
+        send_email.delay(text_body, text_params, [change_request.client_contact_person_id, ],
                          object_id=f'{settings.DOMAIN_ADDRESS}operations/{change_request.id}')
         return Response(data={'id': change_request.id}, status=status.HTTP_200_OK)
 
@@ -1019,18 +1020,17 @@ class TrackView(views.APIView):
                 shipment_details.save()
 
                 if direction == 'import':
-                    message_body = _('The shipment {aceid} has departed from {origin}.') \
-                        .format(aceid=booking.aceid, origin=booking.freight_rate.origin)
+                    text_body = 'The shipment {aceid} has departed from {origin}.'
+                    text_params = {'aceid':booking.aceid, 'origin':booking.freight_rate.origin}
                     create_and_assign_notification.delay(
                         Notification.OPERATIONS_IMPORT,
-                        'The shipment {aceid} has departed from {origin}.',
-                        {'aceid':booking.aceid, 'origin':booking.freight_rate.origin},
+                        text_body,
+                        text_params,
                         [booking.agent_contact_person_id, booking.client_contact_person_id, ],
                         Notification.OPERATION,
                         object_id=booking.id,
                     )
-                    emails = [booking.agent_contact_person.email, booking.client_contact_person.email, ]
-                    send_email.delay(message_body, emails,
+                    send_email.delay(text_body, text_params, [booking.agent_contact_person_id, booking.client_contact_person_id, ],
                                      object_id=f'{settings.DOMAIN_ADDRESS}operations/{booking.id}')
 
             if event.get('type') == 'arrived' and destination == origin_and_destination.get('destination'):
@@ -1038,18 +1038,18 @@ class TrackView(views.APIView):
                 shipment_details.save()
 
                 if direction == 'export':
-                    message_body = _('The shipment {aceid} has arrived at {destination}.') \
-                        .format(aceid=booking.aceid, destination=booking.freight_rate.destination)
+                    text_body ='The shipment {aceid} has arrived at {destination}.'
+                    text_params = {'aceid':booking.aceid, 'destination':booking.freight_rate.destination}
+
                     create_and_assign_notification.delay(
                         Notification.OPERATIONS_EXPORT,
-                        'The shipment {aceid} has arrived at {destination}.',
-                        {'aceid':booking.aceid, 'destination':booking.freight_rate.destination},
+                        text_body,
+                        text_params,
                         [booking.agent_contact_person_id, booking.client_contact_person_id, ],
                         Notification.OPERATION,
                         object_id=booking.id,
                     )
-                    emails = [booking.agent_contact_person.email, booking.client_contact_person.email, ]
-                    send_email.delay(message_body, emails,
+                    send_email.delay(text_body, text_params, [booking.agent_contact_person_id, booking.client_contact_person_id, ],
                                      object_id=f'{settings.DOMAIN_ADDRESS}operations/{booking.id}')
 
         try:

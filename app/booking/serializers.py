@@ -698,23 +698,21 @@ class BookingSerializer(serializers.ModelSerializer):
                 Notification.BOOKING,
                 object_id=booking.id,
             )
-            agent_emails = list(
-                ff_company.users.filter(role__groups__name__in=('master', 'agent')).values_list('email', flat=True)
-            )
-            send_email.delay(agent_text, agent_emails, object_id=f'{settings.DOMAIN_ADDRESS}requests/booking/{booking.id}')
+            send_email.delay(message_body, message_params, users_ids, object_id=f'{settings.DOMAIN_ADDRESS}requests/booking/{booking.id}')
 
+            text_body = 'The booking request on number {aceid} has been sent to "{name}".'
+            text_params = {'aceid': booking.aceid, 'name': ff_company.name}
             client_text = _('The booking request on number {aceid} has been sent to "{name}".') \
                 .format(aceid=booking.aceid, name=ff_company.name)
             create_and_assign_notification.delay(
                 Notification.REQUESTS,
-                'The booking request on number {aceid} has been sent to "{name}".',
-                {'aceid': booking.aceid, 'name': ff_company.name},
+                text_body,
+                text_params,
                 [user.id, ],
                 Notification.OPERATION,
                 object_id=booking.id,
             )
-            users_emails = [user.email, ]
-            send_email.delay(client_text, users_emails,
+            send_email.delay(text_body, text_params, [user.id, ],
                              object_id=f'{settings.DOMAIN_ADDRESS}operations/{booking.id}')
         else:
             bank_account = BankAccount.objects.filter(is_default=True, is_platforms=True).first()
@@ -734,21 +732,19 @@ class BookingSerializer(serializers.ModelSerializer):
                 company.users.filter(role__groups__name__in=('master', 'billing')).values_list('id', flat=True)
             )
 
-            message_body = _(
-                'A new Booking Request on number {aceid} is pending of Booking Fee payment to be sent.') \
-                .format(aceid=booking.aceid)
+            text_body = 'A new Booking Request on number {aceid} is pending of Booking Fee payment to be sent.'
+            text_params = {'aceid': booking.aceid}
+
             create_and_assign_notification.delay(
                 Notification.REQUESTS,
-                'A new Booking Request on number {aceid} is pending of Booking Fee payment to be sent.',
-                {'aceid': booking.aceid},
+                text_body,
+                text_params,
                 users_ids,
                 Notification.BILLING,
                 object_id=booking.id,
             )
-            users_emails = list(
-                company.users.filter(role__groups__name__in=('master', 'billing')).values_list('email', flat=True)
-            )
-            send_email.delay(message_body, users_emails, object_id=f'{settings.DOMAIN_ADDRESS}billing_pending/')
+
+            send_email.delay(text_body, text_params, users_ids, object_id=f'{settings.DOMAIN_ADDRESS}billing_pending/')
         return booking
 
 
@@ -883,22 +879,22 @@ class ShipmentDetailsBaseSerializer(serializers.ModelSerializer):
             create_track = True
 
             if direction == 'import':
-                message_body = _('The shipment {aceid} has departed from {origin}.') \
-                    .format(aceid=booking.aceid, origin=booking.freight_rate.origin)
+                text_body = 'The shipment {aceid} has departed from {origin}.'
+                text_params = {'aceid':booking.aceid, 'origin':booking.freight_rate.origin}
+
                 create_and_assign_notification.delay(
                     Notification.OPERATIONS_IMPORT,
-                    'The shipment {aceid} has departed from {origin}.',
-                    {'aceid':booking.aceid, 'origin':booking.freight_rate.origin},
+                    text_body,
+                    text_params,
                     [booking.agent_contact_person_id, booking.client_contact_person_id, ],
                     Notification.OPERATION,
                     object_id=booking.id,
                 )
-                emails = list(get_user_model().objects.filter(
-                    id__in=(booking.agent_contact_person_id, booking.client_contact_person_id),
-                    emailnotificationsetting__import_shipment_departure_alert=True,
-                ).values_list('email', flat=True))
-                if emails:
-                    send_email.delay(message_body, emails, object_id=f'{settings.DOMAIN_ADDRESS}operations/{booking.id}')
+
+
+                send_email.delay(text_body, text_params, [booking.agent_contact_person_id,
+                                                          booking.client_contact_person_id, ],
+                                 object_id=f'{settings.DOMAIN_ADDRESS}operations/{booking.id}')
 
         elif validated_data.get('actual_date_of_arrival') and not arrival_track_exists:
             track_status = TrackStatus.objects.filter(
@@ -908,22 +904,21 @@ class ShipmentDetailsBaseSerializer(serializers.ModelSerializer):
             create_track = True
 
             if direction == 'export':
-                message_body = _('The shipment {aceid} has arrived at {destination}.') \
-                    .format(aceid=booking.aceid, destination=booking.freight_rate.destination)
+                text_body = 'The shipment {aceid} has arrived at {destination}.'
+                text_params = {'aceid':booking.aceid, 'destination':booking.freight_rate.destination}
+
                 create_and_assign_notification.delay(
                     Notification.OPERATIONS_EXPORT,
-                    'The shipment {aceid} has arrived at {destination}.',
-                    {'aceid':booking.aceid, 'destination':booking.freight_rate.destination},
+                    text_body,
+                    text_params,
                     [booking.agent_contact_person_id, booking.client_contact_person_id, ],
                     Notification.OPERATION,
                     object_id=booking.id,
                 )
-                emails = list(get_user_model().objects.filter(
-                    id__in=(booking.agent_contact_person_id, booking.client_contact_person_id),
-                    emailnotificationsetting__export_shipment_arrival_alert=True,
-                ).values_list('email', flat=True))
-                if emails:
-                    send_email.delay(message_body, emails, object_id=f'{settings.DOMAIN_ADDRESS}operations/{booking.id}')
+
+                send_email.delay(text_body, text_params, [booking.agent_contact_person_id,
+                                                          booking.client_contact_person_id, ],
+                                 object_id=f'{settings.DOMAIN_ADDRESS}operations/{booking.id}')
 
         if create_track:
             Track.objects.create(
@@ -952,23 +947,19 @@ class ShipmentDetailsBaseSerializer(serializers.ModelSerializer):
                 status=track_status,
                 booking=booking,
             )
-            message_body = _('Shipment details in {aceid} have changed. {track_message}') \
-                .format(aceid=booking.aceid, track_message=track_message)
+            text_body = 'Shipment details in {aceid} have changed. {track_message}'
+            text_params = {'aceid':booking.aceid, 'track_message':track_message}
             create_and_assign_notification.delay(
                 Notification.OPERATIONS,
-                'Shipment details in {aceid} have changed. {track_message}',
-                {'aceid':booking.aceid, 'track_message':track_message},
+                text_body,
+                text_params,
                 [booking.agent_contact_person_id, booking.client_contact_person_id, ],
                 Notification.OPERATION,
                 object_id=booking.id,
             )
-
-            emails = list(get_user_model().objects.filter(
-                id__in=(booking.agent_contact_person_id, booking.client_contact_person_id),
-                emailnotificationsetting__operation_details_change=True,
-            ).values_list('email', flat=True))
-            if emails:
-                send_email.delay(message_body, emails, object_id=f'{settings.DOMAIN_ADDRESS}operations/{booking.id}')
+            send_email.delay(text_body, text_params, [booking.agent_contact_person_id,
+                                                      booking.client_contact_person_id, ],
+                             object_id=f'{settings.DOMAIN_ADDRESS}operations/{booking.id}')
 
         return instance
 
@@ -1010,36 +1001,38 @@ class TrackSerializer(serializers.ModelSerializer):
             shipment_details.actual_date_of_departure = actual_date_of_departure
 
             if direction == 'import':
-                message_body = _('The shipment {aceid} has departed from {origin}.') \
-                    .format(aceid=booking.aceid, origin=booking.freight_rate.origin)
+                text_body = 'The shipment {aceid} has departed from {origin}.'
+                text_params = {'aceid':booking.aceid, 'origin':booking.freight_rate.origin}
+
                 create_and_assign_notification.delay(
                     Notification.OPERATIONS_IMPORT,
-                    'The shipment {aceid} has departed from {origin}.',
-                    {'aceid':booking.aceid, 'origin':booking.freight_rate.origin},
+                    text_body,
+                    text_params,
                     [booking.agent_contact_person_id, booking.client_contact_person_id, ],
                     Notification.OPERATION,
                     object_id=booking.id,
                 )
-                emails = [booking.agent_contact_person.email, booking.client_contact_person.email, ]
-                send_email.delay(message_body, emails,
+                send_email.delay(text_body, text_params, [booking.agent_contact_person_id,
+                                                          booking.client_contact_person_id, ],
                                  object_id=f'{settings.DOMAIN_ADDRESS}operations/{booking.id}')
 
         elif status.auto_add_on_actual_date_of_arrival and actual_date_of_arrival:
             shipment_details.actual_date_of_arrival = actual_date_of_arrival
 
             if direction == 'export':
-                message_body = _('The shipment {aceid} has arrived at {destination}.') \
-                    .format(aceid=booking.aceid, destination=booking.freight_rate.destination)
+                text_body = 'The shipment {aceid} has arrived at {destination}.'
+                text_params = {'aceid':booking.aceid, 'destination':booking.freight_rate.destination}
+
                 create_and_assign_notification.delay(
                     Notification.OPERATIONS_EXPORT,
-                    'The shipment {aceid} has arrived at {destination}.',
-                    {'aceid':booking.aceid, 'destination':booking.freight_rate.destination},
+                    text_body,
+                    text_params,
                     [booking.agent_contact_person_id, booking.client_contact_person_id, ],
                     Notification.OPERATION,
                     object_id=booking.id,
                 )
-                emails = [booking.agent_contact_person.email, booking.client_contact_person.email, ]
-                send_email.delay(message_body, emails,
+                send_email.delay(text_body, text_params, [booking.agent_contact_person_id,
+                                                          booking.client_contact_person_id, ],
                                  object_id=f'{settings.DOMAIN_ADDRESS}operations/{booking.id}')
 
         shipment_details.save()
@@ -1162,41 +1155,42 @@ class OperationSerializer(serializers.ModelSerializer):
         original_booking.change_request_status = Booking.CHANGE_REQUESTED
         original_booking.save()
 
-        message_body = _(
-            'The Client has requested a change in the shipment {aceid}, from {origin} to {destination}') \
-            .format(aceid=original_booking.aceid, origin=original_booking.freight_rate.origin,
-                    destination=original_booking.freight_rate.destination)
+        text_body = 'The Client has requested a change in the shipment {aceid}, from {origin} to {destination}'
+        text_params = {'aceid':original_booking.aceid, 'origin':original_booking.freight_rate.origin,
+                    'destination':original_booking.freight_rate.destination}
+
         create_and_assign_notification.delay(
             Notification.OPERATIONS,
-            'The Client has requested a change in the shipment {aceid}, from {origin} to {destination}',
-            {'aceid':original_booking.aceid, 'origin':original_booking.freight_rate.origin,
-                    'destination':original_booking.freight_rate.destination},
+            text_body,
+            text_params,
             [original_booking.agent_contact_person.id, ],
             Notification.OPERATION,
             object_id=original_booking.id,
         )
-        send_email.delay(message_body, [original_booking.agent_contact_person.email, ],
+        send_email.delay(text_body, text_params, [original_booking.agent_contact_person.id, ],
                          object_id=f'{settings.DOMAIN_ADDRESS}operations/{original_booking.id}')
         return operation
 
     def update(self, instance, validated_data):
         super().update(instance, validated_data)
         if 'payment_due_by' in validated_data:
+            text_body = 'Payment due date for the operation {aceid} has been updated to {datetime}.'
+            text_params = {'aceid':instance.aceid,
+                        'datetime':datetime.datetime.strftime(validated_data["payment_due_by"], "%d %B %Y")}
             message_body = _(
                 'Payment due date for the operation {aceid} has been updated to {datetime}.') \
                 .format(aceid=instance.aceid,
                         datetime=datetime.datetime.strftime(validated_data["payment_due_by"], "%d %B %Y"))
             create_and_assign_notification.delay(
                 Notification.OPERATIONS,
-                'Payment due date for the operation {aceid} has been updated to {datetime}.',
-                {'aceid':instance.aceid,
-                        'datetime':datetime.datetime.strftime(validated_data["payment_due_by"], "%d %B %Y")},
+                text_body,
+                text_params,
                 [instance.client_contact_person.id, ],
                 Notification.OPERATION,
                 object_id=instance.id,
             )
-            client_email = [instance.client_contact_person.email, ]
-            send_email.delay(message_body, client_email, object_id=f'{settings.DOMAIN_ADDRESS}operations/{instance.id}')
+            send_email.delay(text_body, text_params, [instance.client_contact_person.id, ],
+                             object_id=f'{settings.DOMAIN_ADDRESS}operations/{instance.id}')
         return instance
 
 

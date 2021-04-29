@@ -267,7 +267,7 @@ class FreightRate(models.Model):
         default=True,
     )
     temporary = models.BooleanField(
-        _('Temporary freight rate or not'),
+        _('Paid Booking'),
         default=False,
     )
     is_archived = models.BooleanField(
@@ -1044,8 +1044,8 @@ class TrackStatus(models.Model):
     )
 
     class Meta:
-        verbose_name = _("Track status")
-        verbose_name_plural = _("Track statuses")
+        verbose_name = _("Tracking milestone")
+        verbose_name_plural = _("Tracking milestones")
 
 
 class Direction(models.Model):

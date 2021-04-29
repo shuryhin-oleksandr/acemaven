@@ -75,11 +75,11 @@ class ShippingMode(models.Model):
         default=False,
     )
     has_freight_containers = models.BooleanField(
-        _('Has container types in freight rate'),
+        _('Requires containers for rate registration'),
         default=False,
     )
     has_surcharge_containers = models.BooleanField(
-        _('Has container types in surcharge'),
+        _('Requires container for surcharges'),
         default=False,
     )
     shipping_type = models.ForeignKey(
@@ -317,7 +317,7 @@ class Carrier(models.Model):
     """
 
     title = models.CharField(
-        _('Carrier title'),
+        _('Carrier name'),
         max_length=100,
     )
     scac = models.CharField(
@@ -506,8 +506,8 @@ class LocalFee(CommonFee):
         return f'{self.fee_type}, {self.company}'
 
     class Meta:
-        verbose_name = _("Local fee")
-        verbose_name_plural = _("Local fees")
+        verbose_name = _("Company Specific Fee")
+        verbose_name_plural = _("Company Specific Fees")
 
 
 class Currency(models.Model):

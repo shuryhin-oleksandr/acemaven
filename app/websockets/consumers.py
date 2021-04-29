@@ -153,7 +153,7 @@ class ChatConsumer(WebsocketConsumer):
             'user_id': message.user.id,
             'photo': f'{photo.url}' if (photo := message.user.photo) else None,
             'content': message.text,
-            'files': list(map(lambda url: f'{url}', message.files.values_list('file', flat=True))),
+            'files': [file.get_absolute_file_upload_url() for file in message.files.all()],
             'date_created': str(message.date_created)
         }
 

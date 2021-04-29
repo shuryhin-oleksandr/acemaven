@@ -127,6 +127,9 @@ class MessageFile(models.Model):
     def __str__(self):
         return f'File of message [{self.message}]'
 
+    def get_absolute_file_upload_url(self):
+        return self.file.url
+
     class Meta:
         verbose_name = _("Message file")
         verbose_name_plural = _("Message files")

@@ -1,6 +1,6 @@
 {% load static %}
 {% load i18n %}
-let socket = new WebSocket('ws://37.17.34.252:8443/ws/operation-chat/'+ CHAT_ID + '/?token=' + TOKEN);
+let socket = new WebSocket('ws://18.230.134.205:80/ws/operation-chat/'+ CHAT_ID + '/?token=' + TOKEN);
 socket.onerror = function(error) {
     alert(`[error] ${error.message}`);
 };

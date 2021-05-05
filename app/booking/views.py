@@ -771,7 +771,7 @@ class BookingViesSet(PermissionClassByActionMixin,
                 Notification.OPERATION,
                 object_id=booking.id,
             )
-            send_email.delay(text_body, text_params
+            send_email.delay(text_body, text_params,
                              [assigned_user.id, ], object_id=f'{settings.DOMAIN_ADDRESS}operations/{booking.id}')
 
         delete_accepted_booking_notifications.delay(booking.id)

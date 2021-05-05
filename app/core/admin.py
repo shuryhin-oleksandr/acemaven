@@ -15,6 +15,8 @@ from app.core.utils import master_account_processing
 
 from django.utils.translation import ugettext_lazy as _
 
+from config.settings import DOMAIN_ADDRESS
+
 MASTER_ACCOUNT_FIELDS = ['email', 'first_name', 'last_name', 'master_phone', 'position', ]
 EXCLUDE_FIELDS = ['id', 'approved', *MASTER_ACCOUNT_FIELDS]
 
@@ -166,6 +168,7 @@ class CustomUserAdmin(UserAdmin):
                 'language',
                 'groups',
                 'photo',
+                'is_staff',
             ),
         }),
     )
@@ -305,7 +308,7 @@ class SignUpRequestAdmin(admin.ModelAdmin):
                     token = SignUpToken.objects.filter(
                         user=get_user_model().objects.filter(email=obj.email).first()).first().token
                     self.message_user(request, _("Company saved. Link to register master account was sent."))
-                    self.message_user(request, _(f"Registration link - 192.168.1.33:8000/create-account?token={token}"))
+                    self.message_user(request, _(f"Registration link - {DOMAIN_ADDRESS}/create-account?token={token}"))
                     # TODO: Do not push test user message and token.
                 except Exception as error:
                     self.message_user(request, _(

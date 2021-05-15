@@ -2,7 +2,7 @@
 {% load i18n %}
 let socket = new WebSocket('ws://18.230.134.205:80/ws/operation-chat/'+ CHAT_ID + '/?token=' + TOKEN);
 socket.onerror = function(error) {
-    alert(`[error] ${error.message}`);
+    console.log(`[error] ${error.message}`);
 };
 
 function getLocaltime(message_time) {
@@ -281,8 +281,8 @@ const wsChatHelper = (res) => {
 }
 
 socket.onopen = function(e) {
-    alert("[open] Соединение установлено");
-    alert("Отправляем данные на сервер");
+    console.log("[open] Соединение установлено");
+    console.log("Отправляем данные на сервер");
 };
 
 socket.onmessage = function(event) {
@@ -292,11 +292,11 @@ socket.onmessage = function(event) {
 
 socket.onclose = function(event) {
     if (event.wasClean) {
-        alert(`[close] Соединение закрыто чисто, код=${event.code} причина=${event.reason}`);
+        console.log(`[close] Соединение закрыто чисто, код=${event.code} причина=${event.reason}`);
     } else {
         // например, сервер убил процесс или сеть недоступна
         // обычно в этом случае event.code 1006
-        alert('[close] Соединение прервано');
+        console.log('[close] Соединение прервано');
         console.log(event)
     }
 };

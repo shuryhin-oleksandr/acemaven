@@ -270,7 +270,7 @@ class Ticket(models.Model):
                               choices=STATUS_CHOICES,
                               default=IN_PROGRESS, )
     chat = models.OneToOneField(Chat, on_delete=models.CASCADE, verbose_name=_('Chat'))
-    aceid = models.CharField(_('Operation number'), max_length=20, null=True)
+    aceid = models.CharField(_('Operation number'), max_length=20, null=True, blank=True)
 
     class Meta:
         verbose_name = _("Ticket")

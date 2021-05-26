@@ -132,15 +132,24 @@ def delete_accepted_booking_notifications(booking_id):
 
 
 @celery_app.task(name='send_emails')
-def send_email(text, recipient_emails: list, object_id=None):
-    for email in recipient_emails:
+def send_email(text_body, text_params, users_ids, object_id=None):
+    users = User.objects.filter(id__in=users_ids)
+
+    for user in users:
+        code = user.language
+        translation.activate(code)
+        text = _(text_body)
+        if text_params:
+            text = text.format(**text_params)
+
         context = {
-            "email": email,
+            "person": f'{user.first_name} {user.last_name}',
             "text": text,
             "link": object_id,
         }
         template_html = get_template(f"core/emails_templates/index.html")
         message_html = template_html.render(context)
-        logger.debug(f"sending email to {email}")
-        send_mail(text, text, settings.EMAIL_HOST_USER, [email, ], html_message=message_html)
-        logger.info(f"email has been sent to {email}")
+        logger.debug(f"sending email to {user.email}")
+        send_mail(text, text, settings.EMAIL_HOST_USER, [user.email, ], html_message=message_html)
+        logger.info(f"email has been sent to {user.email}")
+        translation.deactivate()

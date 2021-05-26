@@ -1,8 +1,8 @@
 {% load static %}
 {% load i18n %}
-let socket = new WebSocket('ws://37.17.34.252:8443/ws/operation-chat/'+ CHAT_ID + '/?token=' + TOKEN);
+let socket = new WebSocket('ws://18.230.134.205:80/ws/operation-chat/'+ CHAT_ID + '/?token=' + TOKEN);
 socket.onerror = function(error) {
-    alert(`[error] ${error.message}`);
+    console.log(`[error] ${error.message}`);
 };
 
 function getLocaltime(message_time) {
@@ -229,7 +229,7 @@ uploadInput.addEventListener('change', (e) => {
     let file = e.target.files[0];
     formData.append('file', file)
 
-    fetch('http://37.17.34.252:8443/api/v1/websockets/file/', {
+    fetch('http://18.230.134.205:80/api/v1/websockets/file/', {
             method: 'POST',
             headers: {
                 "Authorization": 'JWT ' + TOKEN
@@ -281,22 +281,22 @@ const wsChatHelper = (res) => {
 }
 
 socket.onopen = function(e) {
-    alert("[open] Соединение установлено");
-    alert("Отправляем данные на сервер");
+    console.log("[open] Соединение установлено");
+    console.log("Отправляем данные на сервер");
 };
 
 socket.onmessage = function(event) {
-    //alert(`[message] Данные получены с сервера: ${event.data}`);
+    //console.log(`[message] Данные получены с сервера: ${event.data}`);
     wsChatHelper(JSON.parse(event.data))
 };
 
 socket.onclose = function(event) {
     if (event.wasClean) {
-        alert(`[close] Соединение закрыто чисто, код=${event.code} причина=${event.reason}`);
+        console.log(`[close] Соединение закрыто чисто, код=${event.code} причина=${event.reason}`);
     } else {
         // например, сервер убил процесс или сеть недоступна
         // обычно в этом случае event.code 1006
-        alert('[close] Соединение прервано');
+        console.log('[close] Соединение прервано');
         console.log(event)
     }
 };

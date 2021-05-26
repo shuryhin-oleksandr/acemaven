@@ -52,51 +52,49 @@ def check_payment(txid, base_url, developer_key, booking_id, token_uri, client_i
                     client_contact_person_id = booking.client_contact_person_id
                     client_contact_person_email = booking.client_contact_person.email
 
-                    message_body = _('Payment on booking number {aceid} is success').format(aceid=booking.aceid)
+                    text_body = 'Payment on booking number {aceid} is success'
+                    text_params = {'aceid':booking.aceid}
                     create_and_assign_notification.delay(
                         Notification.REQUESTS,
-                        'Payment on booking number {aceid} is success',
-                        {'aceid':booking.aceid},
+                        text_body,
+                        text_params,
                         [client_contact_person_id, ],
                         Notification.OPERATION,
                         booking_id,
                     )
-                    send_email.delay(message_body, [client_contact_person_email, ],
-                                     object_id=f'{settings.DOMAIN_ADDRESS}payment_success/{booking.id}')
+                    send_email.delay(text_body, text_params, [client_contact_person_id, ],
+                                     object_id=f'{settings.DOMAIN_ADDRESS}operations/{booking.id}')
 
-                    agent_text = _('A new booking request {aceid} has been received.').format(aceid=booking.aceid)
+                    agent_text_body = 'A new booking request {aceid} has been received.'
+                    agent_text_params = {'aceid':booking.aceid}
                     ff_company = booking.freight_rate.company
                     users_ids = list(
                         ff_company.users.filter(role__groups__name__in=('master', 'agent')).values_list('id', flat=True)
                     )
                     create_and_assign_notification.delay(
                         Notification.REQUESTS,
-                        'A new booking request {aceid} has been received.',
-                        {'aceid':booking.aceid},
+                        agent_text_body,
+                        agent_text_params,
                         users_ids,
                         Notification.BOOKING,
                         object_id=booking.id,
                     )
-                    agent_emails = list(
-                        ff_company.users.filter(role__groups__name__in=('master', 'agent')).values_list('email',
-                                                                                                        flat=True)
-                    )
-                    send_email.delay(agent_text, agent_emails,
-                                     object_id=f'{settings.DOMAIN_ADDRESS}new_booking/{booking.id}')
 
-                    client_text = _('The booking request {aceid} has been sent to "{name}".') \
-                        .format(aceid=booking.aceid, name=ff_company.name)
+                    send_email.delay(agent_text_body, agent_text_params, users_ids,
+                                     object_id=f'{settings.DOMAIN_ADDRESS}requests/booking/{booking.id}')
+
+                    client_text_body = 'The booking request {aceid} has been sent to "{name}".'
+                    client_text_params = {'aceid':booking.aceid, 'name':ff_company.name}
                     create_and_assign_notification.delay(
                         Notification.REQUESTS,
-                        'The booking request {aceid} has been sent to "{name}".',
-                        {'aceid':booking.aceid, 'name':ff_company.name},
+                        client_text_body,
+                        client_text_params,
                         [client_contact_person_id, ],
                         Notification.OPERATION,
                         object_id=booking.id,
                     )
-                    users_emails = [client_contact_person_email, ]
-                    send_email.delay(client_text, users_emails,
-                                     object_id=f'{settings.DOMAIN_ADDRESS}booking_request/{booking.id}')
+                    send_email.delay(client_text_body, client_text_params, [client_contact_person_id, ],
+                                     object_id=f'{settings.DOMAIN_ADDRESS}operations/{booking.id}')
                     print("Payment success")
 
                 else:
@@ -113,19 +111,18 @@ def check_payment(txid, base_url, developer_key, booking_id, token_uri, client_i
                                           expires=259200)
         else:
             user_id = booking.client_contact_person_id
-            user_email = booking.client_contact_person.email
-            message_body = _(
-                'Have some problems with payment on booking number {aceid}, please, contact support team.').format(
-                aceid=booking.aceid)
+            text_body = 'Have some problems with payment on booking number {aceid}, please, contact support team.'
+            text_params = {'aceid':booking.aceid}
+
             create_and_assign_notification.delay(
                 Notification.REQUESTS,
-                'Have some problems with payment on booking number {aceid}, please, contact support team.',
-                {'aceid':booking.aceid},
+                text_body,
+                text_params,
                 [user_id, ],
                 Notification.BILLING,
                 booking_id,
             )
-            send_email.delay(message_body, [user_email, ], object_id=f'{settings.DOMAIN_ADDRESS}booking/{booking.id}')
+            send_email.delay(text_body, text_params, [user_id, ], object_id=f'{settings.DOMAIN_ADDRESS}billing_pending/')
 
 
 @celery_app.task(name='test')
@@ -148,31 +145,34 @@ def change_charge(base_url, new_amount, developer_key, txid, is_prod, booking_id
 
     if isinstance(response, dict):
         if status_code == 201:
-            message_body = _('Update charge on booking number {aceid} is success').format(aceid=booking.aceid)
+            text_body = 'Update charge on booking number {aceid} is success'
+            text_params = {'aceid':booking.aceid}
             create_and_assign_notification.delay(
                 Notification.OPERATIONS,
-                'Update charge on booking number {aceid} is success',
-                {'aceid':booking.aceid},
+                text_body,
+                text_params,
                 [client_contact_person_id, ],
                 Notification.OPERATION,
                 booking_id,
             )
-            send_email.delay(message_body, [client_contact_person_email, ],
-                             object_id=f'{settings.DOMAIN_ADDRESS}update_payment_success/{booking.id}')
+            send_email.delay(text_body, text_params, [client_contact_person_id, ],
+                             object_id=f'{settings.DOMAIN_ADDRESS}operations/{booking.id}')
         else:
+            text_body = 'Have some problems with updating charge on booking number {aceid}, please, contact support team.'
+            text_params = {'aceid':booking.aceid}
             message_body = _(
                 'Have some problems with updating charge on booking number {aceid}, please, contact support team.') \
                 .format(aceid=booking.aceid)
             create_and_assign_notification.delay(
                 Notification.OPERATIONS,
-                'Have some problems with updating charge on booking number {aceid}, please, contact support team.',
-                {'aceid':booking.aceid},
+                text_body,
+                text_params,
                 [client_contact_person_id, ],
                 Notification.BILLING,
                 booking_id,
             )
-            send_email.delay(message_body, [client_contact_person_email, ],
-                       object_id=f'{settings.DOMAIN_ADDRESS}update_payment_problems/{booking.id}')
+            send_email.delay(text_body, text_params, [client_contact_person_id, ],
+                       object_id=f'{settings.DOMAIN_ADDRESS}billing_pending/')
             raise ValueError
 
 
@@ -302,19 +302,19 @@ def track_confirmed_sea_operations():
 
         if data_json.get('status') == 'error':
             if (message := data_json.get('message')) == 'WRONG_NUMBER':
-                message_body = _('The shipment {aceid} cannot be tracked because of wrong booking number.') \
-                    .format(aceid=operation.aceid)
+                text_body = 'The shipment {aceid} cannot be tracked because of wrong booking number.'
+                text_params = {'aceid':operation.aceid}
+
                 create_and_assign_notification.delay(
                     Notification.OPERATIONS,
-                    'The shipment {aceid} cannot be tracked because of wrong booking number.',
-                    {'aceid':operation.aceid},
+                    text_body,
+                    text_params,
                     [operation.agent_contact_person_id, ],
                     Notification.OPERATION,
                     object_id=operation.id,
                 )
-                client_email = [operation.agent_contact_person.email, ]
-                send_email.delay(message_body, client_email,
-                                 object_id=f'{settings.DOMAIN_ADDRESS}instance/{operation.id}')
+                send_email.delay(text_body, text_params, [operation.agent_contact_person_id, ],
+                                 object_id=f'{settings.DOMAIN_ADDRESS}operations/{operation.id}')
 
 
             else:
@@ -336,20 +336,20 @@ def track_confirmed_sea_operations():
                         shipment_details.actual_date_of_departure = timezone.localtime()
                         shipment_details.save()
                         if direction == 'import':
-                            message_body = _(
-                                'The shipment {aceid} has departed from {origin}.') \
-                                .format(aceid=operation.aceid, origin=operation.freight_rate.origin)
+                            text_body = 'The shipment {aceid} has departed from {origin}.'
+                            text_params = {'aceid':operation.aceid, 'origin':operation.freight_rate.origin}
+
                             create_and_assign_notification.delay(
                                 Notification.OPERATIONS_IMPORT,
-                                'The shipment {aceid} has departed from {origin}.',
-                                {'aceid':operation.aceid, 'origin':operation.freight_rate.origin},
+                                text_body,
+                                text_params,
                                 [operation.agent_contact_person_id, operation.client_contact_person_id, ],
                                 Notification.OPERATION,
                                 object_id=operation.id,
                             )
-                            send_email.delay(message_body, [operation.agent_contact_person.email,
-                                                            operation.client_contact_person.email, ],
-                                             object_id=f'{settings.DOMAIN_ADDRESS}operation/{operation.id}')
+                            send_email.delay(text_body, text_params, [operation.agent_contact_person_id,
+                                                                      operation.client_contact_person_id, ],
+                                             object_id=f'{settings.DOMAIN_ADDRESS}operations/{operation.id}')
 
                     event['location'] = next(
                         filter(lambda x: x.get('id') == event['location'], data_json['data'].get('locations')), {}
@@ -364,20 +364,20 @@ def track_confirmed_sea_operations():
                 shipment_details.actual_date_of_arrival = datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S')
                 shipment_details.save()
                 if direction == 'export':
-                    message_body = _(
-                        'The shipment {aceid} has arrived at {destination}.') \
-                        .format(aceid=operation.aceid, destination=operation.freight_rate.destination)
+                    text_body = 'The shipment {aceid} has arrived at {destination}.'
+                    text_params = {'aceid':operation.aceid, 'destination':operation.freight_rate.destination}
+
                     create_and_assign_notification.delay(
                         Notification.OPERATIONS_EXPORT,
-                        'The shipment {aceid} has arrived at {destination}.',
-                        {'aceid':operation.aceid, 'destination':operation.freight_rate.destination},
+                        text_body,
+                        text_params,
                         [operation.agent_contact_person_id, operation.client_contact_person_id, ],
                         Notification.OPERATION,
                         object_id=operation.id,
                     )
-                    send_email.delay(message_body,
-                                     [operation.agent_contact_person.email, operation.client_contact_person.email, ],
-                                     object_id=f'{settings.DOMAIN_ADDRESS}operation/{operation.id}')
+                    send_email.delay(text_body,text_params
+                                     [operation.agent_contact_person_id, operation.client_contact_person_id, ],
+                                     object_id=f'{settings.DOMAIN_ADDRESS}operations/{operation.id}')
 
         route_response = requests.get(route_url)
         route_json = route_response.json() if (route_status_code := route_response.status_code) == 200 \
@@ -418,11 +418,8 @@ def daily_notify_users_of_expiring_surcharges():
             Notification.SURCHARGE,
             object_id=surcharge.id,
         )
-        users_emails = list(surcharge.company.role_set.filter(
-            groups__name__in=('master', 'agent')
-        ).values_list('user__emails', flat=True))
-        send_email.delay(message_body, users_emails,
-                         object_id=f'{settings.DOMAIN_ADDRESS}surcharge/{surcharge.id}')
+        send_email.delay(message_body, {}, users_ids,
+                         object_id=f'{settings.DOMAIN_ADDRESS}services/surcharge/{surcharge.id}')
 
     for user in get_user_model().objects.filter(role__groups__name__in=('master', 'agent'),
                                                 emailnotificationsetting__surcharge_expiration=True,
@@ -436,11 +433,11 @@ def daily_notify_users_of_expiring_surcharges():
                                                               ), ):
             message_body = _(
                 'Surcharges are about to expire. Please, extend its expiration rate or create a new one with the updated costs.')
-            if user_email := user.email:
-                send_email(
-                    message_body,
-                    [user_email, ],
-                    object_id=f'{settings.DOMAIN_ADDRESS}surcharge/{surcharge.id}')  # TODO generate a link
+
+            send_email(
+                message_body, {},
+                [user.id,],
+                object_id=f'{settings.DOMAIN_ADDRESS}services/surcharge/{surcharge.id}')
 
 
 @celery_app.task(name='notify_users_of_expiring_freight_rates')
@@ -466,11 +463,9 @@ def daily_notify_users_of_expiring_freight_rates():
             Notification.FREIGHT_RATE,
             object_id=freight_rate.id,
         )
-        users_emails = list(freight_rate.company.role_set.filter(
-            groups__name__in=('master', 'agent')
-        ).values_list('user__emails', flat=True))
-        send_email.delay(message_body, users_emails,
-                         object_id=f'{settings.DOMAIN_ADDRESS}freight_rate/{freight_rate.id}')
+
+        send_email.delay(message_body, {}, users_ids,
+                         object_id=f'{settings.DOMAIN_ADDRESS}services/rate/{freight_rate.id}')
 
     for user in get_user_model().objects.filter(role__groups__name__in=('master', 'agent'),
                                                 emailnotificationsetting__freight_rate_expiration=True,
@@ -484,10 +479,10 @@ def daily_notify_users_of_expiring_freight_rates():
                                                                         days=expiration_days), ).distinct():
             message_body = _(
                 'Rates are about to expire.Please, extend its expiration rate or create a new one with the updated costs.')
-            if user_email := user.email:
-                send_email(message_body,
-                           [user_email, ],
-                           object_id=f'{settings.DOMAIN_ADDRESS}freight_rate/{freight_rate.id}')  # TODO generate a link
+
+            send_email(message_body, {}
+                       [user.id, ],
+                       object_id=f'{settings.DOMAIN_ADDRESS}services/rate/{freight_rate.id}')
 
 
 @celery_app.task(name='notify_users_of_import_sea_shipment_arrival')
@@ -534,8 +529,8 @@ def daily_notify_users_of_import_sea_shipment_arrival():
 
         for shipment_detail in email_shipment_details:
             booking = shipment_detail.booking
-            message_body = _(
-                f'The shipment {booking.aceid} is set to arrive in 3 days at {booking.freight_rate.destination}.')
-            if email := user.email:
-                send_email(message_body, [email, ],
-                           object_id=f'{settings.DOMAIN_ADDRESS}operation/{booking.id}')  # TODO generate a link
+            text_body = 'The shipment {aceid} is set to arrive in 3 days at {destination}.'
+            text_params = {'aceid': booking.aceid, 'destination': booking.freight_rate.destination}
+
+            send_email(text_body, text_params, [user.id, ],
+                       object_id=f'{settings.DOMAIN_ADDRESS}operations/{booking.id}')

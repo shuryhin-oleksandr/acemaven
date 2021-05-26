@@ -127,6 +127,9 @@ class MessageFile(models.Model):
     def __str__(self):
         return f'File of message [{self.message}]'
 
+    def get_absolute_file_upload_url(self):
+        return self.file.url
+
     class Meta:
         verbose_name = _("Message file")
         verbose_name_plural = _("Message files")
@@ -267,7 +270,7 @@ class Ticket(models.Model):
                               choices=STATUS_CHOICES,
                               default=IN_PROGRESS, )
     chat = models.OneToOneField(Chat, on_delete=models.CASCADE, verbose_name=_('Chat'))
-    aceid = models.CharField(_('Operation number'), max_length=20, null=True)
+    aceid = models.CharField(_('Operation number'), max_length=20, null=True, blank=True)
 
     class Meta:
         verbose_name = _("Ticket")

@@ -5,6 +5,9 @@ from app.websockets.models import Ticket, Chat, ChatPermission
 from django.contrib import admin
 
 from django.utils.translation import ugettext_lazy as _
+import webbrowser
+
+from config.settings import DOMAIN_ADDRESS_CHAT
 
 
 @admin.register(Ticket)
@@ -40,7 +43,8 @@ class TicketChatAdmin(admin.ModelAdmin):
             user = request.user
             chat.users.add(user)
             url = reverse_lazy("websockets:support_chat", kwargs=dict(chat_id=obj.chat_id))
-            return redirect(url)
+            webbrowser.open_new(f"{DOMAIN_ADDRESS_CHAT}{url}")
+            return redirect(request.path)
         return super().response_change(request, obj)
 
     def unread_messages(self, obj):

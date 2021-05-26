@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-15 08:53+0000\n"
+"POT-Creation-Date: 2021-04-29 09:41+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,52 +20,65 @@ msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/contrib/messages/apps.py:7
 #: app/booking/admin.py:239 app/websockets/models.py:105
+#: venv/lib/python3.9/site-packages/django/contrib/messages/apps.py:7
 msgid "Messages"
 msgstr "Mensajes"
 
 #: acemaven/lib/python3.9/site-packages/django/contrib/sitemaps/apps.py:7
+#: venv/lib/python3.9/site-packages/django/contrib/sitemaps/apps.py:7
 msgid "Site Maps"
 msgstr "Mapas del sitio"
 
 #: acemaven/lib/python3.9/site-packages/django/contrib/staticfiles/apps.py:9
+#: venv/lib/python3.9/site-packages/django/contrib/staticfiles/apps.py:9
 msgid "Static Files"
 msgstr "Archivos estáticos"
 
 #: acemaven/lib/python3.9/site-packages/django/contrib/syndication/apps.py:7
+#: venv/lib/python3.9/site-packages/django/contrib/syndication/apps.py:7
 msgid "Syndication"
 msgstr "Sindicación"
 
 #: acemaven/lib/python3.9/site-packages/django/core/paginator.py:48
+#: venv/lib/python3.9/site-packages/django/core/paginator.py:48
 msgid "That page number is not an integer"
 msgstr "Ese número de página no es un número entero"
 
 #: acemaven/lib/python3.9/site-packages/django/core/paginator.py:50
+#: venv/lib/python3.9/site-packages/django/core/paginator.py:50
 msgid "That page number is less than 1"
 msgstr "Ese número de página es menor que 1"
 
 #: acemaven/lib/python3.9/site-packages/django/core/paginator.py:55
+#: venv/lib/python3.9/site-packages/django/core/paginator.py:55
 msgid "That page contains no results"
 msgstr "Esa página no contiene resultados"
 
 #: acemaven/lib/python3.9/site-packages/django/core/validators.py:20
+#: venv/lib/python3.9/site-packages/django/core/validators.py:20
 msgid "Enter a valid value."
 msgstr "Introduce un valor valido."
 
 #: acemaven/lib/python3.9/site-packages/django/core/validators.py:91
 #: acemaven/lib/python3.9/site-packages/django/forms/fields.py:671
+#: venv/lib/python3.9/site-packages/django/core/validators.py:91
+#: venv/lib/python3.9/site-packages/django/forms/fields.py:671
 msgid "Enter a valid URL."
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/core/validators.py:145
+#: venv/lib/python3.9/site-packages/django/core/validators.py:145
 msgid "Enter a valid integer."
 msgstr "Ingrese una URL válida."
 
 #: acemaven/lib/python3.9/site-packages/django/core/validators.py:156
+#: venv/lib/python3.9/site-packages/django/core/validators.py:156
 msgid "Enter a valid email address."
 msgstr "Introduzca una dirección de correo electrónico válida."
 
 #. Translators: "letters" means latin letters: a-z and A-Z.
 #: acemaven/lib/python3.9/site-packages/django/core/validators.py:230
+#: venv/lib/python3.9/site-packages/django/core/validators.py:230
 msgid ""
 "Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
 msgstr ""
@@ -73,6 +86,7 @@ msgstr ""
 "guiones."
 
 #: acemaven/lib/python3.9/site-packages/django/core/validators.py:237
+#: venv/lib/python3.9/site-packages/django/core/validators.py:237
 msgid ""
 "Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
@@ -82,39 +96,50 @@ msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/core/validators.py:246
 #: acemaven/lib/python3.9/site-packages/django/core/validators.py:266
+#: venv/lib/python3.9/site-packages/django/core/validators.py:246
+#: venv/lib/python3.9/site-packages/django/core/validators.py:266
 msgid "Enter a valid IPv4 address."
 msgstr "Ingrese una dirección IPv4 válida."
 
 #: acemaven/lib/python3.9/site-packages/django/core/validators.py:251
 #: acemaven/lib/python3.9/site-packages/django/core/validators.py:267
+#: venv/lib/python3.9/site-packages/django/core/validators.py:251
+#: venv/lib/python3.9/site-packages/django/core/validators.py:267
 msgid "Enter a valid IPv6 address."
 msgstr "Ingrese una dirección IPv6 válida."
 
 #: acemaven/lib/python3.9/site-packages/django/core/validators.py:261
 #: acemaven/lib/python3.9/site-packages/django/core/validators.py:265
+#: venv/lib/python3.9/site-packages/django/core/validators.py:261
+#: venv/lib/python3.9/site-packages/django/core/validators.py:265
 msgid "Enter a valid IPv4 or IPv6 address."
 msgstr "Ingrese una dirección IPv4 o IPv6 válida."
 
 #: acemaven/lib/python3.9/site-packages/django/core/validators.py:295
+#: venv/lib/python3.9/site-packages/django/core/validators.py:295
 msgid "Enter only digits separated by commas."
 msgstr "Ingrese solo dígitos separados por comas."
 
 #: acemaven/lib/python3.9/site-packages/django/core/validators.py:301
+#: venv/lib/python3.9/site-packages/django/core/validators.py:301
 #, python-format
 msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/core/validators.py:334
+#: venv/lib/python3.9/site-packages/django/core/validators.py:334
 #, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/core/validators.py:343
+#: venv/lib/python3.9/site-packages/django/core/validators.py:343
 #, python-format
 msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/core/validators.py:353
+#: venv/lib/python3.9/site-packages/django/core/validators.py:353
 #, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d character (it has "
@@ -126,6 +151,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: acemaven/lib/python3.9/site-packages/django/core/validators.py:368
+#: venv/lib/python3.9/site-packages/django/core/validators.py:368
 #, python-format
 msgid ""
 "Ensure this value has at most %(limit_value)d character (it has "
@@ -139,10 +165,14 @@ msgstr[1] ""
 #: acemaven/lib/python3.9/site-packages/django/core/validators.py:387
 #: acemaven/lib/python3.9/site-packages/django/forms/fields.py:292
 #: acemaven/lib/python3.9/site-packages/django/forms/fields.py:327
+#: venv/lib/python3.9/site-packages/django/core/validators.py:387
+#: venv/lib/python3.9/site-packages/django/forms/fields.py:292
+#: venv/lib/python3.9/site-packages/django/forms/fields.py:327
 msgid "Enter a number."
 msgstr "Ingrese un numero."
 
 #: acemaven/lib/python3.9/site-packages/django/core/validators.py:389
+#: venv/lib/python3.9/site-packages/django/core/validators.py:389
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -150,6 +180,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: acemaven/lib/python3.9/site-packages/django/core/validators.py:394
+#: venv/lib/python3.9/site-packages/django/core/validators.py:394
 #, python-format
 msgid "Ensure that there are no more than %(max)s decimal place."
 msgid_plural "Ensure that there are no more than %(max)s decimal places."
@@ -157,6 +188,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: acemaven/lib/python3.9/site-packages/django/core/validators.py:399
+#: venv/lib/python3.9/site-packages/django/core/validators.py:399
 #, python-format
 msgid ""
 "Ensure that there are no more than %(max)s digit before the decimal point."
@@ -166,6 +198,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: acemaven/lib/python3.9/site-packages/django/core/validators.py:461
+#: venv/lib/python3.9/site-packages/django/core/validators.py:461
 #, python-format
 msgid ""
 "File extension “%(extension)s” is not allowed. Allowed extensions are: "
@@ -173,33 +206,41 @@ msgid ""
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/core/validators.py:513
+#: venv/lib/python3.9/site-packages/django/core/validators.py:513
 msgid "Null characters are not allowed."
 msgstr "No se permiten caracteres nulos."
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/base.py:1187
 #: acemaven/lib/python3.9/site-packages/django/forms/models.py:760
+#: venv/lib/python3.9/site-packages/django/db/models/base.py:1187
+#: venv/lib/python3.9/site-packages/django/forms/models.py:760
 msgid "and"
 msgstr "y"
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/base.py:1189
+#: venv/lib/python3.9/site-packages/django/db/models/base.py:1189
 #, python-format
 msgid "%(model_name)s with this %(field_labels)s already exists."
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:100
+#: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:100
 #, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:101
+#: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:101
 msgid "This field cannot be null."
 msgstr "Este campo no puede ser nulo."
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:102
+#: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:102
 msgid "This field cannot be blank."
 msgstr "Este campo no puede estar vacío."
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:103
+#: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:103
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr ""
@@ -207,40 +248,48 @@ msgstr ""
 #. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
 #. Eg: "Title must be unique for pub_date year"
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:107
+#: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:107
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:126
+#: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:126
 #, python-format
 msgid "Field of type: %(field_type)s"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:939
+#: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:939
 #, python-format
 msgid "“%(value)s” value must be either True or False."
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:940
+#: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:940
 #, python-format
 msgid "“%(value)s” value must be either True, False, or None."
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:942
+#: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:942
 msgid "Boolean (Either True or False)"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:983
+#: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:983
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1047
+#: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1047
 msgid "Comma-separated integers"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1096
+#: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1096
 #, python-format
 msgid ""
 "“%(value)s” value has an invalid date format. It must be in YYYY-MM-DD "
@@ -249,6 +298,8 @@ msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1098
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1241
+#: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1098
+#: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1241
 #, python-format
 msgid ""
 "“%(value)s” value has the correct format (YYYY-MM-DD) but it is an invalid "
@@ -256,10 +307,12 @@ msgid ""
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1101
+#: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1101
 msgid "Date (without time)"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1239
+#: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1239
 #, python-format
 msgid ""
 "“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
@@ -267,6 +320,7 @@ msgid ""
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1243
+#: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1243
 #, python-format
 msgid ""
 "“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
@@ -274,19 +328,23 @@ msgid ""
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1247
+#: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1247
 msgid "Date (with time)"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1395
+#: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1395
 #, python-format
 msgid "“%(value)s” value must be a decimal number."
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1397
+#: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1397
 msgid "Decimal number"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1536
+#: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1536
 #, python-format
 msgid ""
 "“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
@@ -294,84 +352,104 @@ msgid ""
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1539
+#: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1539
 msgid "Duration"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1589
 #: app/core/models.py:356 app/core/models.py:562
+#: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1589
 msgid "Email address"
 msgstr "Correo electronico"
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1612
+#: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1612
 msgid "File path"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1678
+#: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1678
 #, python-format
 msgid "“%(value)s” value must be a float."
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1680
+#: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1680
 msgid "Floating point number"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1718
+#: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1718
 #, python-format
 msgid "“%(value)s” value must be an integer."
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1720
+#: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1720
 msgid "Integer"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1803
+#: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1803
 msgid "Big (8 byte) integer"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1819
+#: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1819
 msgid "IPv4 address"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1850
+#: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1850
 msgid "IP address"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1930
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1931
+#: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1930
+#: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1931
 #, python-format
 msgid "“%(value)s” value must be either None, True or False."
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1933
+#: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1933
 msgid "Boolean (Either True, False or None)"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1976
+#: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1976
 msgid "Positive big integer"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1989
+#: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1989
 msgid "Positive integer"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2002
+#: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2002
 msgid "Positive small integer"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2016
+#: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2016
 #, python-format
 msgid "Slug (up to %(max_length)s)"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2048
+#: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2048
 msgid "Small integer"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2055
+#: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2055
 msgid "Text"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2083
+#: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2083
 #, python-format
 msgid ""
 "“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
@@ -379,6 +457,7 @@ msgid ""
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2085
+#: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2085
 #, python-format
 msgid ""
 "“%(value)s” value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
@@ -386,119 +465,148 @@ msgid ""
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2088
+#: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2088
 msgid "Time"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2214
+#: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2214
 msgid "URL"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2236
+#: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2236
 msgid "Raw binary data"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2301
+#: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2301
 #, python-format
 msgid "“%(value)s” is not a valid UUID."
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2303
+#: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2303
 msgid "Universally unique identifier"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/files.py:231
+#: venv/lib/python3.9/site-packages/django/db/models/fields/files.py:231
 msgid "File"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/files.py:377
+#: venv/lib/python3.9/site-packages/django/db/models/fields/files.py:377
 msgid "Image"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/json.py:18
+#: venv/lib/python3.9/site-packages/django/db/models/fields/json.py:18
 msgid "A JSON object"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/json.py:20
+#: venv/lib/python3.9/site-packages/django/db/models/fields/json.py:20
 msgid "Value must be valid JSON."
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/related.py:790
+#: venv/lib/python3.9/site-packages/django/db/models/fields/related.py:790
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/related.py:792
+#: venv/lib/python3.9/site-packages/django/db/models/fields/related.py:792
 msgid "Foreign Key (type determined by related field)"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/related.py:1045
+#: venv/lib/python3.9/site-packages/django/db/models/fields/related.py:1045
 msgid "One-to-one relationship"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/related.py:1099
+#: venv/lib/python3.9/site-packages/django/db/models/fields/related.py:1099
 #, python-format
 msgid "%(from)s-%(to)s relationship"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/related.py:1100
+#: venv/lib/python3.9/site-packages/django/db/models/fields/related.py:1100
 #, python-format
 msgid "%(from)s-%(to)s relationships"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/db/models/fields/related.py:1142
+#: venv/lib/python3.9/site-packages/django/db/models/fields/related.py:1142
 msgid "Many-to-many relationship"
 msgstr ""
 
 #. Translators: If found as last label character, these punctuation
 #. characters will prevent the default label_suffix to be appended to the label
 #: acemaven/lib/python3.9/site-packages/django/forms/boundfield.py:150
+#: venv/lib/python3.9/site-packages/django/forms/boundfield.py:150
 msgid ":?.!"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/forms/fields.py:54
+#: venv/lib/python3.9/site-packages/django/forms/fields.py:54
 msgid "This field is required."
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/forms/fields.py:247
+#: venv/lib/python3.9/site-packages/django/forms/fields.py:247
 msgid "Enter a whole number."
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/forms/fields.py:398
 #: acemaven/lib/python3.9/site-packages/django/forms/fields.py:1139
+#: venv/lib/python3.9/site-packages/django/forms/fields.py:398
+#: venv/lib/python3.9/site-packages/django/forms/fields.py:1139
 msgid "Enter a valid date."
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/forms/fields.py:422
 #: acemaven/lib/python3.9/site-packages/django/forms/fields.py:1140
+#: venv/lib/python3.9/site-packages/django/forms/fields.py:422
+#: venv/lib/python3.9/site-packages/django/forms/fields.py:1140
 msgid "Enter a valid time."
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/forms/fields.py:450
+#: venv/lib/python3.9/site-packages/django/forms/fields.py:450
 msgid "Enter a valid date/time."
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/forms/fields.py:484
+#: venv/lib/python3.9/site-packages/django/forms/fields.py:484
 msgid "Enter a valid duration."
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/forms/fields.py:485
+#: venv/lib/python3.9/site-packages/django/forms/fields.py:485
 #, python-brace-format
 msgid "The number of days must be between {min_days} and {max_days}."
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/forms/fields.py:545
+#: venv/lib/python3.9/site-packages/django/forms/fields.py:545
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/forms/fields.py:546
+#: venv/lib/python3.9/site-packages/django/forms/fields.py:546
 msgid "No file was submitted."
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/forms/fields.py:547
+#: venv/lib/python3.9/site-packages/django/forms/fields.py:547
 msgid "The submitted file is empty."
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/forms/fields.py:549
+#: venv/lib/python3.9/site-packages/django/forms/fields.py:549
 #, python-format
 msgid "Ensure this filename has at most %(max)d character (it has %(length)d)."
 msgid_plural ""
@@ -507,10 +615,12 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: acemaven/lib/python3.9/site-packages/django/forms/fields.py:552
+#: venv/lib/python3.9/site-packages/django/forms/fields.py:552
 msgid "Please either submit a file or check the clear checkbox, not both."
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/forms/fields.py:613
+#: venv/lib/python3.9/site-packages/django/forms/fields.py:613
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
@@ -519,6 +629,9 @@ msgstr ""
 #: acemaven/lib/python3.9/site-packages/django/forms/fields.py:775
 #: acemaven/lib/python3.9/site-packages/django/forms/fields.py:865
 #: acemaven/lib/python3.9/site-packages/django/forms/models.py:1296
+#: venv/lib/python3.9/site-packages/django/forms/fields.py:775
+#: venv/lib/python3.9/site-packages/django/forms/fields.py:865
+#: venv/lib/python3.9/site-packages/django/forms/models.py:1296
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr ""
@@ -526,36 +639,46 @@ msgstr ""
 #: acemaven/lib/python3.9/site-packages/django/forms/fields.py:866
 #: acemaven/lib/python3.9/site-packages/django/forms/fields.py:981
 #: acemaven/lib/python3.9/site-packages/django/forms/models.py:1295
+#: venv/lib/python3.9/site-packages/django/forms/fields.py:866
+#: venv/lib/python3.9/site-packages/django/forms/fields.py:981
+#: venv/lib/python3.9/site-packages/django/forms/models.py:1295
 msgid "Enter a list of values."
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/forms/fields.py:982
+#: venv/lib/python3.9/site-packages/django/forms/fields.py:982
 msgid "Enter a complete value."
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/forms/fields.py:1198
+#: venv/lib/python3.9/site-packages/django/forms/fields.py:1198
 msgid "Enter a valid UUID."
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/forms/fields.py:1228
+#: venv/lib/python3.9/site-packages/django/forms/fields.py:1228
 msgid "Enter a valid JSON."
 msgstr ""
 
 #. Translators: This is the default suffix added to form field labels
 #: acemaven/lib/python3.9/site-packages/django/forms/forms.py:78
+#: venv/lib/python3.9/site-packages/django/forms/forms.py:78
 msgid ":"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/forms/forms.py:205
+#: venv/lib/python3.9/site-packages/django/forms/forms.py:205
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/forms/formsets.py:93
+#: venv/lib/python3.9/site-packages/django/forms/formsets.py:93
 msgid "ManagementForm data is missing or has been tampered with"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/forms/formsets.py:345
+#: venv/lib/python3.9/site-packages/django/forms/formsets.py:345
 #, python-format
 msgid "Please submit %d or fewer forms."
 msgid_plural "Please submit %d or fewer forms."
@@ -563,6 +686,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: acemaven/lib/python3.9/site-packages/django/forms/formsets.py:352
+#: venv/lib/python3.9/site-packages/django/forms/formsets.py:352
 #, python-format
 msgid "Please submit %d or more forms."
 msgid_plural "Please submit %d or more forms."
@@ -571,24 +695,30 @@ msgstr[1] ""
 
 #: acemaven/lib/python3.9/site-packages/django/forms/formsets.py:379
 #: acemaven/lib/python3.9/site-packages/django/forms/formsets.py:386
+#: venv/lib/python3.9/site-packages/django/forms/formsets.py:379
+#: venv/lib/python3.9/site-packages/django/forms/formsets.py:386
 msgid "Order"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/forms/formsets.py:391
+#: venv/lib/python3.9/site-packages/django/forms/formsets.py:391
 msgid "Delete"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/forms/models.py:755
+#: venv/lib/python3.9/site-packages/django/forms/models.py:755
 #, python-format
 msgid "Please correct the duplicate data for %(field)s."
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/forms/models.py:759
+#: venv/lib/python3.9/site-packages/django/forms/models.py:759
 #, python-format
 msgid "Please correct the duplicate data for %(field)s, which must be unique."
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/forms/models.py:765
+#: venv/lib/python3.9/site-packages/django/forms/models.py:765
 #, python-format
 msgid ""
 "Please correct the duplicate data for %(field_name)s which must be unique "
@@ -596,23 +726,28 @@ msgid ""
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/forms/models.py:774
+#: venv/lib/python3.9/site-packages/django/forms/models.py:774
 msgid "Please correct the duplicate values below."
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/forms/models.py:1096
+#: venv/lib/python3.9/site-packages/django/forms/models.py:1096
 msgid "The inline value did not match the parent instance."
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/forms/models.py:1180
+#: venv/lib/python3.9/site-packages/django/forms/models.py:1180
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/forms/models.py:1298
+#: venv/lib/python3.9/site-packages/django/forms/models.py:1298
 #, python-format
 msgid "“%(pk)s” is not a valid value."
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/forms/utils.py:167
+#: venv/lib/python3.9/site-packages/django/forms/utils.py:167
 #, python-format
 msgid ""
 "%(datetime)s couldn’t be interpreted in time zone %(current_timezone)s; it "
@@ -620,39 +755,48 @@ msgid ""
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/forms/widgets.py:398
+#: venv/lib/python3.9/site-packages/django/forms/widgets.py:398
 msgid "Clear"
 msgstr "Claro"
 
 #: acemaven/lib/python3.9/site-packages/django/forms/widgets.py:399
+#: venv/lib/python3.9/site-packages/django/forms/widgets.py:399
 msgid "Currently"
 msgstr "Actualmente"
 
 #: acemaven/lib/python3.9/site-packages/django/forms/widgets.py:400
 #: app/core/templates/core/local_fee_inline_tabular.html:49
 #: app/language_switcher/templates/language_switcher/base_site.html:74
+#: venv/lib/python3.9/site-packages/django/forms/widgets.py:400
 msgid "Change"
 msgstr "Cambio"
 
 #: acemaven/lib/python3.9/site-packages/django/forms/widgets.py:709
-#: app/booking/utils.py:556
+#: app/booking/utils.py:574
+#: venv/lib/python3.9/site-packages/django/forms/widgets.py:709
 msgid "Unknown"
 msgstr "Desconocido"
 
 #: acemaven/lib/python3.9/site-packages/django/forms/widgets.py:710
+#: venv/lib/python3.9/site-packages/django/forms/widgets.py:710
 msgid "Yes"
 msgstr "Sí"
 
 #: acemaven/lib/python3.9/site-packages/django/forms/widgets.py:711
+#: venv/lib/python3.9/site-packages/django/forms/widgets.py:711
 msgid "No"
 msgstr "No"
 
 #. Translators: Please do not add spaces around commas.
 #: acemaven/lib/python3.9/site-packages/django/template/defaultfilters.py:790
+#: venv/lib/python3.9/site-packages/django/template/defaultfilters.py:790
 msgid "yes,no,maybe"
 msgstr "Sí,No,Quizás"
 
 #: acemaven/lib/python3.9/site-packages/django/template/defaultfilters.py:819
 #: acemaven/lib/python3.9/site-packages/django/template/defaultfilters.py:836
+#: venv/lib/python3.9/site-packages/django/template/defaultfilters.py:819
+#: venv/lib/python3.9/site-packages/django/template/defaultfilters.py:836
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
@@ -660,347 +804,426 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: acemaven/lib/python3.9/site-packages/django/template/defaultfilters.py:838
+#: venv/lib/python3.9/site-packages/django/template/defaultfilters.py:838
 #, python-format
 msgid "%s KB"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/template/defaultfilters.py:840
+#: venv/lib/python3.9/site-packages/django/template/defaultfilters.py:840
 #, python-format
 msgid "%s MB"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/template/defaultfilters.py:842
+#: venv/lib/python3.9/site-packages/django/template/defaultfilters.py:842
 #, python-format
 msgid "%s GB"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/template/defaultfilters.py:844
+#: venv/lib/python3.9/site-packages/django/template/defaultfilters.py:844
 #, python-format
 msgid "%s TB"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/template/defaultfilters.py:846
+#: venv/lib/python3.9/site-packages/django/template/defaultfilters.py:846
 #, python-format
 msgid "%s PB"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dateformat.py:65
+#: venv/lib/python3.9/site-packages/django/utils/dateformat.py:65
 msgid "p.m."
 msgstr "p.m."
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dateformat.py:66
+#: venv/lib/python3.9/site-packages/django/utils/dateformat.py:66
 msgid "a.m."
 msgstr "a.m."
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dateformat.py:71
+#: venv/lib/python3.9/site-packages/django/utils/dateformat.py:71
 msgid "PM"
 msgstr "PM"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dateformat.py:72
+#: venv/lib/python3.9/site-packages/django/utils/dateformat.py:72
 msgid "AM"
 msgstr "AM"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dateformat.py:149
+#: venv/lib/python3.9/site-packages/django/utils/dateformat.py:149
 msgid "midnight"
 msgstr "medianoche"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dateformat.py:151
+#: venv/lib/python3.9/site-packages/django/utils/dateformat.py:151
 msgid "noon"
 msgstr "mediodía"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:6
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:6
 msgid "Monday"
 msgstr "Lunes"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:6
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:6
 msgid "Tuesday"
 msgstr "Martes"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:6
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:6
 msgid "Wednesday"
 msgstr "Miercoles"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:6
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:6
 msgid "Thursday"
 msgstr "Jueves"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:6
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:6
 msgid "Friday"
 msgstr "Viernes"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:7
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:7
 msgid "Saturday"
 msgstr "Sabado"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:7
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:7
 msgid "Sunday"
 msgstr "Domingo"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:10
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:10
 msgid "Mon"
 msgstr "Lun"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:10
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:10
 msgid "Tue"
 msgstr "Mar"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:10
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:10
 msgid "Wed"
 msgstr "Mie"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:10
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:10
 msgid "Thu"
 msgstr "Jue"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:10
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:10
 msgid "Fri"
 msgstr "Vie"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:11
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:11
 msgid "Sat"
 msgstr "Sab"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:11
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:11
 msgid "Sun"
 msgstr "Dom"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:14
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:14
 msgid "January"
 msgstr "Enero"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:14
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:14
 msgid "February"
 msgstr "Febrero"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:14
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:14
 msgid "March"
 msgstr "Marzo"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:14
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:14
 msgid "April"
 msgstr "Abril"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:14
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:14
 msgid "May"
 msgstr "Mayo"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:14
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:14
 msgid "June"
 msgstr "Junio"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:15
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:15
 msgid "July"
 msgstr "Julio"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:15
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:15
 msgid "August"
 msgstr "Agosto"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:15
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:15
 msgid "September"
 msgstr "Septiembre"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:15
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:15
 msgid "October"
 msgstr "Octubre"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:15
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:15
 msgid "November"
 msgstr "Noviembro"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:16
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:16
 msgid "December"
 msgstr "Diciembro"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:19
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:19
 msgid "jan"
 msgstr "enero"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:19
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:19
 msgid "feb"
 msgstr "feb"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:19
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:19
 msgid "mar"
 msgstr "marzo"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:19
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:19
 msgid "apr"
 msgstr "abr"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:19
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:19
 msgid "may"
 msgstr "mayo"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:19
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:19
 msgid "jun"
 msgstr "jun"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:20
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:20
 msgid "jul"
 msgstr "jul"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:20
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:20
 msgid "aug"
 msgstr "agosto"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:20
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:20
 msgid "sep"
 msgstr "sept"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:20
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:20
 msgid "oct"
 msgstr "oct"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:20
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:20
 msgid "nov"
 msgstr "nov"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:20
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:20
 msgid "dec"
 msgstr "dic"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:23
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:23
 msgctxt "abbrev. month"
 msgid "Jan."
 msgstr "enero"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:24
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:24
 msgctxt "abbrev. month"
 msgid "Feb."
 msgstr "feb."
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:25
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:25
 msgctxt "abbrev. month"
 msgid "March"
 msgstr "marzo"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:26
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:26
 msgctxt "abbrev. month"
 msgid "April"
 msgstr "abr."
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:27
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:27
 msgctxt "abbrev. month"
 msgid "May"
 msgstr "mayo"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:28
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:28
 msgctxt "abbrev. month"
 msgid "June"
 msgstr "jun."
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:29
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:29
 msgctxt "abbrev. month"
 msgid "July"
 msgstr "jul."
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:30
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:30
 msgctxt "abbrev. month"
 msgid "Aug."
 msgstr "agosto"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:31
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:31
 msgctxt "abbrev. month"
 msgid "Sept."
 msgstr "sept."
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:32
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:32
 msgctxt "abbrev. month"
 msgid "Oct."
 msgstr "oct."
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:33
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:33
 msgctxt "abbrev. month"
 msgid "Nov."
 msgstr "nov."
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:34
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:34
 msgctxt "abbrev. month"
 msgid "Dec."
 msgstr "dic."
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:37
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:37
 msgctxt "alt. month"
 msgid "January"
 msgstr "Enero"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:38
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:38
 msgctxt "alt. month"
 msgid "February"
 msgstr "Febrero"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:39
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:39
 msgctxt "alt. month"
 msgid "March"
 msgstr "Marcha"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:40
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:40
 msgctxt "alt. month"
 msgid "April"
 msgstr "Abril"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:41
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:41
 msgctxt "alt. month"
 msgid "May"
 msgstr "Mayo"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:42
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:42
 msgctxt "alt. month"
 msgid "June"
 msgstr "Junio"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:43
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:43
 msgctxt "alt. month"
 msgid "July"
 msgstr "Julio"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:44
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:44
 msgctxt "alt. month"
 msgid "August"
 msgstr "Agosto"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:45
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:45
 msgctxt "alt. month"
 msgid "September"
 msgstr "Septiembre"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:46
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:46
 msgctxt "alt. month"
 msgid "October"
 msgstr "Octubre"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:47
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:47
 msgctxt "alt. month"
 msgid "November"
 msgstr "Noviembre"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/dates.py:48
+#: venv/lib/python3.9/site-packages/django/utils/dates.py:48
 msgctxt "alt. month"
 msgid "December"
 msgstr "Diciembre"
 
 #: acemaven/lib/python3.9/site-packages/django/utils/ipv6.py:8
+#: venv/lib/python3.9/site-packages/django/utils/ipv6.py:8
 msgid "This is not a valid IPv6 address."
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/utils/text.py:70
+#: venv/lib/python3.9/site-packages/django/utils/text.py:70
 #, python-format
 msgctxt "String to return when truncating text"
 msgid "%(truncated_text)s…"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/utils/text.py:236
+#: venv/lib/python3.9/site-packages/django/utils/text.py:236
 msgid "or"
 msgstr ""
 
 #. Translators: This string is used as a separator between list elements
 #: acemaven/lib/python3.9/site-packages/django/utils/text.py:255
 #: acemaven/lib/python3.9/site-packages/django/utils/timesince.py:83
+#: venv/lib/python3.9/site-packages/django/utils/text.py:255
+#: venv/lib/python3.9/site-packages/django/utils/timesince.py:83
 msgid ", "
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/utils/timesince.py:9
+#: venv/lib/python3.9/site-packages/django/utils/timesince.py:9
 #, python-format
 msgid "%d year"
 msgid_plural "%d years"
@@ -1008,6 +1231,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: acemaven/lib/python3.9/site-packages/django/utils/timesince.py:10
+#: venv/lib/python3.9/site-packages/django/utils/timesince.py:10
 #, python-format
 msgid "%d month"
 msgid_plural "%d months"
@@ -1015,6 +1239,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: acemaven/lib/python3.9/site-packages/django/utils/timesince.py:11
+#: venv/lib/python3.9/site-packages/django/utils/timesince.py:11
 #, python-format
 msgid "%d week"
 msgid_plural "%d weeks"
@@ -1022,6 +1247,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: acemaven/lib/python3.9/site-packages/django/utils/timesince.py:12
+#: venv/lib/python3.9/site-packages/django/utils/timesince.py:12
 #, python-format
 msgid "%d day"
 msgid_plural "%d days"
@@ -1029,6 +1255,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: acemaven/lib/python3.9/site-packages/django/utils/timesince.py:13
+#: venv/lib/python3.9/site-packages/django/utils/timesince.py:13
 #, python-format
 msgid "%d hour"
 msgid_plural "%d hours"
@@ -1036,6 +1263,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: acemaven/lib/python3.9/site-packages/django/utils/timesince.py:14
+#: venv/lib/python3.9/site-packages/django/utils/timesince.py:14
 #, python-format
 msgid "%d minute"
 msgid_plural "%d minutes"
@@ -1043,14 +1271,17 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: acemaven/lib/python3.9/site-packages/django/views/csrf.py:110
+#: venv/lib/python3.9/site-packages/django/views/csrf.py:110
 msgid "Forbidden"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/views/csrf.py:111
+#: venv/lib/python3.9/site-packages/django/views/csrf.py:111
 msgid "CSRF verification failed. Request aborted."
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/views/csrf.py:115
+#: venv/lib/python3.9/site-packages/django/views/csrf.py:115
 msgid ""
 "You are seeing this message because this HTTPS site requires a “Referer "
 "header” to be sent by your Web browser, but none was sent. This header is "
@@ -1059,6 +1290,7 @@ msgid ""
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/views/csrf.py:120
+#: venv/lib/python3.9/site-packages/django/views/csrf.py:120
 msgid ""
 "If you have configured your browser to disable “Referer” headers, please re-"
 "enable them, at least for this site, or for HTTPS connections, or for “same-"
@@ -1066,6 +1298,7 @@ msgid ""
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/views/csrf.py:124
+#: venv/lib/python3.9/site-packages/django/views/csrf.py:124
 msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
 "including the “Referrer-Policy: no-referrer” header, please remove them. The "
@@ -1075,6 +1308,7 @@ msgid ""
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/views/csrf.py:132
+#: venv/lib/python3.9/site-packages/django/views/csrf.py:132
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
@@ -1082,44 +1316,56 @@ msgid ""
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/views/csrf.py:137
+#: venv/lib/python3.9/site-packages/django/views/csrf.py:137
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
 "them, at least for this site, or for “same-origin” requests."
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/views/csrf.py:142
+#: venv/lib/python3.9/site-packages/django/views/csrf.py:142
 msgid "More information is available with DEBUG=True."
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/views/generic/dates.py:41
+#: venv/lib/python3.9/site-packages/django/views/generic/dates.py:41
 msgid "No year specified"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/views/generic/dates.py:61
 #: acemaven/lib/python3.9/site-packages/django/views/generic/dates.py:111
 #: acemaven/lib/python3.9/site-packages/django/views/generic/dates.py:208
+#: venv/lib/python3.9/site-packages/django/views/generic/dates.py:61
+#: venv/lib/python3.9/site-packages/django/views/generic/dates.py:111
+#: venv/lib/python3.9/site-packages/django/views/generic/dates.py:208
 msgid "Date out of range"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/views/generic/dates.py:90
+#: venv/lib/python3.9/site-packages/django/views/generic/dates.py:90
 msgid "No month specified"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/views/generic/dates.py:142
+#: venv/lib/python3.9/site-packages/django/views/generic/dates.py:142
 msgid "No day specified"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/views/generic/dates.py:188
+#: venv/lib/python3.9/site-packages/django/views/generic/dates.py:188
 msgid "No week specified"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/views/generic/dates.py:338
 #: acemaven/lib/python3.9/site-packages/django/views/generic/dates.py:367
+#: venv/lib/python3.9/site-packages/django/views/generic/dates.py:338
+#: venv/lib/python3.9/site-packages/django/views/generic/dates.py:367
 #, python-format
 msgid "No %(verbose_name_plural)s available"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/views/generic/dates.py:589
+#: venv/lib/python3.9/site-packages/django/views/generic/dates.py:589
 #, python-format
 msgid ""
 "Future %(verbose_name_plural)s not available because %(class_name)s."
@@ -1127,48 +1373,58 @@ msgid ""
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/views/generic/dates.py:623
+#: venv/lib/python3.9/site-packages/django/views/generic/dates.py:623
 #, python-format
 msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/views/generic/detail.py:54
+#: venv/lib/python3.9/site-packages/django/views/generic/detail.py:54
 #, python-format
 msgid "No %(verbose_name)s found matching the query"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/views/generic/list.py:67
+#: venv/lib/python3.9/site-packages/django/views/generic/list.py:67
 msgid "Page is not “last”, nor can it be converted to an int."
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/views/generic/list.py:72
+#: venv/lib/python3.9/site-packages/django/views/generic/list.py:72
 #, python-format
 msgid "Invalid page (%(page_number)s): %(message)s"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/views/generic/list.py:154
+#: venv/lib/python3.9/site-packages/django/views/generic/list.py:154
 #, python-format
 msgid "Empty list and “%(class_name)s.allow_empty” is False."
 msgstr "Lista vacía y “%(class_name)s.allow_empty” es falso"
 
 #: acemaven/lib/python3.9/site-packages/django/views/static.py:40
+#: venv/lib/python3.9/site-packages/django/views/static.py:40
 msgid "Directory indexes are not allowed here."
 msgstr "Los índices de directorio no están permitidos aquí."
 
 #: acemaven/lib/python3.9/site-packages/django/views/static.py:42
+#: venv/lib/python3.9/site-packages/django/views/static.py:42
 #, python-format
 msgid "“%(path)s” does not exist"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/views/static.py:80
+#: venv/lib/python3.9/site-packages/django/views/static.py:80
 #, python-format
 msgid "Index of %(directory)s"
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/views/templates/default_urlconf.html:7
+#: venv/lib/python3.9/site-packages/django/views/templates/default_urlconf.html:7
 msgid "Django: the Web framework for perfectionists with deadlines."
 msgstr "Django: el marco web para perfeccionistas con plazos."
 
 #: acemaven/lib/python3.9/site-packages/django/views/templates/default_urlconf.html:346
+#: venv/lib/python3.9/site-packages/django/views/templates/default_urlconf.html:346
 #, python-format
 msgid ""
 "View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
@@ -1176,10 +1432,12 @@ msgid ""
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/views/templates/default_urlconf.html:368
+#: venv/lib/python3.9/site-packages/django/views/templates/default_urlconf.html:368
 msgid "The install worked successfully! Congratulations!"
 msgstr "¡La instalación funcionó correctamente! ¡Felicidades!"
 
 #: acemaven/lib/python3.9/site-packages/django/views/templates/default_urlconf.html:369
+#: venv/lib/python3.9/site-packages/django/views/templates/default_urlconf.html:369
 #, python-format
 msgid ""
 "You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
@@ -1189,49 +1447,60 @@ msgid ""
 msgstr ""
 
 #: acemaven/lib/python3.9/site-packages/django/views/templates/default_urlconf.html:384
+#: venv/lib/python3.9/site-packages/django/views/templates/default_urlconf.html:384
 msgid "Django Documentation"
 msgstr "Documentación de Django"
 
 #: acemaven/lib/python3.9/site-packages/django/views/templates/default_urlconf.html:385
+#: venv/lib/python3.9/site-packages/django/views/templates/default_urlconf.html:385
 msgid "Topics, references, &amp; how-to’s"
 msgstr "Temas, referencias y amp; cómo hacer"
 
 #: acemaven/lib/python3.9/site-packages/django/views/templates/default_urlconf.html:396
+#: venv/lib/python3.9/site-packages/django/views/templates/default_urlconf.html:396
 msgid "Tutorial: A Polling App"
 msgstr "Tutorial: una aplicación de encuesta"
 
 #: acemaven/lib/python3.9/site-packages/django/views/templates/default_urlconf.html:397
+#: venv/lib/python3.9/site-packages/django/views/templates/default_urlconf.html:397
 msgid "Get started with Django"
 msgstr "Empiece con Django"
 
 #: acemaven/lib/python3.9/site-packages/django/views/templates/default_urlconf.html:408
+#: venv/lib/python3.9/site-packages/django/views/templates/default_urlconf.html:408
 msgid "Django Community"
 msgstr "Comunidad Django"
 
 #: acemaven/lib/python3.9/site-packages/django/views/templates/default_urlconf.html:409
+#: venv/lib/python3.9/site-packages/django/views/templates/default_urlconf.html:409
 msgid "Connect, get help, or contribute"
 msgstr "Conéctese, obtenga ayuda o contribuya"
 
 #: acemaven/lib/python3.9/site-packages/kombu/transport/qpid.py:1301
+#: venv/lib/python3.9/site-packages/kombu/transport/qpid.py:1301
 #, python-format
 msgid "Attempting to connect to qpid with SASL mechanism %s"
 msgstr "Intentando conectarse a qpid con el mecanismo SASL %s"
 
 #: acemaven/lib/python3.9/site-packages/kombu/transport/qpid.py:1306
+#: venv/lib/python3.9/site-packages/kombu/transport/qpid.py:1306
 #, python-format
 msgid "Connected to qpid with SASL mechanism %s"
 msgstr "Conectado a qpid con mecanismo SASL %s"
 
 #: acemaven/lib/python3.9/site-packages/kombu/transport/qpid.py:1324
+#: venv/lib/python3.9/site-packages/kombu/transport/qpid.py:1324
 #, python-format
 msgid "Unable to connect to qpid with SASL mechanism %s"
 msgstr "No se puede conectar a qpid con el mecanismo SASL %s"
 
 #: acemaven/lib/python3.9/site-packages/tabbed_admin/admin.py:85
+#: venv/lib/python3.9/site-packages/tabbed_admin/admin.py:85
 msgid "Each tab entry must be either a list or a tuple"
 msgstr "Cada entrada de pestaña debe ser una lista o una tupla"
 
 #: acemaven/lib/python3.9/site-packages/tabbed_admin/admin.py:87
+#: venv/lib/python3.9/site-packages/tabbed_admin/admin.py:87
 msgid ""
 "Each tabs entry must contain 2 arguments: a verbose name and the tab setup."
 msgstr ""
@@ -1239,16 +1508,19 @@ msgstr ""
 "la configuración de la pestaña."
 
 #: acemaven/lib/python3.9/site-packages/tabbed_admin/admin.py:89
+#: venv/lib/python3.9/site-packages/tabbed_admin/admin.py:89
 msgid "A tab definition must be either a list or a tuple"
 msgstr "Una definición de pestaña debe ser una lista o una tupla"
 
 #: acemaven/lib/python3.9/site-packages/tabbed_admin/templates/tabbed_admin/change_form.html:15
 #: app/handling/templates/handling/global_fee_change_list.html:54
+#: venv/lib/python3.9/site-packages/tabbed_admin/templates/tabbed_admin/change_form.html:15
 msgid "Please correct the error below."
 msgstr "Corrija el error a continuación."
 
 #: acemaven/lib/python3.9/site-packages/tabbed_admin/templates/tabbed_admin/change_form.html:15
 #: app/handling/templates/handling/global_fee_change_list.html:54
+#: venv/lib/python3.9/site-packages/tabbed_admin/templates/tabbed_admin/change_form.html:15
 msgid "Please correct the errors below."
 msgstr "Por favor corrija los siguientes errores."
 
@@ -1438,8 +1710,8 @@ msgid "Freight rate is active or paused"
 msgstr "La tarifa de flete está activa o en pausa"
 
 #: app/booking/models.py:270
-msgid "Temporary freight rate or not"
-msgstr "Tarifa de flete temporal o no"
+msgid "Paid Booking"
+msgstr "Reserva pagada"
 
 #: app/booking/models.py:274
 msgid "Freight rate is archived"
@@ -1845,12 +2117,12 @@ msgid "Add the status after changing shipment details"
 msgstr "Agregue el estado después de cambiar los detalles del envío"
 
 #: app/booking/models.py:1047
-msgid "Track status"
-msgstr "Estado de seguimiento"
+msgid "Tracking milestone"
+msgstr "Etapa de seguimiento"
 
 #: app/booking/models.py:1048
-msgid "Track statuses"
-msgstr "Seguimiento de estados"
+msgid "Tracking milestones"
+msgstr "Etapas de seguimiento"
 
 #: app/booking/models.py:1057
 msgid "Direction title"
@@ -1860,41 +2132,42 @@ msgstr "Título de la dirección"
 msgid "Directions"
 msgstr "Direcciones"
 
-#: app/booking/serializers.py:686
+#: app/booking/serializers.py:685
 #, python-brace-format
 msgid "A new booking request on number {aceid} has been received."
 msgstr "Una nueva solicitud de reserva fue recibida ID {aceid}"
 
-#: app/booking/serializers.py:704
+#: app/booking/serializers.py:706
 #, python-brace-format
 msgid "The booking request on number {aceid} has been sent to \"{name}\"."
 msgstr ""
 "La solicitud de reserva {aceid} ha sido procesada e enviada para \"{name}\"."
 
-#: app/booking/serializers.py:735
+#: app/booking/serializers.py:738
+#, python-brace-format
 msgid ""
 "A new Booking Request on number {aceid} is pending of Booking Fee payment to "
 "be sent."
 msgstr "Una nueva solicitud de reserva fue recibida ID {aceid}"
 
-#: app/booking/serializers.py:882 app/booking/serializers.py:1006
-#: app/booking/tasks.py:331 app/booking/views.py:1001
+#: app/booking/serializers.py:886 app/booking/serializers.py:1013
+#: app/booking/tasks.py:340 app/booking/views.py:1022
 #, python-brace-format
 msgid "The shipment {aceid} has departed from {origin}."
 msgstr "El embarque {aceid} salió del local de origen {origin}."
 
-#: app/booking/serializers.py:906 app/booking/serializers.py:1023
-#: app/booking/tasks.py:358 app/booking/views.py:1019
+#: app/booking/serializers.py:911 app/booking/serializers.py:1031
+#: app/booking/tasks.py:368 app/booking/views.py:1041
 #, python-brace-format
 msgid "The shipment {aceid} has arrived at {destination}."
 msgstr "El embarque {aceid} arribó a su destino {destination}."
 
-#: app/booking/serializers.py:949
+#: app/booking/serializers.py:955
 #, python-brace-format
 msgid "Shipment details in {aceid} have changed. {track_message}"
 msgstr "Hubieron cambios en los detalles del embarque {aceid}. {track_message}"
 
-#: app/booking/serializers.py:1156
+#: app/booking/serializers.py:1166
 #, python-brace-format
 msgid ""
 "The Client has requested a change in the shipment {aceid}, from {origin} to "
@@ -1903,7 +2176,7 @@ msgstr ""
 "El cliente solicitó una alteración en la reserva {aceid} de {origin} para "
 "{destination}"
 
-#: app/booking/serializers.py:1174
+#: app/booking/serializers.py:1186
 #, python-brace-format
 msgid ""
 "Payment due date for the operation {aceid} has been updated to {datetime}."
@@ -1916,17 +2189,17 @@ msgstr ""
 msgid "Payment on booking number {aceid} is success"
 msgstr "El pago de la reserva con el número {aceid} se realizó correctamente"
 
-#: app/booking/tasks.py:66
+#: app/booking/tasks.py:67
 #, python-brace-format
 msgid "A new booking request {aceid} has been received."
 msgstr "Una nueva solicitud de reserva ID {aceid} fue recibida."
 
-#: app/booking/tasks.py:85
+#: app/booking/tasks.py:87
 #, python-brace-format
 msgid "The booking request {aceid} has been sent to \"{name}\"."
 msgstr "La solicitud de reserva {aceid} se ha enviado a \"{name}\"."
 
-#: app/booking/tasks.py:115
+#: app/booking/tasks.py:118
 #, python-brace-format
 msgid ""
 "Have some problems with payment on booking number {aceid}, please, contact "
@@ -1935,12 +2208,12 @@ msgstr ""
 "Hubieron algunos problemas con el pago de la reserva número {aceid}, "
 "comuníquese con el equipo de soporte."
 
-#: app/booking/tasks.py:147
+#: app/booking/tasks.py:151
 #, python-brace-format
 msgid "Update charge on booking number {aceid} is success"
 msgstr "La actualización del encargo en la reserva número {aceid} fue un éxito"
 
-#: app/booking/tasks.py:159
+#: app/booking/tasks.py:164
 #, python-brace-format
 msgid ""
 "Have some problems with updating charge on booking number {aceid}, please, "
@@ -1949,7 +2222,7 @@ msgstr ""
 "Hubieron algunos problemas con el pago de la reserva número {aceid}, "
 "comuníquese con el equipo de soporte."
 
-#: app/booking/tasks.py:223
+#: app/booking/tasks.py:230
 msgid ""
 "Operation cancelled according to expired time for confirming booking by an "
 "agent"
@@ -1957,12 +2230,12 @@ msgstr ""
 "Operación cancelada según el plazo de vencimiento para confirmar la reserva "
 "por parte de un agente"
 
-#: app/booking/tasks.py:230
+#: app/booking/tasks.py:237
 #, python-brace-format
 msgid "Sending new airway bill number to track [{booking_number}]"
 msgstr "Envío de un nuevo número de AWB aérea para rastrear {booking_number}"
 
-#: app/booking/tasks.py:247
+#: app/booking/tasks.py:254
 #, python-brace-format
 msgid ""
 "The shipment {booking_number} cannot be tracked because of wrong booking "
@@ -1971,7 +2244,7 @@ msgstr ""
 "El embarque {booking_number} ser rastreado debido a un número de reserva "
 "incorrecto."
 
-#: app/booking/tasks.py:264
+#: app/booking/tasks.py:272
 #, python-brace-format
 msgid ""
 "Response text for airway bill number [{booking_number}] - {response.text}"
@@ -1979,18 +2252,18 @@ msgstr ""
 "Texto de respuesta para el número de factura de la vía aérea "
 "{booking_number} - {response.text}"
 
-#: app/booking/tasks.py:269
+#: app/booking/tasks.py:277
 msgid "Starting to get track statuses for confirmed operations"
 msgstr ""
 "Comenzando a obtener estados de seguimiento para operaciones confirmadas"
 
-#: app/booking/tasks.py:297
+#: app/booking/tasks.py:305
 #, python-brace-format
 msgid "The shipment {aceid} cannot be tracked because of wrong booking number."
 msgstr ""
 "El embarque {aceid} ser rastreado debido a un número de reserva incorrecto."
 
-#: app/booking/tasks.py:401 app/booking/tasks.py:426
+#: app/booking/tasks.py:412 app/booking/tasks.py:438
 msgid ""
 "Surcharges are about to expire. Please, extend its expiration rate or create "
 "a new one with the updated costs."
@@ -1998,7 +2271,7 @@ msgstr ""
 "Algunas tasas irán a vencer pronto. Por favor, extienda su plazo de validad "
 "o cree un nuevo registro con valores actualizados."
 
-#: app/booking/tasks.py:448 app/booking/tasks.py:473
+#: app/booking/tasks.py:460 app/booking/tasks.py:486
 msgid ""
 "Rates are about to expire.Please, extend its expiration rate or create a new "
 "one with the updated costs."
@@ -2006,12 +2279,14 @@ msgstr ""
 "Algunas tarifas irán a vencer pronto. Por favor, extienda su plazo de "
 "validad o cree un nuevo registro con valores actualizados."
 
-#: app/booking/tasks.py:498
+#: app/booking/tasks.py:511
+#, python-brace-format
 msgid "The shipment {aceid} is set to arrive in 3 days at {destination}."
 msgstr ""
-"El embarque {aceid} está programado para arribar a su destino {destination} en 3 dias"
+"El embarque {aceid} está programado para arribar a su destino {destination} "
+"en 3 dias"
 
-#: app/booking/tasks.py:524
+#: app/booking/tasks.py:538
 #, python-brace-format
 msgid ""
 "The shipment {booking.aceid} is set to arrive in 3 days at {booking."
@@ -2049,85 +2324,85 @@ msgstr "Conversación abierta"
 msgid "Message..."
 msgstr "Mensaje..."
 
-#: app/booking/utils.py:557
+#: app/booking/utils.py:575
 msgid "Land Transshipment"
 msgstr "Transbordo terrestre"
 
-#: app/booking/utils.py:558
+#: app/booking/utils.py:576
 msgid "Barge Transshipment"
 msgstr "Transbordo de barcazas"
 
-#: app/booking/utils.py:559
+#: app/booking/utils.py:577
 msgid "Container empty to shipper"
 msgstr "Contenedor vacío para expedidor"
 
-#: app/booking/utils.py:560
+#: app/booking/utils.py:578
 msgid "Container pickup at shipper"
 msgstr "Recogida de contenedores en el expedidor"
 
-#: app/booking/utils.py:561
+#: app/booking/utils.py:579
 msgid "Container arrival at first POL (Gate in)"
 msgstr "Llegada del contenedor al primer POL (puerta de entrada)"
 
-#: app/booking/utils.py:562
+#: app/booking/utils.py:580
 msgid "Container loaded at first POL"
 msgstr "Contenedor cargado en el primer POL"
 
-#: app/booking/utils.py:563
+#: app/booking/utils.py:581
 msgid "Vessel departure from first POL"
 msgstr "Salida del buque desde el primer POL"
 
-#: app/booking/utils.py:564
+#: app/booking/utils.py:582
 msgid "Vessel arrival at T/S port"
 msgstr "Llegada del buque al puerto T/S"
 
-#: app/booking/utils.py:565
+#: app/booking/utils.py:583
 msgid "Container discharge at T/S port"
 msgstr "Descarga de contenedores en el puerto T/S"
 
-#: app/booking/utils.py:566
+#: app/booking/utils.py:584
 msgid "Transshipment delay"
 msgstr "Retraso de transbordo"
 
-#: app/booking/utils.py:567
+#: app/booking/utils.py:585
 msgid "Container loaded at T/S port"
 msgstr "Contenedor cargado en puerto T/S"
 
-#: app/booking/utils.py:568
+#: app/booking/utils.py:586
 msgid "Vessel departure from T/S"
 msgstr "Salida del barco desde T/S"
 
-#: app/booking/utils.py:569
+#: app/booking/utils.py:587
 msgid "Vessel arrival at final POD"
 msgstr "Llegada del barco al POD final"
 
-#: app/booking/utils.py:570
+#: app/booking/utils.py:588
 msgid "Container discharge at final POD"
 msgstr "Descarga del contenedor en el POD final"
 
-#: app/booking/utils.py:571
+#: app/booking/utils.py:589
 msgid "Container departure from final POD (Gate out)"
 msgstr "Salida del contenedor desde el POD final (puerta de salida)"
 
-#: app/booking/utils.py:572
+#: app/booking/utils.py:590
 msgid "Container delivery to consignee"
 msgstr "Entrega de contenedores al destinatario"
 
-#: app/booking/utils.py:573
+#: app/booking/utils.py:591
 msgid "Container empty return to depot"
 msgstr "Contenedor vacío retorno a depósito"
 
-#: app/booking/views.py:715
+#: app/booking/views.py:727
 msgid "date_from or date_to mismatch with surcharges or freight rate dates."
 msgstr ""
 "date_from o date_to desajuste con recargos o fechas de tarifas de flete."
 
-#: app/booking/views.py:752
+#: app/booking/views.py:764
 #, python-brace-format
 msgid "{user} has assigned an operation to you. Operation [{aceid}]."
 msgstr "{user} te ha asignado una operación. Operación [{aceid}]."
 
-#: app/booking/views.py:853
+#: app/booking/views.py:868
 #, python-brace-format
 msgid ""
 "The Agent has confirmed your changes in the shipment {aceid} from {origin} "
@@ -2136,11 +2411,11 @@ msgstr ""
 "El agente confirmo sus alteraciones para el embarque {aceid} de {origin} "
 "para {destination}."
 
-#: app/core/admin.py:161
+#: app/core/admin.py:160
 msgid "User info"
 msgstr "Información de usuario"
 
-#: app/core/admin.py:238 app/core/admin.py:332 app/core/models.py:167
+#: app/core/admin.py:238 app/core/admin.py:333 app/core/models.py:167
 #: app/core/models.py:299
 msgid "Company Type"
 msgstr "Tipo de compañía"
@@ -2157,20 +2432,20 @@ msgstr "Información de la compañía"
 msgid "Contact person info"
 msgstr "Información de la persona de contacto"
 
-#: app/core/admin.py:293
+#: app/core/admin.py:294
 msgid "Sign up request was already approved."
 msgstr "La solicitud de registro ya fue aprobada."
 
-#: app/core/admin.py:306
+#: app/core/admin.py:307
 msgid "Company saved. Link to register master account was sent."
 msgstr "Empresa aprobada. Se envió el enlace para registrar la cuenta maestra."
 
-#: app/core/admin.py:307
+#: app/core/admin.py:308
 #, python-brace-format
 msgid "Registration link - 192.168.1.33:8000/create-account?token={token}"
 msgstr "Enlace de registro - 192.168.1.33:8000/create-account?token={token}"
 
-#: app/core/admin.py:311
+#: app/core/admin.py:312
 #, python-brace-format
 msgid ""
 "Company with provided phone number or tax id already exists. Additional info "
@@ -2179,19 +2454,19 @@ msgstr ""
 "La empresa con el número de teléfono o el número de identificación fiscal "
 "proporcionados ya existe. información adicional {error}"
 
-#: app/core/admin.py:355
+#: app/core/admin.py:356
 msgid "Review info"
 msgstr "Revisar información"
 
-#: app/core/admin.py:363 app/core/models.py:352
+#: app/core/admin.py:364 app/core/models.py:352
 msgid "Approved"
 msgstr "Aprobado"
 
-#: app/core/admin.py:373
+#: app/core/admin.py:374
 msgid "Review was already approved."
 msgstr "La revisión ya fue aprobada."
 
-#: app/core/admin.py:377
+#: app/core/admin.py:378
 msgid "Review successfully approved."
 msgstr "Revisión aprobada con éxito."
 
@@ -2465,16 +2740,11 @@ msgstr "Revisar"
 msgid "Reviews"
 msgstr "Reseñas"
 
-#: app/core/tasks.py:17
+#: app/core/tasks.py:18
 msgid "Acemaven. Registration process."
 msgstr "Acemaven. Proceso de registro."
 
-#: app/core/tasks.py:19
-#, python-brace-format
-msgid "{settings.DOMAIN_ADDRESS}signup?token={token}"
-msgstr "{settings.DOMAIN_ADDRESS}signup?token={token}"
-
-#: app/core/tasks.py:21
+#: app/core/tasks.py:22
 msgid "To complete your sign-up, please press the button:"
 msgstr "Presione el botón para completar su registro:"
 
@@ -2543,12 +2813,12 @@ msgid "Is need volume"
 msgstr "Es volumen de necesidad"
 
 #: app/handling/models.py:78
-msgid "Has container types in freight rate"
-msgstr "Tiene tipos de contenedores en la tarifa de flete"
+msgid "Requires containers for rate registration"
+msgstr ""
 
 #: app/handling/models.py:82
-msgid "Has container types in surcharge"
-msgstr "Tiene tipos de contenedores en recargo"
+msgid "Requires container for surcharges"
+msgstr "Requiere de contenedores para registrar recargos"
 
 #: app/handling/models.py:97 app/handling/models.py:151
 msgid "Shipping modes"
@@ -2664,8 +2934,8 @@ msgid "Release types"
 msgstr "Tipos de lanzamiento"
 
 #: app/handling/models.py:320
-msgid "Carrier title"
-msgstr "Título del transportista"
+msgid "Carrier name"
+msgstr "Nombre del Transportador"
 
 #: app/handling/models.py:324
 msgid "SCAC code"
@@ -2764,12 +3034,12 @@ msgid "Global fees"
 msgstr "Tarifas globales"
 
 #: app/handling/models.py:509
-msgid "Local fee"
-msgstr "Tarifa local"
+msgid "Company Specific Fee"
+msgstr "Tasa específica de la empresa"
 
 #: app/handling/models.py:510
-msgid "Local fees"
-msgstr "Tarifas locales"
+msgid "Company Specific Fees"
+msgstr "Tasas específicas de las empresas"
 
 #: app/handling/models.py:519
 msgid "Currency three char code"
@@ -3193,37 +3463,41 @@ msgstr "llamados"
 msgid "Join the chat"
 msgstr "Únete al chat"
 
-#: config/settings/common.py:182
+#: config/settings/common.py:184
 msgid "English"
 msgstr "Ingles"
 
-#: config/settings/common.py:183
+#: config/settings/common.py:185
 msgid "Spanish"
 msgstr "Español"
 
-#: config/settings/common.py:184
+#: config/settings/common.py:186
 msgid "Portuguese"
 msgstr "Portugues"
 
-#: config/settings/common.py:274
+#: config/settings/common.py:276
 msgid "AceMaven Service Revenue Settings"
 msgstr "Configuración de cobros por servicios AceMaven"
 
-#: config/settings/common.py:279
+#: config/settings/common.py:281
 msgid "Accounts and Billing"
 msgstr "Cuentas y facturación"
 
-#: config/settings/common.py:284
+#: config/settings/common.py:286
 msgid "Sections"
 msgstr "Secciones"
 
-#: config/settings/common.py:289
+#: config/settings/common.py:291
 msgid "Platform setting"
 msgstr "Configuración de la plataforma"
 
-#: config/settings/common.py:295
+#: config/settings/common.py:297
 msgid "Ticket section"
 msgstr "Sección de llamados"
+
+#: config/settings/common.py:302
+msgid "Special settings on platform (for superuser)"
+msgstr ""
 
 #: config/urls.py:32
 msgid "Acemaven admin"
@@ -3236,6 +3510,28 @@ msgstr "Gestión del sistema"
 #: config/urls.py:34
 msgid "Acemaven system management"
 msgstr "Gestión del sistema Acemaven"
+
+msgid "Temporary freight rate or not"
+msgstr "Tarifa de flete temporal o no"
+
+msgid "Track status"
+msgstr "Estado de seguimiento"
+
+#, python-brace-format
+msgid "{settings.DOMAIN_ADDRESS}signup?token={token}"
+msgstr "{settings.DOMAIN_ADDRESS}signup?token={token}"
+
+msgid "Has container types in freight rate"
+msgstr "Tiene tipos de contenedores en la tarifa de flete"
+
+msgid "Carrier title"
+msgstr "Título del transportista"
+
+msgid "Local fee"
+msgstr "Tarifa local"
+
+msgid "Local fees"
+msgstr "Tarifas locales"
 
 msgid "Fixed value"
 msgstr "Valor fijo"

@@ -43,8 +43,7 @@ class TicketChatAdmin(admin.ModelAdmin):
             user = request.user
             chat.users.add(user)
             url = reverse_lazy("websockets:support_chat", kwargs=dict(chat_id=obj.chat_id))
-            webbrowser.open_new(f"{DOMAIN_ADDRESS_CHAT}{url}")
-            return redirect(request.path)
+            return redirect(url)
         return super().response_change(request, obj)
 
     def unread_messages(self, obj):

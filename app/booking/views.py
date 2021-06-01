@@ -1039,7 +1039,7 @@ class TrackView(views.APIView):
 
                 if direction == 'export':
                     text_body ='The shipment {aceid} has arrived at {destination}.'
-                    text_params = {'aceid':booking.aceid, 'destination':booking.freight_rate.destination}
+                    text_params = {'aceid':booking.aceid, 'destination':booking.freight_rate.destination.code}
 
                     create_and_assign_notification.delay(
                         Notification.OPERATIONS_EXPORT,

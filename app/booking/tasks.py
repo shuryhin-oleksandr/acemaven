@@ -365,7 +365,7 @@ def track_confirmed_sea_operations():
                 shipment_details.save()
                 if direction == 'export':
                     text_body = 'The shipment {aceid} has arrived at {destination}.'
-                    text_params = {'aceid':operation.aceid, 'destination':operation.freight_rate.destination}
+                    text_params = {'aceid':operation.aceid, 'destination':operation.freight_rate.destination.code}
 
                     create_and_assign_notification.delay(
                         Notification.OPERATIONS_EXPORT,
@@ -504,11 +504,11 @@ def daily_notify_users_of_import_sea_shipment_arrival():
         booking = shipment_detail.booking
         message_body = _(
             'The shipment {aceid} is set to arrive in 3 days at {destination}.')\
-            .format(aceid=booking.aceid, destination=booking.freight_rate.destination)
+            .format(aceid=booking.aceid, destination=booking.freight_rate.destination.code)
         create_and_assign_notification.delay(
             Notification.OPERATIONS_IMPORT,
             'The shipment {aceid} is set to arrive in 3 days at {destination}.',
-            {'aceid':booking.aceid, 'destination':booking.freight_rate.destination},
+            {'aceid':booking.aceid, 'destination':booking.freight_rate.destination.code},
             [booking.agent_contact_person_id, booking.client_contact_person_id, ],
             Notification.OPERATION,
             object_id=booking.id,

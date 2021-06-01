@@ -337,7 +337,7 @@ def track_confirmed_sea_operations():
                         shipment_details.save()
                         if direction == 'import':
                             text_body = 'The shipment {aceid} has departed from {origin}.'
-                            text_params = {'aceid':operation.aceid, 'origin':operation.freight_rate.origin}
+                            text_params = {'aceid':operation.aceid, 'origin':operation.freight_rate.origin.code}
 
                             create_and_assign_notification.delay(
                                 Notification.OPERATIONS_IMPORT,

@@ -866,11 +866,11 @@ class OperationViewSet(PermissionClassByActionMixin,
         change_request.save()
 
         message_body = _('The Agent has confirmed your changes in the shipment {aceid} from {origin} to {destination}.') \
-            .format(aceid=change_request.aceid, origin=change_request.freight_rate.origin,
+            .format(aceid=change_request.aceid, origin=change_request.freight_rate.origin.code,
                     destination=change_request.freight_rate.destination)
         text_body = 'The Agent has confirmed your changes in the shipment {aceid} from {origin} to {destination}.'
-        text_params = {'aceid':change_request.aceid, 'origin':change_request.freight_rate.origin,
-                    'destination':change_request.freight_rate.destination}
+        text_params = {'aceid':change_request.aceid, 'origin':change_request.freight_rate.origin.code,
+                    'destination':change_request.freight_rate.destination.code}
         create_and_assign_notification.delay(
             Notification.OPERATIONS,
             text_body,
@@ -1021,7 +1021,7 @@ class TrackView(views.APIView):
 
                 if direction == 'import':
                     text_body = 'The shipment {aceid} has departed from {origin}.'
-                    text_params = {'aceid':booking.aceid, 'origin':booking.freight_rate.origin}
+                    text_params = {'aceid':booking.aceid, 'origin':booking.freight_rate.origin.code}
                     create_and_assign_notification.delay(
                         Notification.OPERATIONS_IMPORT,
                         text_body,

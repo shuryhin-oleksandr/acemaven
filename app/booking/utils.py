@@ -136,7 +136,15 @@ def calculate_additional_surcharges(totals,
                 data['currency'] = code
                 data['cost'] = cost_per_pack
                 data['subtotal'] = subtotal
-                new_cargo_group[charge.additional_surcharge.title.split()[0].lower()] = data
+
+                title = charge.additional_surcharge.title.split()[0].lower()
+                if title == 'OTHER SURCHARGES (PER CONTAINER)':
+                    if shipping_mode.get('title') == 'FCL':
+                        title = 'OTHER SURCHARGES (PER CONTAINER)'
+                    else:
+                        title = 'OTHER SURCHARGES'
+
+                new_cargo_group[title] = data
                 add_currency_value(totals, code, subtotal)
                 add_currency_value(totals['total_surcharge'], code, subtotal)
 

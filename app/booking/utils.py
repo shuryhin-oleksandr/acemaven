@@ -12,7 +12,6 @@ from app.location.models import Country
 
 from django.utils.translation import ugettext as _
 
-
 try:
     MAIN_COUNTRY_CODE = Country.objects.filter(is_main=True).first().code
 except (ProgrammingError, AttributeError):
@@ -129,13 +128,15 @@ def calculate_additional_surcharges(totals,
                         cost_per_pack = Decimal(cargo_group.get('weight')) * charge.charge
                     elif condition == Charge.FIXED:
                         fixed_cost = True
-                subtotal = cost_per_pack * Decimal(cargo_group.get('volume')) if not fixed_cost else cost_per_pack * Decimal(cargo_group.get('volume'))
+                subtotal = cost_per_pack * Decimal(
+                    cargo_group.get('volume')) if not fixed_cost else cost_per_pack * Decimal(cargo_group.get('volume'))
                 subtotal = float(subtotal)
                 cost_per_pack = float(cost_per_pack)
                 code = charge.currency.code
                 data['currency'] = code
                 data['cost'] = cost_per_pack
                 data['subtotal'] = subtotal
+
                 new_cargo_group[charge.additional_surcharge.title.split()[0].lower()] = data
                 add_currency_value(totals, code, subtotal)
                 add_currency_value(totals['total_surcharge'], code, subtotal)
@@ -465,7 +466,7 @@ def freight_rate_search(data, company=None):
     data['rates__surcharges__start_date__lte'] = date_from
     data['rates__surcharges__expiration_date__gte'] = date_to
 
-    freight_rates = FreightRate.objects\
+    freight_rates = FreightRate.objects \
         .filter(**data,
                 is_active=True,
                 temporary=False,
@@ -494,7 +495,7 @@ def freight_rate_search(data, company=None):
                                              rates__surcharges__charges__charge__isnull=False))
 
     if company:
-        queryset.append(freight_rates.filter(company=company,))
+        queryset.append(freight_rates.filter(company=company, ))
 
     freight_rates = freight_rates.intersection(*queryset)
     return freight_rates, shipping_mode

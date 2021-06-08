@@ -880,7 +880,7 @@ class ShipmentDetailsBaseSerializer(serializers.ModelSerializer):
 
             if direction == 'import':
                 text_body = 'The shipment {aceid} has departed from {origin}.'
-                text_params = {'aceid':booking.aceid, 'origin':booking.freight_rate.origin}
+                text_params = {'aceid':booking.aceid, 'origin':booking.freight_rate.origin.code}
 
                 create_and_assign_notification.delay(
                     Notification.OPERATIONS_IMPORT,
@@ -905,7 +905,7 @@ class ShipmentDetailsBaseSerializer(serializers.ModelSerializer):
 
             if direction == 'export':
                 text_body = 'The shipment {aceid} has arrived at {destination}.'
-                text_params = {'aceid':booking.aceid, 'destination':booking.freight_rate.destination}
+                text_params = {'aceid':booking.aceid, 'destination':booking.freight_rate.destination.code}
 
                 create_and_assign_notification.delay(
                     Notification.OPERATIONS_EXPORT,
@@ -1002,7 +1002,7 @@ class TrackSerializer(serializers.ModelSerializer):
 
             if direction == 'import':
                 text_body = 'The shipment {aceid} has departed from {origin}.'
-                text_params = {'aceid':booking.aceid, 'origin':booking.freight_rate.origin}
+                text_params = {'aceid':booking.aceid, 'origin':booking.freight_rate.origin.code}
 
                 create_and_assign_notification.delay(
                     Notification.OPERATIONS_IMPORT,
@@ -1021,7 +1021,7 @@ class TrackSerializer(serializers.ModelSerializer):
 
             if direction == 'export':
                 text_body = 'The shipment {aceid} has arrived at {destination}.'
-                text_params = {'aceid':booking.aceid, 'destination':booking.freight_rate.destination}
+                text_params = {'aceid':booking.aceid, 'destination':booking.freight_rate.destination.code}
 
                 create_and_assign_notification.delay(
                     Notification.OPERATIONS_EXPORT,
@@ -1156,8 +1156,8 @@ class OperationSerializer(serializers.ModelSerializer):
         original_booking.save()
 
         text_body = 'The Client has requested a change in the shipment {aceid}, from {origin} to {destination}'
-        text_params = {'aceid':original_booking.aceid, 'origin':original_booking.freight_rate.origin,
-                    'destination':original_booking.freight_rate.destination}
+        text_params = {'aceid':original_booking.aceid, 'origin':original_booking.freight_rate.origin.code,
+                    'destination':original_booking.freight_rate.destination.code}
 
         create_and_assign_notification.delay(
             Notification.OPERATIONS,
@@ -1235,7 +1235,7 @@ class OperationListBaseSerializer(GetTrackingInitialMixin, OperationSerializer):
             return 'Awaiting Payment'
         elif (shipment_details := obj.shipment_details.first()) and shipment_details.actual_date_of_departure:
             return 'Shipment in progress'
-        elif (change_request_status := obj.change_request_status) and change_request_status != Booking.CHANGE_CONFIRMED:
+        elif (change_request_status := obj.change_request_status) and change_request_status != Booking.CHANGE_CONFIRMED and obj.status != Booking.CANCELED_BY_AGENT:
             return next(filter(lambda x: x[0] == change_request_status, Booking.CHANGE_REQUESTED_CHOICES),
                         Booking.CHANGE_REQUESTED_CHOICES[0])[1]
         return next(filter(lambda x: x[0] == obj.status, Booking.STATUS_CHOICES), Booking.STATUS_CHOICES[0])[1]

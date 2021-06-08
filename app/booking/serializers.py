@@ -1235,7 +1235,7 @@ class OperationListBaseSerializer(GetTrackingInitialMixin, OperationSerializer):
             return 'Awaiting Payment'
         elif (shipment_details := obj.shipment_details.first()) and shipment_details.actual_date_of_departure:
             return 'Shipment in progress'
-        elif (change_request_status := obj.change_request_status) and change_request_status != Booking.CHANGE_CONFIRMED:
+        elif (change_request_status := obj.change_request_status) and change_request_status != Booking.CHANGE_CONFIRMED and obj.status != Booking.CANCELED_BY_AGENT:
             return next(filter(lambda x: x[0] == change_request_status, Booking.CHANGE_REQUESTED_CHOICES),
                         Booking.CHANGE_REQUESTED_CHOICES[0])[1]
         return next(filter(lambda x: x[0] == obj.status, Booking.STATUS_CHOICES), Booking.STATUS_CHOICES[0])[1]

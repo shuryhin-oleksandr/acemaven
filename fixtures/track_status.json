@@ -1,1 +1,275 @@
-[{"model": "booking.trackstatus", "pk": 1, "fields": {"title": "Shipment Details have changed", "must_update_actual_date_of_departure": false, "show_after_departure": true, "auto_add_on_actual_date_of_departure": false, "auto_add_on_actual_date_of_arrival": false, "auto_add_on_shipment_details_change": true, "shipping_mode": [1, 2, 3, 4, 5], "direction": [1, 2]}}, {"model": "booking.trackstatus", "pk": 2, "fields": {"title": "Documents Received", "must_update_actual_date_of_departure": false, "show_after_departure": false, "auto_add_on_actual_date_of_departure": false, "auto_add_on_actual_date_of_arrival": false, "auto_add_on_shipment_details_change": false, "shipping_mode": [1, 2, 3, 4, 5], "direction": [1, 2]}}, {"model": "booking.trackstatus", "pk": 3, "fields": {"title": "Cargo Delivered at Departure Terminal", "must_update_actual_date_of_departure": false, "show_after_departure": false, "auto_add_on_actual_date_of_departure": false, "auto_add_on_actual_date_of_arrival": false, "auto_add_on_shipment_details_change": false, "shipping_mode": [3, 4, 5], "direction": [1]}}, {"model": "booking.trackstatus", "pk": 4, "fields": {"title": "Cargo Delivered at Departure Location", "must_update_actual_date_of_departure": false, "show_after_departure": false, "auto_add_on_actual_date_of_departure": false, "auto_add_on_actual_date_of_arrival": false, "auto_add_on_shipment_details_change": false, "shipping_mode": [1, 2], "direction": [1, 2]}}, {"model": "booking.trackstatus", "pk": 5, "fields": {"title": "Vessel Departed", "must_update_actual_date_of_departure": false, "show_after_departure": false, "auto_add_on_actual_date_of_departure": true, "auto_add_on_actual_date_of_arrival": false, "auto_add_on_shipment_details_change": false, "shipping_mode": [3, 4, 5], "direction": [1, 2]}}, {"model": "booking.trackstatus", "pk": 6, "fields": {"title": "Aircraft Departed", "must_update_actual_date_of_departure": false, "show_after_departure": false, "auto_add_on_actual_date_of_departure": true, "auto_add_on_actual_date_of_arrival": false, "auto_add_on_shipment_details_change": false, "shipping_mode": [1, 2], "direction": [1, 2]}}, {"model": "booking.trackstatus", "pk": 7, "fields": {"title": "Cargo Shipped on Board", "must_update_actual_date_of_departure": false, "show_after_departure": false, "auto_add_on_actual_date_of_departure": false, "auto_add_on_actual_date_of_arrival": false, "auto_add_on_shipment_details_change": false, "shipping_mode": [3, 4, 5], "direction": [1, 2]}}, {"model": "booking.trackstatus", "pk": 8, "fields": {"title": "Cargo Shipped on Aircraft", "must_update_actual_date_of_departure": true, "show_after_departure": false, "auto_add_on_actual_date_of_departure": false, "auto_add_on_actual_date_of_arrival": false, "auto_add_on_shipment_details_change": false, "shipping_mode": [1, 2], "direction": [1, 2]}}, {"model": "booking.trackstatus", "pk": 9, "fields": {"title": "Vessel Arrived in Transshipment Port", "must_update_actual_date_of_departure": false, "show_after_departure": true, "auto_add_on_actual_date_of_departure": false, "auto_add_on_actual_date_of_arrival": false, "auto_add_on_shipment_details_change": false, "shipping_mode": [3, 4, 5], "direction": [1, 2]}}, {"model": "booking.trackstatus", "pk": 10, "fields": {"title": "Vessel Departed from Transshipment Port", "must_update_actual_date_of_departure": false, "show_after_departure": true, "auto_add_on_actual_date_of_departure": false, "auto_add_on_actual_date_of_arrival": false, "auto_add_on_shipment_details_change": false, "shipping_mode": [3, 4, 5], "direction": [1, 2]}}, {"model": "booking.trackstatus", "pk": 11, "fields": {"title": "Vessel Arrived at Destination", "must_update_actual_date_of_departure": false, "show_after_departure": true, "auto_add_on_actual_date_of_departure": false, "auto_add_on_actual_date_of_arrival": true, "auto_add_on_shipment_details_change": false, "shipping_mode": [3, 4, 5], "direction": [1, 2]}}, {"model": "booking.trackstatus", "pk": 12, "fields": {"title": "Cargo Arrived at Destination", "must_update_actual_date_of_departure": false, "show_after_departure": true, "auto_add_on_actual_date_of_departure": false, "auto_add_on_actual_date_of_arrival": true, "auto_add_on_shipment_details_change": false, "shipping_mode": [1, 2], "direction": [1, 2]}}, {"model": "booking.trackstatus", "pk": 13, "fields": {"title": "Cargo ready for pick up", "must_update_actual_date_of_departure": false, "show_after_departure": true, "auto_add_on_actual_date_of_departure": false, "auto_add_on_actual_date_of_arrival": false, "auto_add_on_shipment_details_change": false, "shipping_mode": [1, 2, 3, 4, 5], "direction": [2]}}]
+[
+  {
+    "model": "booking.trackstatus",
+    "pk": 1,
+    "fields": {
+      "title": "Shipment Details have changed",
+      "must_update_actual_date_of_departure": false,
+      "show_after_departure": true,
+      "auto_add_on_actual_date_of_departure": false,
+      "auto_add_on_actual_date_of_arrival": false,
+      "auto_add_on_shipment_details_change": true,
+      "shipping_mode": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "direction": [
+        1,
+        2
+      ]
+    }
+  },
+  {
+    "model": "booking.trackstatus",
+    "pk": 2,
+    "fields": {
+      "title": "Documents Received",
+      "must_update_actual_date_of_departure": false,
+      "show_after_departure": false,
+      "auto_add_on_actual_date_of_departure": false,
+      "auto_add_on_actual_date_of_arrival": false,
+      "auto_add_on_shipment_details_change": false,
+      "shipping_mode": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "direction": [
+        1,
+        2
+      ]
+    }
+  },
+  {
+    "model": "booking.trackstatus",
+    "pk": 3,
+    "fields": {
+      "title": "Cargo Delivered at Departure Terminal",
+      "must_update_actual_date_of_departure": false,
+      "show_after_departure": false,
+      "auto_add_on_actual_date_of_departure": false,
+      "auto_add_on_actual_date_of_arrival": false,
+      "auto_add_on_shipment_details_change": false,
+      "shipping_mode": [
+        3,
+        4,
+        5
+      ],
+      "direction": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "booking.trackstatus",
+    "pk": 4,
+    "fields": {
+      "title": "Cargo Delivered at Departure Location",
+      "must_update_actual_date_of_departure": false,
+      "show_after_departure": false,
+      "auto_add_on_actual_date_of_departure": false,
+      "auto_add_on_actual_date_of_arrival": false,
+      "auto_add_on_shipment_details_change": false,
+      "shipping_mode": [
+        1,
+        2
+      ],
+      "direction": [
+        1,
+        2
+      ]
+    }
+  },
+  {
+    "model": "booking.trackstatus",
+    "pk": 7,
+    "fields": {
+      "title": "Vessel Departed",
+      "must_update_actual_date_of_departure": false,
+      "show_after_departure": false,
+      "auto_add_on_actual_date_of_departure": true,
+      "auto_add_on_actual_date_of_arrival": false,
+      "auto_add_on_shipment_details_change": false,
+      "shipping_mode": [
+        3,
+        4,
+        5
+      ],
+      "direction": [
+        1,
+        2
+      ]
+    }
+  },
+  {
+    "model": "booking.trackstatus",
+    "pk": 6,
+    "fields": {
+      "title": "Aircraft Departed",
+      "must_update_actual_date_of_departure": false,
+      "show_after_departure": false,
+      "auto_add_on_actual_date_of_departure": true,
+      "auto_add_on_actual_date_of_arrival": false,
+      "auto_add_on_shipment_details_change": false,
+      "shipping_mode": [
+        1,
+        2
+      ],
+      "direction": [
+        1,
+        2
+      ]
+    }
+  },
+  {
+    "model": "booking.trackstatus",
+    "pk": 5,
+    "fields": {
+      "title": "Cargo Shipped on Board",
+      "must_update_actual_date_of_departure": false,
+      "show_after_departure": false,
+      "auto_add_on_actual_date_of_departure": false,
+      "auto_add_on_actual_date_of_arrival": false,
+      "auto_add_on_shipment_details_change": false,
+      "shipping_mode": [
+        3,
+        4,
+        5
+      ],
+      "direction": [
+        1,
+        2
+      ]
+    }
+  },
+  {
+    "model": "booking.trackstatus",
+    "pk": 8,
+    "fields": {
+      "title": "Cargo Shipped on Aircraft",
+      "must_update_actual_date_of_departure": true,
+      "show_after_departure": false,
+      "auto_add_on_actual_date_of_departure": false,
+      "auto_add_on_actual_date_of_arrival": false,
+      "auto_add_on_shipment_details_change": false,
+      "shipping_mode": [
+        1,
+        2
+      ],
+      "direction": [
+        1,
+        2
+      ]
+    }
+  },
+  {
+    "model": "booking.trackstatus",
+    "pk": 9,
+    "fields": {
+      "title": "Vessel Arrived in Transshipment Port",
+      "must_update_actual_date_of_departure": false,
+      "show_after_departure": true,
+      "auto_add_on_actual_date_of_departure": false,
+      "auto_add_on_actual_date_of_arrival": false,
+      "auto_add_on_shipment_details_change": false,
+      "shipping_mode": [
+        3,
+        4,
+        5
+      ],
+      "direction": [
+        1,
+        2
+      ]
+    }
+  },
+  {
+    "model": "booking.trackstatus",
+    "pk": 10,
+    "fields": {
+      "title": "Vessel Departed from Transshipment Port",
+      "must_update_actual_date_of_departure": false,
+      "show_after_departure": true,
+      "auto_add_on_actual_date_of_departure": false,
+      "auto_add_on_actual_date_of_arrival": false,
+      "auto_add_on_shipment_details_change": false,
+      "shipping_mode": [
+        3,
+        4,
+        5
+      ],
+      "direction": [
+        1,
+        2
+      ]
+    }
+  },
+  {
+    "model": "booking.trackstatus",
+    "pk": 11,
+    "fields": {
+      "title": "Vessel Arrived at Destination",
+      "must_update_actual_date_of_departure": false,
+      "show_after_departure": true,
+      "auto_add_on_actual_date_of_departure": false,
+      "auto_add_on_actual_date_of_arrival": true,
+      "auto_add_on_shipment_details_change": false,
+      "shipping_mode": [
+        3,
+        4,
+        5
+      ],
+      "direction": [
+        1,
+        2
+      ]
+    }
+  },
+  {
+    "model": "booking.trackstatus",
+    "pk": 12,
+    "fields": {
+      "title": "Cargo Arrived at Destination",
+      "must_update_actual_date_of_departure": false,
+      "show_after_departure": true,
+      "auto_add_on_actual_date_of_departure": false,
+      "auto_add_on_actual_date_of_arrival": true,
+      "auto_add_on_shipment_details_change": false,
+      "shipping_mode": [
+        1,
+        2
+      ],
+      "direction": [
+        1,
+        2
+      ]
+    }
+  },
+  {
+    "model": "booking.trackstatus",
+    "pk": 13,
+    "fields": {
+      "title": "Cargo ready for pick up",
+      "must_update_actual_date_of_departure": false,
+      "show_after_departure": true,
+      "auto_add_on_actual_date_of_departure": false,
+      "auto_add_on_actual_date_of_arrival": false,
+      "auto_add_on_shipment_details_change": false,
+      "shipping_mode": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "direction": [
+        2
+      ]
+    }
+  }
+]

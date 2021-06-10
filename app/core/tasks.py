@@ -10,6 +10,8 @@ from config.settings.local import DOMAIN_ADDRESS
 
 from django.utils.translation import ugettext as _
 
+from core.models import CustomUser
+
 logger = logging.getLogger("acemaven.task.logging")
 
 
@@ -17,7 +19,12 @@ logger = logging.getLogger("acemaven.task.logging")
 def send_registration_email(token, recipient_email):
     subject = _('Acemaven. Registration process.')
     logger.info(f'New registration email is going to be send to {recipient_email}')
-    message_body = f'{DOMAIN_ADDRESS}create-account?token={token}'
+
+    role = CustomUser.objects.filter(email=recipient_email).first().roles[0]
+    if role == 'master':
+        message_body = f'{DOMAIN_ADDRESS}create-account?token={token}'
+    else:
+        message_body = f'{DOMAIN_ADDRESS}additional/user?token={token}'
     template_html = get_template(f"core/emails_templates/index.html")
     text = _("To complete your sign-up, please press the button:")
     context = {

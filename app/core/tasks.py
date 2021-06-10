@@ -10,7 +10,7 @@ from config.settings.local import DOMAIN_ADDRESS
 
 from django.utils.translation import ugettext as _
 
-from core.models import CustomUser
+from app.core.models import CustomUser
 
 logger = logging.getLogger("acemaven.task.logging")
 

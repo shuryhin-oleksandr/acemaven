@@ -1199,6 +1199,7 @@ class OperationListBaseSerializer(GetTrackingInitialMixin, OperationSerializer):
     shipping_type = serializers.CharField(source='freight_rate.shipping_mode.shipping_type.title')
     status = serializers.SerializerMethodField()
     agent_contact_person = serializers.CharField(source='agent_contact_person.get_full_name', default=None)
+    client_contact_person = serializers.CharField(source='client_contact_person.get_full_name', default=None)
     agent = serializers.SerializerMethodField()
     cargo_groups = CargoGroupRetrieveSerializer(many=True)
     shipment_details = ShipmentDetailsBaseSerializer(many=True)
@@ -1220,6 +1221,7 @@ class OperationListBaseSerializer(GetTrackingInitialMixin, OperationSerializer):
             'tracking_initial',
             'tracking',
             'automatic_tracking',
+            'client_contact_person',
         )
 
     def get_agent(self, obj):

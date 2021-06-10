@@ -1316,7 +1316,7 @@ class OperationRetrieveSerializer(OperationListBaseSerializer):
                         result['today_exchange_rate'].update(today_exchange_rate)
                     total_today += value * rate_today
 
-                result['total_today'] = total_today
+                result['total_today'] = round(total_today, 2)
         return result
 
     def get_chat(self, obj):

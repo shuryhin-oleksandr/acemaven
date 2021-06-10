@@ -1109,6 +1109,7 @@ class OperationSerializer(serializers.ModelSerializer):
             'freight_rate',
             'shipper',
             'original_booking',
+            'shipment_details',
         )
 
     def create(self, validated_data):

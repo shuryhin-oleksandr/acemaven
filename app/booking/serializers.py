@@ -12,7 +12,7 @@ from app.booking.models import Surcharge, UsageFee, Charge, AdditionalSurcharge,
     Booking, Status, ShipmentDetails, CancellationReason, Track, TrackStatus, Transaction
 from app.booking.tasks import send_awb_number_to_air_tracking_api, check_payment
 from app.booking.utils import rate_surcharges_filter, calculate_freight_rate_charges, get_fees, generate_aceid, \
-    create_message_for_track, get_shipping_type_titles
+    create_message_for_track, get_shipping_type_titles, str_from_datetime
 from app.core.models import Shipper, BankAccount
 from app.core.serializers import ShipperSerializer, BankAccountBaseSerializer
 from app.core.utils import get_average_company_rating, get_random_string
@@ -871,12 +871,26 @@ class ShipmentDetailsBaseSerializer(serializers.ModelSerializer):
             ).first(),
         ).exists()
         create_track = False
-        if validated_data.get('actual_date_of_departure') and not departure_track_exists:
+        if validated_data.get('actual_date_of_departure'):
             track_status = TrackStatus.objects.filter(
                 shipping_mode=booking.freight_rate.shipping_mode,
                 auto_add_on_actual_date_of_departure=True,
             ).first()
-            create_track = True
+
+            qs = Track.objects.filter(manual=True, booking=booking, status=track_status)
+            if qs:
+                Track.objects.filter(
+                    manual=True,
+                    booking=booking,
+                    status=track_status).update(
+                    comment=f'At {datetime.datetime.strftime(validated_data.get("actual_date_of_departure"), "%d/%m/%Y %H:%M")}',
+                    date_created=f'{str(datetime.datetime.now())}')
+            else:
+                Track.objects.create(manual=True, booking=booking,
+                                     status=track_status,
+                                     comment=f'At {datetime.datetime.strftime(validated_data.get("actual_date_of_departure"), "%d/%m/%Y %H:%M")}')
+            create_track = False
+
 
             if direction == 'import':
                 text_body = 'The shipment {aceid} has departed from {origin}.'
@@ -896,12 +910,29 @@ class ShipmentDetailsBaseSerializer(serializers.ModelSerializer):
                                                           booking.client_contact_person_id, ],
                                  object_id=f'{settings.DOMAIN_ADDRESS}operations/{booking.id}')
 
-        elif validated_data.get('actual_date_of_arrival') and not arrival_track_exists:
+        elif validated_data.get('actual_date_of_arrival'):
             track_status = TrackStatus.objects.filter(
                 shipping_mode=booking.freight_rate.shipping_mode,
                 auto_add_on_actual_date_of_arrival=True,
             ).first()
-            create_track = True
+
+            qs = Track.objects.filter(manual=True, booking=booking, status=track_status)
+
+            if qs:
+                Track.objects.filter(
+                    manual=True,
+                    booking=booking,
+                    status=track_status).update(
+                    comment=f'At {datetime.datetime.strftime(validated_data.get("actual_date_of_arrival"), "%d/%m/%Y %H:%M")}',
+                    date_created=f'{str(datetime.datetime.now())}')
+            else:
+                Track.objects.create(manual=True, booking=booking,
+                                     status=track_status,
+                                     comment=f'At {datetime.datetime.strftime(validated_data.get("actual_date_of_arrival"), "%d/%m/%Y %H:%M")}')
+
+            create_track = False
+
+
 
             if direction == 'export':
                 text_body = 'The shipment {aceid} has arrived at {destination}.'

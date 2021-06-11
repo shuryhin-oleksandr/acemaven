@@ -14,7 +14,7 @@ def get_random_string(length):
 
 def process_sign_up_token(user):
     sign_up_token = SignUpToken.objects.create(token=get_random_string(30), user=user)
-    send_registration_email.delay(sign_up_token.token, user.email)
+    send_registration_email.delay(sign_up_token.token, user.email, user.roles[0])
 
 
 def master_account_processing(company, master_account_info):

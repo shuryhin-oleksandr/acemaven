@@ -10,17 +10,14 @@ from config.settings.local import DOMAIN_ADDRESS
 
 from django.utils.translation import ugettext as _
 
-from app.core.models import CustomUser
-
 logger = logging.getLogger("acemaven.task.logging")
 
 
 @celery_app.task
-def send_registration_email(token, recipient_email):
+def send_registration_email(token, recipient_email, role):
     subject = _('Acemaven. Registration process.')
     logger.info(f'New registration email is going to be send to {recipient_email}')
 
-    role = CustomUser.objects.filter(email=recipient_email).first().roles[0]
     if role == 'master':
         message_body = f'{DOMAIN_ADDRESS}create-account?token={token}'
     else:

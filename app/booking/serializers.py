@@ -886,12 +886,12 @@ class ShipmentDetailsBaseSerializer(serializers.ModelSerializer):
                     .update(
                     comment=f'At {datetime.datetime.strftime(validated_data.get("actual_date_of_departure"), "%d/%m/%Y %H:%M")}',
                     date_created=f'{str(datetime.datetime.now())}',
-                    created_by=user.get_full_name(),)
+                    created_by=user,)
             else:
                 Track.objects.create(manual=True, booking=booking,
                                      status=track_status,
                                      comment=f'At {datetime.datetime.strftime(validated_data.get("actual_date_of_departure"), "%d/%m/%Y %H:%M")}',
-                                     created_by=user.get_full_name(),)
+                                     created_by=user,)
             create_track = False
 
 
@@ -928,12 +928,12 @@ class ShipmentDetailsBaseSerializer(serializers.ModelSerializer):
                     status=track_status).update(
                     comment=f'At {datetime.datetime.strftime(validated_data.get("actual_date_of_arrival"), "%d/%m/%Y %H:%M")}',
                     date_created=f'{str(datetime.datetime.now())}',
-                    created_by=user.get_full_name(),)
+                    created_by=user,)
             else:
                 Track.objects.create(manual=True, booking=booking,
                                      status=track_status,
                                      comment=f'At {datetime.datetime.strftime(validated_data.get("actual_date_of_arrival"), "%d/%m/%Y %H:%M")}',
-                                     created_by=user.get_full_name(),)
+                                     created_by=user,)
 
             create_track = False
 

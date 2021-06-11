@@ -882,13 +882,16 @@ class ShipmentDetailsBaseSerializer(serializers.ModelSerializer):
                 Track.objects.filter(
                     manual=True,
                     booking=booking,
-                    status=track_status).update(
+                    status=track_status)\
+                    .update(
                     comment=f'At {datetime.datetime.strftime(validated_data.get("actual_date_of_departure"), "%d/%m/%Y %H:%M")}',
-                    date_created=f'{str(datetime.datetime.now())}')
+                    date_created=f'{str(datetime.datetime.now())}',
+                    created_by=user.get_full_name(),)
             else:
                 Track.objects.create(manual=True, booking=booking,
                                      status=track_status,
-                                     comment=f'At {datetime.datetime.strftime(validated_data.get("actual_date_of_departure"), "%d/%m/%Y %H:%M")}')
+                                     comment=f'At {datetime.datetime.strftime(validated_data.get("actual_date_of_departure"), "%d/%m/%Y %H:%M")}',
+                                     created_by=user.get_full_name(),)
             create_track = False
 
 
@@ -924,11 +927,13 @@ class ShipmentDetailsBaseSerializer(serializers.ModelSerializer):
                     booking=booking,
                     status=track_status).update(
                     comment=f'At {datetime.datetime.strftime(validated_data.get("actual_date_of_arrival"), "%d/%m/%Y %H:%M")}',
-                    date_created=f'{str(datetime.datetime.now())}')
+                    date_created=f'{str(datetime.datetime.now())}',
+                    created_by=user.get_full_name(),)
             else:
                 Track.objects.create(manual=True, booking=booking,
                                      status=track_status,
-                                     comment=f'At {datetime.datetime.strftime(validated_data.get("actual_date_of_arrival"), "%d/%m/%Y %H:%M")}')
+                                     comment=f'At {datetime.datetime.strftime(validated_data.get("actual_date_of_arrival"), "%d/%m/%Y %H:%M")}',
+                                     created_by=user.get_full_name(),)
 
             create_track = False
 

@@ -1,5 +1,6 @@
 import datetime
 import logging
+import smtplib
 
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
@@ -18,6 +19,9 @@ from app.booking.models import Booking
 from app.websockets.models import Chat, Notification
 
 from django.utils.translation import ugettext_lazy as _
+
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 logger = logging.getLogger("acemaven.task.logging")
 User = get_user_model()
@@ -133,23 +137,48 @@ def delete_accepted_booking_notifications(booking_id):
 
 @celery_app.task(name='send_emails')
 def send_email(text_body, text_params, users_ids, object_id=None):
+
     users = User.objects.filter(id__in=users_ids)
 
     for user in users:
+        msg = MIMEMultipart('alternative')
+
+        msg['From'] = settings.EMAIL_HOST_USER
+        msg['To'] = user.email
         code = user.language
         translation.activate(code)
         text = _(text_body)
         if text_params:
             text = text.format(**text_params)
 
+        body_text = text
+
         context = {
             "person": f'{user.first_name} {user.last_name}',
             "text": text,
             "link": object_id,
         }
+
         template_html = get_template(f"core/emails_templates/index.html")
         message_html = template_html.render(context)
+
+        part1 = MIMEText(body_text, 'plain')
+        part2 = MIMEText(message_html, 'html')
+
+        msg.attach(part1)
+        msg.attach(part2)
+
+        mail = smtplib.SMTP("smtp.outlook.office365.com", 587, timeout=20)
+        mail.starttls()
+        recepient = [user.email,]
+
+        mail.login(settings.EMAIL_HOST_USER, settings.EMAIL_HOST_PASSWORD)
+
         logger.debug(f"sending email to {user.email}")
-        send_mail(text, text, settings.EMAIL_HOST_USER, [user.email, ], html_message=message_html)
+        mail.sendmail((settings.EMAIL_HOST_USER, recepient, msg.as_string()))
+
+        logger.debug(f"sending email to {user.email}")
+        # send_mail(text, text, settings.EMAIL_HOST_USER, [user.email, ], html_message=message_html)
         logger.info(f"email has been sent to {user.email}")
+        mail.quit()
         translation.deactivate()

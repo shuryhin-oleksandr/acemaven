@@ -175,7 +175,7 @@ def send_email(text_body, text_params, users_ids, object_id=None):
         mail.login(settings.EMAIL_HOST_USER, settings.EMAIL_HOST_PASSWORD)
 
         logger.debug(f"sending email to {user.email}")
-        mail.sendmail((settings.EMAIL_HOST_USER, recepient, msg.as_string()))
+        mail.sendmail(settings.EMAIL_HOST_USER, recepient, msg.as_string())
 
         logger.debug(f"sending email to {user.email}")
         # send_mail(text, text, settings.EMAIL_HOST_USER, [user.email, ], html_message=message_html)

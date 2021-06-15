@@ -54,7 +54,7 @@ def send_registration_email(token, recipient_email, role):
     mail.login(settings.EMAIL_HOST_USER, settings.EMAIL_HOST_PASSWORD)
 
     logger.debug(f"sending invitation email to {recipient_email}")
-    mail.sendmail((settings.EMAIL_HOST_USER, recepient, msg.as_string()))
+    mail.sendmail(settings.EMAIL_HOST_USER, recepient, msg.as_string())
     # send_mail(subject, message_body, settings.EMAIL_HOST_USER, [recipient_email], html_message=message_html)
     logger.info(f"invitation has been sent to {recipient_email} from {settings.EMAIL_HOST_USER}")
     mail.quit()

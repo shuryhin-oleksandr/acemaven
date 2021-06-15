@@ -25,6 +25,7 @@ def send_registration_email(token, recipient_email, role):
     msg['To'] = recipient_email
 
     subject = _('Acemaven. Registration process.')
+    msg['Subject'] = subject
     logger.info(f'New registration email is going to be send to {recipient_email}')
 
     if role == 'master':

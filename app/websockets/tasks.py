@@ -143,6 +143,7 @@ def send_email(text_body, text_params, users_ids, object_id=None):
     for user in users:
         msg = MIMEMultipart('alternative')
 
+        msg['Subject'] = 'Acemaven'
         msg['From'] = settings.EMAIL_HOST_USER
         msg['To'] = user.email
         code = user.language

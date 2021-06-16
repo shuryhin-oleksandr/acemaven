@@ -33,7 +33,7 @@ def send_registration_email(token, recipient_email, role):
     else:
         message_body = f'{DOMAIN_ADDRESS}additional/user?token={token}'
     template_html = get_template(f"core/emails_templates/index.html")
-    text = _("To complete your sign-up, <br> please press \n the button:")
+    text = _("To complete your sign-up, \n please press \n the button:")
     body_text = text
     context = {
         "email": recipient_email,

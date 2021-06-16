@@ -156,7 +156,7 @@ def send_email(text_body, text_params, users_ids, object_id=None):
 
         context = {
             "person": f'{user.first_name} {user.last_name}',
-            "text": text,
+            "text": MIMEText(text, 'html'),
             "link": object_id,
         }
 

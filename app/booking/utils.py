@@ -161,7 +161,7 @@ def calculate_fee(booking_fee, rate, main_currency_code, exchange_rate, subtotal
         booking_fee_value_in_foreign_curr = booking_fee.value
         booking_fee_value_in_local_curr = booking_fee.value
     else:
-        booking_fee_value_in_foreign_curr = subtotal * booking_fee.value / 100
+        booking_fee_value_in_foreign_curr = float(subtotal) * float(booking_fee.value) / 100
         if rate.currency.code != main_currency_code:
             booking_fee_value_in_local_curr = booking_fee_value_in_foreign_curr * (
                     exchange_rate.rate * (1 + exchange_rate.spread / 100))

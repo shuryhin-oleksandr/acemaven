@@ -136,7 +136,7 @@ def delete_accepted_booking_notifications(booking_id):
 
 
 @celery_app.task(name='send_emails')
-def send_email(text_body, text_params, users_ids, object_id=None):
+def send_email(text_body, text_params, users_ids, object_id=None, data=None):
 
     users = User.objects.filter(id__in=users_ids)
 
@@ -157,6 +157,7 @@ def send_email(text_body, text_params, users_ids, object_id=None):
         context = {
             "person": f'{user.first_name} {user.last_name}',
             "text": text,
+            "data": data,
             "link": object_id,
         }
 

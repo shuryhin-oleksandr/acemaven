@@ -39,7 +39,7 @@ class SeaTrackingSettingAdmin(admin.ModelAdmin):
 
 @admin.register(Port)
 class PortAdmin(admin.ModelAdmin):
-    pass
+    search_fields = ('code',)
 
 
 @admin.register(Currency)

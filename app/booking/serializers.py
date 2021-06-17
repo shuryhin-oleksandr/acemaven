@@ -907,11 +907,33 @@ class ShipmentDetailsBaseSerializer(serializers.ModelSerializer):
                     Notification.OPERATION,
                     object_id=booking.id,
                 )
-
-
-                send_email.delay(text_body, text_params, [booking.agent_contact_person_id,
-                                                          booking.client_contact_person_id, ],
+                send_email.delay(text_body, text_params, [booking.client_contact_person_id, ],
                                  object_id=f'{settings.DOMAIN_ADDRESS}operations/{booking.id}')
+                try:
+                    text_client = 'Your shipment has departed from {origin}. Please, verify the payment ' \
+                                  'deadlines with the agent to avoid delays or fines.'
+                    text_agent = 'This shipment has departed from {origin}. Please, keep the client informed about ' \
+                                 'the payment deadlines to avoid delays or fines.'
+                    text_client_agent_params = {'origin': booking.freight_rate.origin.code}
+                    data_for_email = {
+                        "ACEID": booking.aceid,
+                        "SHIPPING MODE": f"{booking.freight_rate.shipping_mode.title} [{booking.freight_rate.shipping_mode.shipping_type.title}]",
+                        "SHIPPER": booking.shipper.company.name,
+                        "CARRIER": booking.freight_rate.carrier.title,
+                        "ROUTE": f"{booking.freight_rate.origin.code} - {booking.freight_rate.destination.code}",
+                        "VESSEL": self.instance.vessel,
+                        "ACTUAL TIME OF DEPARTURE": datetime.datetime.strftime(self.instance.actual_date_of_departure,
+                                                                               '%H:%M %d %B %Y'),
+                        "ESTIMATED TIME OF ARRIVAL": datetime.datetime.strftime(self.instance.date_of_arrival,
+                                                                                '%H:%M %d %B %Y'),
+                    }
+                    send_email.delay(text_client, text_client_agent_params, [booking.client_contact_person_id,],
+                                     object_id=f'{settings.DOMAIN_ADDRESS}operations/{booking.id}', data=data_for_email)
+                    send_email.delay(text_agent, text_client_agent_params, [booking.agent_contact_person_id, ],
+                                     object_id=f'{settings.DOMAIN_ADDRESS}operations/{booking.id}', data=data_for_email)
+
+                except Exception:
+                    pass
 
         elif validated_data.get('actual_date_of_arrival'):
             track_status = TrackStatus.objects.filter(
@@ -941,7 +963,7 @@ class ShipmentDetailsBaseSerializer(serializers.ModelSerializer):
 
             if direction == 'export':
                 text_body = 'The shipment {aceid} has arrived at {destination}.'
-                text_params = {'aceid':booking.aceid, 'destination':booking.freight_rate.destination.code}
+                text_params = {'aceid':booking.aceid, 'destination': booking.freight_rate.destination.code}
 
                 create_and_assign_notification.delay(
                     Notification.OPERATIONS_EXPORT,
@@ -952,9 +974,30 @@ class ShipmentDetailsBaseSerializer(serializers.ModelSerializer):
                     object_id=booking.id,
                 )
 
-                send_email.delay(text_body, text_params, [booking.agent_contact_person_id,
-                                                          booking.client_contact_person_id, ],
-                                 object_id=f'{settings.DOMAIN_ADDRESS}operations/{booking.id}')
+                try:
+                    text_agent = 'The shipment {aceid} has arrived at {destination}. Please, keep the client ' \
+                                  'informed about the payment deadlines to avoid delays or fines.'
+                    text_client = 'Your shipment has arrived at its destination. Please, verify the payment' \
+                                  'deadlines with the agent to avoid delays or fines.'
+                    text_client_agent_params = {'aceid': booking.aceid, 'destination': booking.freight_rate.destination.code}
+                    data_for_email = {
+                        "ACEID": booking.aceid,
+                        "SHIPPING MODE": f"{booking.freight_rate.shipping_mode.title} [{booking.freight_rate.shipping_mode.shipping_type.title}]",
+                        "SHIPPER": booking.shipper.company.name,
+                        "CARRIER": booking.freight_rate.carrier.title,
+                        "ROUTE": f"{booking.freight_rate.origin.code} - {booking.freight_rate.destination.code}",
+                        "VESSEL": self.instance.vessel,
+                        "ACTUAL TIME OF DEPARTURE": datetime.datetime.strftime(self.instance.actual_date_of_departure, '%H:%M %d %B %Y'),
+                        "ACTUAL TIME OF ARRIVAL": datetime.datetime.strftime(self.instance.actual_date_of_arrival, '%H:%M %d %B %Y'),
+                    }
+
+                    send_email.delay(text_client, text_client_agent_params, [booking.client_contact_person_id, ],
+                                     object_id=f'{settings.DOMAIN_ADDRESS}operations/{booking.id}', data=data_for_email)
+                    send_email.delay(text_agent, text_client_agent_params, [booking.agent_contact_person_id, ],
+                                     object_id=f'{settings.DOMAIN_ADDRESS}operations/{booking.id}', data=data_for_email)
+
+                except Exception:
+                    pass
 
         if create_track:
             Track.objects.create(
@@ -1048,9 +1091,31 @@ class TrackSerializer(serializers.ModelSerializer):
                     Notification.OPERATION,
                     object_id=booking.id,
                 )
-                send_email.delay(text_body, text_params, [booking.agent_contact_person_id,
-                                                          booking.client_contact_person_id, ],
-                                 object_id=f'{settings.DOMAIN_ADDRESS}operations/{booking.id}')
+                try:
+                    text_client = 'Your shipment has departed from {origin}. Please, verify the payment ' \
+                                  'deadlines with the agent to avoid delays or fines.'
+                    text_agent = 'This shipment has departed from {origin}. Please, keep the client informed about ' \
+                                 'the payment deadlines to avoid delays or fines.'
+                    text_client_agent_params = {'origin': booking.freight_rate.origin.code}
+                    data_for_email = {
+                        "ACEID": booking.aceid,
+                        "SHIPPING MODE": f"{booking.freight_rate.shipping_mode.title} [{booking.freight_rate.shipping_mode.shipping_type.title}]",
+                        "SHIPPER": booking.shipper.company.name,
+                        "CARRIER": booking.freight_rate.carrier.title,
+                        "ROUTE": f"{booking.freight_rate.origin.code} - {booking.freight_rate.destination.code}",
+                        "VESSEL": self.instance.vessel,
+                        "ACTUAL TIME OF DEPARTURE": datetime.datetime.strftime(actual_date_of_departure,
+                                                                               '%H:%M %d %B %Y'),
+                        "ESTIMATED TIME OF ARRIVAL": datetime.datetime.strftime(self.validated_data['date_of_arrival'],
+                                                                                '%H:%M %d %B %Y'),
+                    }
+                    send_email.delay(text_client, text_client_agent_params, [booking.client_contact_person_id, ],
+                                     object_id=f'{settings.DOMAIN_ADDRESS}operations/{booking.id}', data=data_for_email)
+                    send_email.delay(text_agent, text_client_agent_params, [booking.agent_contact_person_id, ],
+                                     object_id=f'{settings.DOMAIN_ADDRESS}operations/{booking.id}', data=data_for_email)
+
+                except Exception:
+                    pass
 
         elif status.auto_add_on_actual_date_of_arrival and actual_date_of_arrival:
             shipment_details.actual_date_of_arrival = actual_date_of_arrival
@@ -1067,6 +1132,8 @@ class TrackSerializer(serializers.ModelSerializer):
                     Notification.OPERATION,
                     object_id=booking.id,
                 )
+
+
                 send_email.delay(text_body, text_params, [booking.agent_contact_person_id,
                                                           booking.client_contact_person_id, ],
                                  object_id=f'{settings.DOMAIN_ADDRESS}operations/{booking.id}')

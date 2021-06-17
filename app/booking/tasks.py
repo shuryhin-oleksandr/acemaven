@@ -375,7 +375,7 @@ def track_confirmed_sea_operations():
                         Notification.OPERATION,
                         object_id=operation.id,
                     )
-                    send_email.delay(text_body,text_params
+                    send_email.delay(text_body,text_params,
                                      [operation.agent_contact_person_id, operation.client_contact_person_id, ],
                                      object_id=f'{settings.DOMAIN_ADDRESS}operations/{operation.id}')
 

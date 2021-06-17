@@ -312,6 +312,17 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD
                                         {{ text }}
                                     </td>
                                 </tr>
+                                <tr>
+                                    <td class="text-descr-td" style="font-family: Arial, Helvetica, sans-serif, 'Roboto';">
+                                        {% if data %}
+                                        {% for key, value in data.items %}
+
+                                        {{ key }}: {{ value }} <br/>
+
+                                        {% endfor %}
+                                        {% endif %}
+                                    </td>
+                                </tr>
                             </table>
                         </td>
                     </tr>

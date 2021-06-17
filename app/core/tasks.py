@@ -4,7 +4,6 @@ import smtplib
 from django.template.loader import get_template
 
 from config.celery import celery_app
-from django.core.mail import send_mail
 from django.conf import settings
 
 from app.handling.models import LocalFee, ShippingMode

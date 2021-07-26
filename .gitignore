@@ -6,3 +6,4 @@ config/media
 config/settings/local.py
 config/staticfiles
 venv/
+local_alex.py

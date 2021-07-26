@@ -16,16 +16,16 @@ class Migration(migrations.Migration):
             name='company',
             options={'verbose_name_plural': 'Companies'},
         ),
-        migrations.AddField(
-            model_name='company',
-            name='disabled',
-            field=models.BooleanField(default=False, verbose_name='Disable functionality'),
-        ),
-        migrations.AddField(
-            model_name='customuser',
-            name='username',
-            field=models.TextField(blank=True, null=True),
-        ),
+        # migrations.AddField(
+        #     model_name='company',
+        #     name='disabled',
+        #     field=models.BooleanField(default=False, verbose_name='Disable functionality'),
+        # ),
+        # migrations.AddField(
+        #     model_name='customuser',
+        #     name='username',
+        #     field=models.TextField(blank=True, null=True),
+        # ),
         migrations.AlterField(
             model_name='review',
             name='operation',
